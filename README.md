@@ -14,4 +14,5 @@ TravelThemes is a photo-centric travel website where trips are displayed through
 ## TODO
 
 - [x] Iteration 1: Project setup, types, mock data, home page with trip cards
-- [ ] Iteration 2: ...
+- [x] Iteration 2: Storybook setup, Playwright setup, trip card variants
+- [ ] Iteration 3: ...
