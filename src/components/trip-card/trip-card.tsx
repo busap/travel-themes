@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Trip } from '@/types/trip';
 import { TripCardVariant } from '@/enums/trip-card-variant';
+import { getTripRoute } from '@/utils/route';
 
 interface TripCardProps {
   trip: Trip;
@@ -43,7 +44,7 @@ function PolaroidCard({
 
   return (
     <Link
-      href={`/trip/${trip.id}`}
+      href={getTripRoute(trip.id)}
       className="group relative block p-4 bg-white dark:bg-zinc-800 shadow-xl transition-all duration-500 hover:rotate-0 hover:scale-105 hover:shadow-2xl"
       style={{ transform: transformStyle }}
     >
@@ -78,7 +79,7 @@ function PolaroidCard({
 function ImmersiveCard({ trip, priority }: { trip: Trip; priority: boolean }) {
   return (
     <Link
-      href={`/trip/${trip.id}`}
+      href={getTripRoute(trip.id)}
       className="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 shadow-lg"
     >
       <Image
