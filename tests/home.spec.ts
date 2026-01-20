@@ -21,6 +21,6 @@ test.describe('Home Page', () => {
 
     await page.getByRole('link', { name: /Japan Adventures/i }).click();
 
-    await expect(page).toHaveURL('/trips/japan-2023');
+    await expect(page).toHaveURL('/trip/japan-2023');
   });
 });

@@ -43,7 +43,7 @@ function PolaroidCard({
 
   return (
     <Link
-      href={`/trips/${trip.id}`}
+      href={`/trip/${trip.id}`}
       className="group relative block p-4 bg-white dark:bg-zinc-800 shadow-xl transition-all duration-500 hover:rotate-0 hover:scale-105 hover:shadow-2xl"
       style={{ transform: transformStyle }}
     >
@@ -78,7 +78,7 @@ function PolaroidCard({
 function ImmersiveCard({ trip, priority }: { trip: Trip; priority: boolean }) {
   return (
     <Link
-      href={`/trips/${trip.id}`}
+      href={`/trip/${trip.id}`}
       className="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 shadow-lg"
     >
       <Image
