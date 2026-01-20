@@ -49,6 +49,7 @@ next-env.d.ts
 
 # agent rules
 AGENTS.md
+CLAUDE.md
 
 *storybook.log
 storybook-static
