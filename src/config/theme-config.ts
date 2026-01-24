@@ -48,8 +48,8 @@ export interface ThemeConfig {
 
 // Configuration map - initially empty/minimal
 const themeConfigs: Record<Theme, ThemeConfig> = {
-  [Theme.Minimal]: {
-    component: 'minimal-theme',
+  [Theme.Collage]: {
+    component: 'collage-theme',
     layout: {
       type: 'card-grid',
       scrollDirection: 'none',
@@ -68,38 +68,7 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
         bodyClasses: 'text-sm',
       },
     },
-  },
-  [Theme.Immersive]: {
-    component: 'immersive-theme',
-    layout: {
-      type: 'card-grid',
-      scrollDirection: 'none',
-      spacing: 'gap-12',
-    },
-    animation: {
-      enabled: false, // Will be implemented later
-    },
-    photos: {
-      arrangement: 'grid',
-      revealPattern: 'sequential',
-    },
-    styling: {},
-  },
-  [Theme.Editorial]: {
-    component: 'editorial-theme',
-    layout: {
-      type: 'card-grid',
-      scrollDirection: 'none',
-      spacing: 'gap-12',
-    },
-    animation: {
-      enabled: false, // Will be implemented later
-    },
-    photos: {
-      arrangement: 'grid',
-      revealPattern: 'sequential',
-    },
-    styling: {},
+    }
   },
 };
 

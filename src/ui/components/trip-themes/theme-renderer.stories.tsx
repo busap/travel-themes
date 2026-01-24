@@ -15,23 +15,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const MinimalTheme: Story = {
+export const CollageTheme: Story = {
   args: {
     trip: trips[0], // japan-2023
-    config: getThemeConfig(Theme.Minimal)
-  },
-};
-
-export const ImmersiveTheme: Story = {
-  args: {
-    trip: trips[1], // morocco-markets
-    config: getThemeConfig(Theme.Immersive)
-  },
-};
-
-export const EditorialTheme: Story = {
-  args: {
-    trip: trips[2], // nordic-winter
-    config: getThemeConfig(Theme.Editorial)
+    config: getThemeConfig(Theme.Collage)
   },
 };

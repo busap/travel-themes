@@ -4,14 +4,14 @@ import { Theme } from '@/enums/theme';
 export const tripThemes: TripTheme[] = [
   {
     tripId: 'japan-2023',
-    theme: Theme.Minimal,
+    theme: Theme.Collage,
   },
   {
     tripId: 'morocco-markets',
-    theme: Theme.Immersive,
+    theme: Theme.Collage,
   },
   {
     tripId: 'nordic-winter',
-    theme: Theme.Editorial,
+    theme: Theme.Collage,
   },
 ];

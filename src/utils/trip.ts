@@ -14,7 +14,7 @@ export function getAllTrips(): Trip[] {
 
 export function getThemeForTrip(tripId: string): Theme {
     const tripTheme = tripThemes.find((tt) => tt.tripId === tripId);
-    return tripTheme?.theme ?? Theme.Minimal;
+    return tripTheme?.theme ?? Theme.Collage;
 }
 
 export function getTripThemeConfig(tripId: string): ThemeConfig {
