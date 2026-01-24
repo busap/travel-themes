@@ -1,6 +1,6 @@
 import { getTripById, getAllTrips, getThemeForTrip } from '@/utils/trip';
 import { getThemeConfig } from '@/config/theme-config';
-import { TripDetail } from '@/pages/trip-detail/trip-detail';
+import { TripDetail } from '@/ui/pages/trip-detail/trip-detail';
 import { notFound } from 'next/navigation';
 
 export default async function TripPage({

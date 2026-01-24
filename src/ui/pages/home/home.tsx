@@ -1,4 +1,4 @@
-import { TripCard } from '@/components/trip-card/trip-card';
+import { TripCard } from '@/ui/components/trip-card/trip-card';
 import { TripCardVariant } from '@/enums/trip-card-variant';
 import { getAllTrips } from '@/utils/trip';
 import { getPolaroidRotation, getPolaroidScale, getPolaroidOffset } from '@/utils/polaroid-layout';

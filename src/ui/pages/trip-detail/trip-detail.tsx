@@ -1,6 +1,6 @@
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { ThemeRenderer } from '@/components/trip-themes/theme-renderer';
+import { ThemeRenderer } from '@/ui/components/trip-themes/theme-renderer';
 
 interface TripDetailProps {
   trip: Trip;
