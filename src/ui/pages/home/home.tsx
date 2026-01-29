@@ -1,7 +1,7 @@
 import { TripCard } from '@/ui/components/trip-card/trip-card';
 import { TripCardVariant } from '@/enums/trip-card-variant';
 import { getAllTrips } from '@/utils/trip';
-import { getPolaroidRotation, getPolaroidScale, getPolaroidOffset } from '@/utils/polaroid-layout';
+import { getPolaroidTransform } from '@/utils/polaroid-layout';
 
 export function Home() {
   const trips = getAllTrips();
@@ -19,17 +19,21 @@ export function Home() {
 
       <main className="px-6 pb-16 md:px-12 md:pb-24">
         <div className="grid gap-12 sm:gap-16 md:gap-20 sm:grid-cols-2 lg:grid-cols-3 auto-rows-auto">
-          {trips.map((trip, index) => (
-            <TripCard
-              key={trip.id}
-              trip={trip}
-              variant={TripCardVariant.Polaroid}
-              rotation={getPolaroidRotation(index)}
-              scale={getPolaroidScale(index)}
-              offset={getPolaroidOffset(index)}
-              priority={index < 3}
-            />
-          ))}
+          {trips.map((trip, index) => {
+            const { rotation, scale, offset } = getPolaroidTransform(index);
+
+            return (
+              <TripCard
+                key={trip.id}
+                trip={trip}
+                variant={TripCardVariant.Polaroid}
+                rotation={rotation}
+                scale={scale}
+                offset={offset}
+                priority={index < 3}
+              />
+            );
+          })}
         </div>
       </main>
     </div>
