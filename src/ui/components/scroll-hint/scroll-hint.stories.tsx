@@ -5,15 +5,16 @@ const meta = {
   title: 'Components/ScrollHint',
   component: ScrollHint,
   parameters: {
-    layout: 'fullscreen',
+    layout: 'centered',
   },
   tags: ['autodocs'],
   decorators: [
     (Story) => (
       <div style={{
         position: 'relative',
-        width: '100vw',
-        height: '100vh',
+        width: '500px',
+        height: '500px',
+        backgroundColor: "lightblue",
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
