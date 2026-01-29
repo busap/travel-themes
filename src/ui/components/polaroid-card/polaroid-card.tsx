@@ -103,7 +103,7 @@ export function PolaroidCard(props: PolaroidCardProps) {
     const photoProps = props as PhotoPolaroidCardProps;
     const aspectClass = photoProps.aspectRatio === 'square'
       ? 'aspect-square'
-      : 'w-48 h-60 sm:w-56 sm:h-72 md:w-64 md:h-80';
+      : 'w-60 h-[300px] sm:w-72 sm:h-[360px] md:w-80 md:h-[400px]';
 
     return (
       <>
