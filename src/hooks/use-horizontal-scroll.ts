@@ -1,7 +1,7 @@
 import { useEffect, RefObject } from 'react';
 
-export function useHorizontalScroll(
-  containerRef: RefObject<HTMLElement>,
+export function useHorizontalScroll<T extends HTMLElement>(
+  containerRef: RefObject<T | null>,
   enabled: boolean = true
 ) {
   useEffect(() => {
