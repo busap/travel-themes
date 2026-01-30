@@ -292,4 +292,219 @@ export const trips: Trip[] = [
       },
     ],
   },
+  {
+    id: 'italian-escape',
+    name: 'Italian Escape',
+    countries: ['Italy'],
+    year: 2023,
+    description: 'Renaissance art, rolling hills, and coastal beauty',
+    coverPhoto: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&q=80',
+        title: 'Venice Canals',
+        description: 'Gondolas on the Grand Canal',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80',
+        title: 'Roman Colosseum',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1200&q=80',
+        title: 'Tuscan Countryside',
+        description: 'Rolling hills and vineyards',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1534445538923-ab38438550d8?w=1200&q=80',
+        title: 'Florence Cathedral',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1529260830199-42c24126f198?w=1200&q=80',
+        title: 'Amalfi Coast',
+      },
+    ],
+  },
+  {
+    id: 'greek-islands',
+    name: 'Greek Islands',
+    countries: ['Greece'],
+    year: 2022,
+    description: 'White-washed villages, azure waters, and ancient history',
+    coverPhoto: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80',
+        title: 'Santorini Sunset',
+        description: 'Iconic blue domes of Oia',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80',
+        title: 'Mykonos Windmills',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1555993539-1732b0258235?w=1200&q=80',
+        title: 'Athens Acropolis',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1200&q=80',
+        title: 'Greek Coast',
+      },
+    ],
+  },
+  {
+    id: 'thailand-adventure',
+    name: 'Tropical Thailand',
+    countries: ['Thailand'],
+    year: 2024,
+    description: 'Golden temples, jungle adventures, and island paradise',
+    coverPhoto: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=1200&q=80',
+        title: 'Bangkok Temple',
+        description: 'Wat Arun at sunrise',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1537458224466-780fe92b8338?w=1200&q=80',
+        title: 'Phi Phi Islands',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80',
+        title: 'Phuket Beach',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&q=80',
+        title: 'Chiang Mai',
+        description: 'Mountain temples and night markets',
+      },
+    ],
+  },
+  {
+    id: 'paris-romance',
+    name: 'Parisian Dreams',
+    countries: ['France'],
+    year: 2023,
+    description: 'Art, architecture, and timeless elegance',
+    coverPhoto: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80',
+        title: 'Paris at Dusk',
+        description: 'The City of Lights awakens',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80',
+        title: 'Eiffel Tower',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=1200&q=80',
+        title: 'Louvre Museum',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=1200&q=80',
+        title: 'Montmartre',
+      },
+    ],
+  },
+  {
+    id: 'swiss-alps',
+    name: 'Alpine Adventure',
+    countries: ['Switzerland'],
+    year: 2024,
+    description: 'Majestic peaks, pristine lakes, and chocolate dreams',
+    coverPhoto: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80',
+        title: 'Matterhorn',
+        description: 'Iconic Alpine peak',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
+        title: 'Lake Lucerne',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+        title: 'Swiss Slopes',
+      },
+    ],
+  },
+  {
+    id: 'spain-fiesta',
+    name: 'Spanish Fiesta',
+    countries: ['Spain'],
+    year: 2022,
+    description: 'Flamenco rhythms, Gothic quarters, and Mediterranean sun',
+    coverPhoto: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=1200&q=80',
+        title: 'Barcelona',
+        description: 'Sagrada Familia at twilight',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80',
+        title: 'Seville',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80',
+        title: 'Costa del Sol',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1512187374372-3ecf4db53627?w=1200&q=80',
+        title: 'Madrid',
+      },
+    ],
+  },
+  {
+    id: 'australian-outback',
+    name: 'Australian Adventure',
+    countries: ['Australia'],
+    year: 2023,
+    description: 'Reef wonders, outback adventures, and coastal beauty',
+    coverPhoto: 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1200&q=80',
+        title: 'Sydney Opera House',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?w=1200&q=80',
+        title: 'Great Barrier Reef',
+        description: 'Underwater paradise',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&q=80',
+        title: 'Bondi Beach',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=1200&q=80',
+        title: 'Uluru',
+        description: 'Heart of the Outback',
+      },
+    ],
+  },
+  {
+    id: 'new-zealand',
+    name: 'New Zealand Quest',
+    countries: ['New Zealand'],
+    year: 2024,
+    description: 'Dramatic landscapes, Maori culture, and adventure sports',
+    coverPhoto: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
+    photos: [
+      {
+        src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80',
+        title: 'Milford Sound',
+        description: 'Fjordland National Park',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1200&q=80',
+        title: 'Queenstown',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1464690661257-1a4c590e5b6d?w=1200&q=80',
+        title: 'Mount Cook',
+      },
+    ],
+  },
 ];
