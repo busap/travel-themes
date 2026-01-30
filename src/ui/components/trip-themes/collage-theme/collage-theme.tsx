@@ -35,7 +35,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   });
 
   const renderHeader = () => (
-    <div className="absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 md:p-8 bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm">
+    <div className="absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 md:p-8 bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm pointer-events-none">
       <h1 className={`text-lg sm:text-xl ${config.styling?.typography?.titleClasses || 'md:text-2xl font-bold'}`}>
         {trip.name}
       </h1>

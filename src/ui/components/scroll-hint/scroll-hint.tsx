@@ -1,6 +1,6 @@
 export function ScrollHint() {
     return (
-        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 flex items-center gap-2 text-zinc-500 text-xs sm:text-sm">
+        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 flex items-center gap-2 text-zinc-500 text-xs sm:text-sm pointer-events-none">
             <span className="hidden sm:inline">Scroll to explore</span>
             <span className="sm:hidden">Scroll</span>
             <svg
