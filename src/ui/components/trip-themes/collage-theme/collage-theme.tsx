@@ -2,11 +2,13 @@
 
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { PolaroidCard } from '@/ui/components/polaroid-card/polaroid-card';
 import { PolaroidCardVariant } from '@/enums/polaroid-card-variant';
 import { ScrollHint } from '@/ui/components/scroll-hint/scroll-hint';
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
+import { useHorizontalScroll } from '@/hooks/use-horizontal-scroll';
+import { useScrollBasedReveal } from '@/hooks/use-scroll-based-reveal';
 
 interface CollageThemeProps {
   trip: Trip;
@@ -15,55 +17,66 @@ interface CollageThemeProps {
 
 export function CollageTheme({ trip, config }: CollageThemeProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isHorizontalScroll = config.layout.scrollDirection === 'horizontal';
+  const animationEnabled = config.animation.enabled;
+  const revealPattern = config.photos.revealPattern;
+  const isScrollBasedReveal = animationEnabled && revealPattern === 'scroll-based';
+  const photosToShow = config.photos?.count
+    ? trip.photos.slice(0, config.photos.count)
+    : trip.photos;
 
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.scrollLeft = 0;
+  useHorizontalScroll(scrollContainerRef, isHorizontalScroll);
 
-      const handleWheel = (e: WheelEvent) => {
-        if (e.deltaY !== 0) {
-          e.preventDefault();
-          container.scrollLeft += e.deltaY;
-        }
-      };
-
-      container.addEventListener('wheel', handleWheel, { passive: false });
-      return () => container.removeEventListener('wheel', handleWheel);
-    }
-  }, []);
+  const visiblePhotos = useScrollBasedReveal({
+    containerRef: scrollContainerRef,
+    enabled: isScrollBasedReveal ?? false,
+    totalItems: trip.photos.length,
+    itemCount: config.photos?.count,
+  });
 
   const renderHeader = () => (
     <div className="absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 md:p-8 bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm">
-      <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
+      <h1 className={`text-lg sm:text-xl ${config.styling?.typography?.titleClasses || 'md:text-2xl font-bold'}`}>
         {trip.name}
       </h1>
-      <p className="text-xs sm:text-sm text-zinc-600">
+      <p className={config.styling?.typography?.bodyClasses || 'text-xs sm:text-sm text-zinc-600'}>
         {trip.countries.join(', ')} {trip.year && `• ${trip.year}`}
       </p>
     </div>
   );
 
-  const renderPolaroidCards = () => (
-    <div className="h-full flex items-center px-4 sm:px-8 md:px-16 lg:px-32 gap-4 sm:gap-8 md:gap-12 lg:gap-16 min-w-max">
-      {trip.photos.map((photo, index) => {
-        const { rotation, offset } = getPolaroidTransform(index);
+  const renderPolaroidCards = () => {
+    return (
+      <div className={`h-full flex items-center px-4 sm:px-8 md:px-16 lg:px-32 ${config.layout.spacing} min-w-max`}>
+        {photosToShow.map((photo, index) => {
+          const { rotation, offset } = getPolaroidTransform(index);
+          const isVisible = visiblePhotos.has(index);
 
-        return (
-          <PolaroidCard
-            key={index}
-            variant={PolaroidCardVariant.Photo}
-            imageSrc={photo.src}
-            imageAlt={photo.title || `Photo ${index + 1}`}
-            caption={photo.title}
-            rotation={rotation}
-            verticalOffset={offset.y}
-            aspectRatio="portrait"
-          />
-        );
-      })}
-    </div>
-  );
+          const cardClasses = isScrollBasedReveal
+            ? `transition-all duration-700 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`
+            : '';
+
+          return (
+            <div
+              key={index}
+              data-photo-index={index}
+              className={cardClasses}
+            >
+              <PolaroidCard
+                variant={PolaroidCardVariant.Photo}
+                imageSrc={photo.src}
+                imageAlt={photo.title || `Photo ${index + 1}`}
+                caption={photo.title}
+                rotation={rotation}
+                verticalOffset={offset.y}
+                aspectRatio="portrait"
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const renderScrollContainer = () => (
     <div
