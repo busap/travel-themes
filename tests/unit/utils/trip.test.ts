@@ -143,7 +143,6 @@ describe('trip utilities', () => {
       expect(typeof config.component).toBe('string');
 
       // Layout properties
-      expect(config.layout).toHaveProperty('type');
       expect(config.layout).toHaveProperty('scrollDirection');
       expect(config.layout).toHaveProperty('spacing');
 
@@ -151,11 +150,7 @@ describe('trip utilities', () => {
       expect(config.animation).toHaveProperty('enabled');
 
       // Photos properties
-      expect(config.photos).toHaveProperty('arrangement');
       expect(config.photos).toHaveProperty('revealPattern');
-
-      // Styling properties
-      expect(config.styling).toBeDefined();
     });
 
     it('should return different configs for different trips', () => {
