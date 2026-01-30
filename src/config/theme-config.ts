@@ -6,7 +6,7 @@ export interface ThemeConfig {
 
   // Layout configuration
   layout: {
-    type: 'card-grid' | 'horizontal-scroll' | 'vertical-parallax' | 'photo-trail' | 'masonry';
+    type?: 'card-grid' | 'horizontal-scroll' | 'vertical-parallax' | 'photo-trail' | 'masonry';
     scrollDirection: 'vertical' | 'horizontal' | 'none';
     aspectRatio?: string;
     spacing: string;
@@ -31,13 +31,13 @@ export interface ThemeConfig {
 
   // Photo presentation
   photos: {
-    arrangement: 'grid' | 'trail' | 'stack' | 'scatter' | 'flow';
+    arrangement?: 'grid' | 'trail' | 'stack' | 'scatter' | 'flow';
     revealPattern: 'sequential' | 'random' | 'scroll-based';
     count?: number;
   };
 
   // Styling hints (can override in component)
-  styling: {
+  styling?: {
     colorScheme?: string; // For CSS variables
     typography?: {
       titleClasses: string;
