@@ -1,5 +1,6 @@
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
+import { CollageTheme } from './collage-theme/collage-theme';
 
 interface ThemeRendererProps {
   trip: Trip;
@@ -11,7 +12,7 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
   switch (config.component) {
     case 'collage-theme':
-      return <>collage</>
+      return <CollageTheme trip={trip} config={config} />;
 
     default:
       // Default fallback
