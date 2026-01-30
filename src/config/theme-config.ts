@@ -51,23 +51,20 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
   [Theme.Collage]: {
     component: 'collage-theme',
     layout: {
-      type: 'card-grid',
-      scrollDirection: 'none',
-      spacing: 'gap-12',
+      scrollDirection: 'horizontal',
+      spacing: 'gap-16',
     },
     animation: {
-      enabled: false, // Will be implemented later
+      enabled: true,
     },
     photos: {
-      arrangement: 'grid',
-      revealPattern: 'sequential',
+      revealPattern: 'scroll-based',
     },
     styling: {
       typography: {
-        titleClasses: 'text-xl font-semibold',
-        bodyClasses: 'text-sm',
+        titleClasses: 'text-2xl font-bold',
+        bodyClasses: 'text-sm text-zinc-600',
       },
-    },
     }
   },
 };
