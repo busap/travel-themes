@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { PolaroidCardVariant } from '@/enums/polaroid-card-variant';
 import { ImagePlaceholder } from '@/ui/components/image-placeholder/image-placeholder';
+import './polaroid-card.css';
 
 interface BasePolaroidCardProps {
   variant?: PolaroidCardVariant;
@@ -63,19 +64,24 @@ export function PolaroidCard(props: PolaroidCardProps) {
     return `translate(${offset.x}px, ${offset.y}px) rotate(${rotation}deg) scale(${scale})`;
   };
 
+  const getPhotoImageContainerClass = (aspectRatio?: 'square' | 'portrait') => {
+    const modifier = aspectRatio === 'square' ? 'square' : 'portrait';
+    return `polaroid-photo-image-container polaroid-photo-image-container--${modifier}`;
+  };
+
   const renderPolaroidContent = () => {
     if (variant === PolaroidCardVariant.Trip) {
       const tripProps = props as TripPolaroidCardProps;
       return (
         <>
-          <div className="relative aspect-square overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+          <div className="polaroid-trip-image-container">
             {!imageError ? (
               <Image
                 src={tripProps.imageSrc}
                 alt={tripProps.title}
                 fill
                 priority={priority}
-                className="object-cover transition-all duration-500 group-hover:brightness-110"
+                className="polaroid-trip-image"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 onError={handleImageError}
               />
@@ -83,15 +89,15 @@ export function PolaroidCard(props: PolaroidCardProps) {
               <ImagePlaceholder />
             )}
           </div>
-          <div className="mt-4 pb-2">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
+          <div className="polaroid-trip-content">
+            <h2 className="polaroid-trip-title">
               {tripProps.title}
             </h2>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="polaroid-trip-subtitle">
               {tripProps.subtitle}
             </p>
             {tripProps.description && (
-              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500 line-clamp-2 italic">
+              <p className="polaroid-trip-description">
                 {tripProps.description}
               </p>
             )}
@@ -101,19 +107,16 @@ export function PolaroidCard(props: PolaroidCardProps) {
     }
 
     const photoProps = props as PhotoPolaroidCardProps;
-    const aspectClass = photoProps.aspectRatio === 'square'
-      ? 'aspect-square'
-      : 'w-60 h-[300px] sm:w-72 sm:h-[360px] md:w-80 md:h-[400px]';
 
     return (
       <>
-        <div className={`relative ${aspectClass} overflow-hidden`}>
+        <div className={getPhotoImageContainerClass(photoProps.aspectRatio)}>
           {!imageError ? (
             <Image
               src={photoProps.imageSrc}
               alt={photoProps.imageAlt}
               fill
-              className="object-cover"
+              className="polaroid-photo-image"
               sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
               onError={handleImageError}
             />
@@ -121,9 +124,9 @@ export function PolaroidCard(props: PolaroidCardProps) {
             <ImagePlaceholder />
           )}
         </div>
-        <div className="mt-3 sm:mt-4 text-center h-5 sm:h-6">
+        <div className="polaroid-photo-caption-container">
           {photoProps.caption && (
-            <p className="text-xs sm:text-sm text-zinc-700">
+            <p className="polaroid-photo-caption">
               {photoProps.caption}
             </p>
           )}
@@ -132,28 +135,23 @@ export function PolaroidCard(props: PolaroidCardProps) {
     );
   };
 
+  const frameClass = variant === PolaroidCardVariant.Trip
+    ? 'polaroid-frame polaroid-frame--trip'
+    : 'polaroid-frame';
+
   const polaroidFrame = (
-    <div
-      className={`bg-white p-3 sm:p-4 shadow-2xl rounded-sm hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-shadow duration-300 ${
-        variant === PolaroidCardVariant.Trip ? 'dark:bg-zinc-800' : ''
-      }`}
-    >
+    <div className={frameClass}>
       {renderPolaroidContent()}
     </div>
   );
 
-  const containerClasses = `relative flex-shrink-0 transition-transform duration-300 ${
-    variant === PolaroidCardVariant.Photo
-      ? 'hover:scale-105 hover:z-20'
-      : ''
-  } ${className}`;
-
   if (variant === PolaroidCardVariant.Trip) {
     const tripProps = props as TripPolaroidCardProps;
+    const linkClass = `polaroid-container polaroid-trip-link ${className}`.trim();
     return (
       <Link
         href={tripProps.href}
-        className={`${containerClasses} group block transition-all duration-500 hover:rotate-0 hover:scale-105 hover:shadow-2xl`}
+        className={linkClass}
         style={{ transform: getTransform() }}
       >
         {polaroidFrame}
@@ -161,8 +159,12 @@ export function PolaroidCard(props: PolaroidCardProps) {
     );
   }
 
+  const containerClass = `polaroid-container polaroid-container--photo ${className}`.trim();
   return (
-    <div className={containerClasses} style={{ transform: getTransform() }}>
+    <div
+      className={containerClass}
+      style={{ transform: getTransform() }}
+    >
       {polaroidFrame}
     </div>
   );
