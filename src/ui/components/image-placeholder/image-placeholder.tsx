@@ -1,9 +1,11 @@
+import './image-placeholder.css';
+
 export function ImagePlaceholder() {
     return (
-        <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-300 flex items-center justify-center">
-            <div className="text-center text-zinc-400">
+        <div className="image-placeholder">
+            <div className="image-placeholder__content">
                 <svg
-                    className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 opacity-50"
+                    className="image-placeholder__icon"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

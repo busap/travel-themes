@@ -1,0 +1,14 @@
+@reference "../../../app/globals.css";
+
+.image-placeholder {
+  @apply w-full h-full flex items-center justify-center;
+  @apply bg-gradient-to-br from-zinc-200 to-zinc-300;
+}
+
+.image-placeholder__content {
+  @apply text-center text-zinc-400;
+}
+
+.image-placeholder__icon {
+  @apply w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 opacity-50;
+}
