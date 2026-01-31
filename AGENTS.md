@@ -97,7 +97,7 @@ The project uses a type-safe routing system to avoid hardcoded URLs.
 3. Never use string literals for URLs - always use route builders
 
 ### Usage:
-```typescript
+```tsx
 import { getTripRoute, getHomeRoute } from '@/utils/route';
 import { buildRoute, RouteKey } from '@/utils/route';
 
@@ -149,7 +149,7 @@ ui/pages/
 
 **Render Function Pattern**: Break complex components into render functions for better organization and readability.
 
-```typescript
+```tsx
 export function ComplexComponent({ data }: Props) {
   // Hooks and state at the top
   const [state, setState] = useState();
@@ -212,7 +212,7 @@ All component styles use co-located CSS files with Tailwind's `@apply` directive
 - Don't extract arbitrary groupings
 
 **Component Pattern:**
-```typescript
+```tsx
 import './my-component.css';
 
 export function MyComponent({ variant }: Props) {
@@ -287,7 +287,7 @@ Trip ID → getThemeForTrip() → Theme enum → getThemeConfig() → ThemeRende
 
 Themes should be driven by their ThemeConfig, not hardcoded values:
 
-```typescript
+```tsx
 export function MyTheme({ trip, config }: ThemeProps) {
   // Extract config values as constants at the top
   const spacing = config.layout?.spacing || 'gap-8';
