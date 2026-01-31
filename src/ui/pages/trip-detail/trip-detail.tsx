@@ -1,6 +1,7 @@
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
 import { ThemeRenderer } from '@/ui/components/trip-themes/theme-renderer';
+import './trip-detail.css';
 
 interface TripDetailProps {
   trip: Trip;
@@ -9,7 +10,7 @@ interface TripDetailProps {
 
 export function TripDetail({ trip, config }: TripDetailProps) {
   return (
-    <div className="min-h-screen">
+    <div className="trip-detail">
       <ThemeRenderer trip={trip} config={config} />
     </div>
   );

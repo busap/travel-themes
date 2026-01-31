@@ -1,0 +1,30 @@
+@reference "../../../app/globals.css";
+
+.home {
+  @apply min-h-screen;
+  @apply bg-white dark:bg-zinc-950;
+}
+
+.home__header {
+  @apply px-6 py-12 md:px-12 md:py-16;
+}
+
+.home__title {
+  @apply text-4xl font-bold tracking-tight md:text-5xl;
+  @apply text-zinc-900 dark:text-white;
+}
+
+.home__subtitle {
+  @apply mt-2 text-lg;
+  @apply text-zinc-600 dark:text-zinc-400;
+}
+
+.home__main {
+  @apply px-6 pb-16 md:px-12 md:pb-24;
+}
+
+.home__grid {
+  @apply grid gap-12 sm:gap-16 md:gap-20;
+  @apply sm:grid-cols-2 lg:grid-cols-3;
+  @apply auto-rows-auto;
+}
