@@ -1,0 +1,13 @@
+@reference "../../../app/globals.css";
+
+.theme-renderer-fallback {
+  @apply min-h-screen p-12;
+}
+
+.theme-renderer-fallback__title {
+  @apply text-4xl font-bold;
+}
+
+.theme-renderer-fallback__message {
+  @apply mt-4;
+}
