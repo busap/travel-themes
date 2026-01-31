@@ -13,7 +13,7 @@ TravelThemes is a photo-centric travel website where trips are displayed through
 | Next.js | 16.1.3 | Framework (App Router) |
 | React | 19.2.3 | UI library |
 | TypeScript | 5.x | Type safety |
-| Tailwind CSS | 4.x | Styling |
+| Tailwind CSS | 4.x | Styling (with @apply in component CSS) |
 | Node.js | 20+ | Runtime |
 | Storybook | 10.1.11 | Component development |
 | Vitest | 4.0.17 | Unit testing framework |
@@ -185,6 +185,47 @@ export function ComplexComponent({ data }: Props) {
 
 **Benefits**: Improves readability, makes structure clear, easier to maintain and refactor.
 
+### Component Styling Conventions
+
+All component styles use co-located CSS files with Tailwind's `@apply` directive.
+
+**File Structure:**
+```css
+@reference "../../../app/globals.css";
+
+.component-name {
+  @apply layout-classes spacing-classes color-classes;
+}
+
+.component-name__element {
+  @apply styles-for-sub-element;
+}
+
+.component-name--modifier {
+  @apply variant-specific-styles;
+}
+```
+
+**Naming:**
+- Use BEM-style: `.component`, `.component__element`, `.component--modifier`
+- Only extract classes with semantic purpose (`.card`, `.card__header`, `.btn-primary`)
+- Don't extract arbitrary groupings
+
+**Component Pattern:**
+```typescript
+import './my-component.css';
+
+export function MyComponent({ variant }: Props) {
+  const cardClass = variant === 'featured' ? 'card card--featured' : 'card';
+
+  return (
+    <div className={cardClass}>
+      <div className="card__header">...</div>
+    </div>
+  );
+}
+```
+
 ## Custom Hooks
 
 Reusable React hooks live in `src/hooks/` and encapsulate common behaviors across components.
@@ -289,6 +330,7 @@ export function MyTheme({ trip, config }: ThemeProps) {
 - Don't hardcode URLs - use route builders from `utils/route.ts`
 - Don't hardcode theme behavior - use config from `theme-config.ts`
 - Don't specify unused config options - only include what the theme actually uses
+- Don't use inline Tailwind classes - create co-located CSS files with `@apply`
 
 ## When Adding Dependencies
 
@@ -370,3 +412,8 @@ When installing packages, tools, MCP servers, or any external dependencies:
   - `useScrollBasedReveal` - reusable scroll-based reveal animations
 - Made ThemeConfig interface fully optional to support different theme needs
 - Established pattern: extract config values as constants at component top
+
+### Iteration 9
+- Established CSS-first styling approach using Tailwind's `@apply` directive
+- Created co-located CSS files for all components and pages
+- Implemented BEM-style naming convention for component classes
