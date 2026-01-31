@@ -9,6 +9,7 @@ import { ScrollHint } from '@/ui/components/scroll-hint/scroll-hint';
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
 import { useHorizontalScroll } from '@/hooks/use-horizontal-scroll';
 import { useScrollBasedReveal } from '@/hooks/use-scroll-based-reveal';
+import './collage-theme.css';
 
 interface CollageThemeProps {
   trip: Trip;
@@ -34,12 +35,27 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
     itemCount: config.photos?.count,
   });
 
+  const titleClass = config.styling?.typography?.titleClasses
+    ? `collage-theme__title ${config.styling.typography.titleClasses}`
+    : 'collage-theme__title';
+
+  const subtitleClass = config.styling?.typography?.bodyClasses || 'collage-theme__subtitle';
+
+  const cardsContainerClass = `collage-theme__cards-container ${config.layout.spacing}`.trim();
+
+  const getCardWrapperClass = (isVisible: boolean) => {
+    if (!isScrollBasedReveal) return '';
+    return isVisible
+      ? 'collage-theme__card-wrapper collage-theme__card-wrapper--visible'
+      : 'collage-theme__card-wrapper collage-theme__card-wrapper--hidden';
+  };
+
   const renderHeader = () => (
-    <div className="absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 md:p-8 bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm pointer-events-none">
-      <h1 className={`text-lg sm:text-xl ${config.styling?.typography?.titleClasses || 'md:text-2xl font-bold'}`}>
+    <div className="collage-theme__header">
+      <h1 className={titleClass}>
         {trip.name}
       </h1>
-      <p className={config.styling?.typography?.bodyClasses || 'text-xs sm:text-sm text-zinc-600'}>
+      <p className={subtitleClass}>
         {trip.countries.join(', ')} {trip.year && `• ${trip.year}`}
       </p>
     </div>
@@ -47,20 +63,16 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
 
   const renderPolaroidCards = () => {
     return (
-      <div className={`h-full flex items-center px-4 sm:px-8 md:px-16 lg:px-32 ${config.layout.spacing} min-w-max`}>
+      <div className={cardsContainerClass}>
         {photosToShow.map((photo, index) => {
           const { rotation, offset } = getPolaroidTransform(index);
           const isVisible = visiblePhotos.has(index);
-
-          const cardClasses = isScrollBasedReveal
-            ? `transition-all duration-700 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`
-            : '';
 
           return (
             <div
               key={index}
               data-photo-index={index}
-              className={cardClasses}
+              className={getCardWrapperClass(isVisible)}
             >
               <PolaroidCard
                 variant={PolaroidCardVariant.Photo}
@@ -81,7 +93,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const renderScrollContainer = () => (
     <div
       ref={scrollContainerRef}
-      className="h-full overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
+      className="collage-theme__scroll-container"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -94,7 +106,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const renderScrollHint = () => <ScrollHint />;
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-zinc-100 to-zinc-200">
+    <div className="collage-theme">
       {renderHeader()}
       {renderScrollContainer()}
       {renderScrollHint()}
