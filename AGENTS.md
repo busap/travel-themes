@@ -331,6 +331,7 @@ export function MyTheme({ trip, config }: ThemeProps) {
 - Don't hardcode theme behavior - use config from `theme-config.ts`
 - Don't specify unused config options - only include what the theme actually uses
 - Don't use inline Tailwind classes - create co-located CSS files with `@apply`
+- Don't use plain `<img>` tags - always use Next.js `<Image>` from `next/image` for lazy loading, optimization, and correct `sizes` hints
 
 ## When Adding Dependencies
 
