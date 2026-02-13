@@ -22,17 +22,18 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const animationEnabled = config.animation.enabled;
   const revealPattern = config.photos.revealPattern;
   const isScrollBasedReveal = animationEnabled && revealPattern === 'scroll-based';
+  const photosWithSrc = trip.photos.filter(photo => photo.src?.trim());
   const photosToShow = config.photos?.count
-    ? trip.photos.slice(0, config.photos.count)
-    : trip.photos;
+    ? photosWithSrc.slice(0, config.photos.count)
+    : photosWithSrc;
 
   useHorizontalScroll(scrollContainerRef, isHorizontalScroll);
 
   const visiblePhotos = useScrollBasedReveal({
     containerRef: scrollContainerRef,
     enabled: isScrollBasedReveal ?? false,
-    totalItems: trip.photos.length,
-    itemCount: config.photos?.count,
+    totalItems: photosToShow.length,
+    itemCount: photosToShow.length,
   });
 
   const titleClass = config.styling?.typography?.titleClasses
