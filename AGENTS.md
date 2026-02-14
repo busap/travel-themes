@@ -13,7 +13,8 @@ TravelThemes is a photo-centric travel website where trips are displayed through
 | Next.js | 16.1.3 | Framework (App Router) |
 | React | 19.2.3 | UI library |
 | TypeScript | 5.x | Type safety |
-| Tailwind CSS | 4.x | Styling (with @apply in component CSS) |
+| Tailwind CSS | 4.x | Styling (with @apply in SCSS modules) |
+| SCSS | - | CSS preprocessor (module-based) |
 | Node.js | 20+ | Runtime |
 | Storybook | 10.1.11 | Component development |
 | Vitest | 4.0.17 | Unit testing framework |
@@ -187,44 +188,56 @@ export function ComplexComponent({ data }: Props) {
 
 ### Component Styling Conventions
 
-All component styles use co-located CSS files with Tailwind's `@apply` directive.
+All component styles use SCSS modules with Tailwind's `@apply` directive (**Tailwind-first approach**).
 
 **File Structure:**
-```css
-@reference "../../../app/globals.css";
+```scss
+// component-name.module.scss
+@reference "../../../app/globals.scss";
 
-.component-name {
+.componentName {
   @apply layout-classes spacing-classes color-classes;
 }
 
-.component-name__element {
+.componentNameElement {
   @apply styles-for-sub-element;
 }
 
-.component-name--modifier {
+.componentNameModifier {
   @apply variant-specific-styles;
 }
 ```
 
-**Naming:**
-- Use BEM-style: `.component`, `.component__element`, `.component--modifier`
-- Only extract classes with semantic purpose (`.card`, `.card__header`, `.btn-primary`)
-- Don't extract arbitrary groupings
+**Key Principles:**
+
+1. **Tailwind First**: Use `@apply` with Tailwind utilities as the primary styling approach
+2. **SCSS Modules**: Use `.module.scss` extension for scoped styles
+3. **Reference, Not Import**: Use `@reference` for globals.scss (not `@import`)
+4. **CamelCase in SCSS**: Class names use camelCase in `.module.scss` files
+5. **Semantic Names**: Only create classes with semantic purpose (`.card`, `.header`, `.title`)
 
 **Component Pattern:**
 ```tsx
-import './my-component.css';
+import styles from './my-component.module.scss';
 
 export function MyComponent({ variant }: Props) {
-  const cardClass = variant === 'featured' ? 'card card--featured' : 'card';
+  const cardClass = variant === 'featured'
+    ? `${styles.card} ${styles.cardFeatured}`
+    : styles.card;
 
   return (
     <div className={cardClass}>
-      <div className="card__header">...</div>
+      <div className={styles.cardHeader}>...</div>
     </div>
   );
 }
 ```
+
+**Benefits:**
+- **Scoped styles**: CSS Modules prevent global class name collisions
+- **Tailwind utilities**: Leverage full Tailwind ecosystem with `@apply`
+- **Type safety**: TypeScript can validate imported style objects
+- **Clean markup**: No inline Tailwind classes cluttering JSX
 
 ## Custom Hooks
 
@@ -330,7 +343,8 @@ export function MyTheme({ trip, config }: ThemeProps) {
 - Don't hardcode URLs - use route builders from `utils/route.ts`
 - Don't hardcode theme behavior - use config from `theme-config.ts`
 - Don't specify unused config options - only include what the theme actually uses
-- Don't use inline Tailwind classes - create co-located CSS files with `@apply`
+- Don't use inline Tailwind classes - create SCSS modules (`.module.scss`) with `@apply`
+- Don't use `@import` in SCSS - use `@reference` for globals
 - Don't use plain `<img>` tags - always use Next.js `<Image>` from `next/image` for lazy loading, optimization, and correct `sizes` hints
 
 ## When Adding Dependencies
@@ -418,3 +432,10 @@ When installing packages, tools, MCP servers, or any external dependencies:
 - Established CSS-first styling approach using Tailwind's `@apply` directive
 - Created co-located CSS files for all components and pages
 - Implemented BEM-style naming convention for component classes
+
+### Iteration 10
+- Migrated from plain CSS to SCSS modules (`.module.scss`)
+- Adopted Tailwind-first approach: use `@apply` with Tailwind utilities in SCSS modules
+- Switched from `@import` to `@reference` for globals.scss
+- Implemented CSS Modules pattern with scoped styles (camelCase class names)
+- Added SCSS to tech stack
