@@ -82,8 +82,9 @@ export const randomTrip = (seed?: string): Trip => {
   const coverPhoto = `https://images.unsplash.com/${pickRandom(unsplashPhotos)}?w=800&q=80`;
 
   const photoCount = randomInt(1, 4);
-  const photos = Array.from({ length: photoCount }, (_, i) => ({
-    src: `https://images.unsplash.com/${pickRandom(unsplashPhotos)}?w=1200&q=80`,
+  const selectedPhotos = pickMultiple(unsplashPhotos, photoCount);
+  const photos = selectedPhotos.map((photoId, i) => ({
+    src: `https://images.unsplash.com/${photoId}?w=1200&q=80`,
     title: randomBoolean(0.5) ? `Photo ${i + 1}` : undefined,
     description: randomBoolean(0.33) ? 'A beautiful moment captured' : undefined,
   }));
