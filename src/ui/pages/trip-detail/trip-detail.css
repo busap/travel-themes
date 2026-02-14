@@ -1,5 +1,0 @@
-@reference "../../../app/globals.css";
-
-.trip-detail {
-  @apply min-h-screen;
-}

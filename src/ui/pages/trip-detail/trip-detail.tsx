@@ -1,7 +1,7 @@
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
 import { ThemeRenderer } from '@/ui/components/trip-themes/theme-renderer';
-import './trip-detail.css';
+import styles from './trip-detail.module.scss';
 
 interface TripDetailProps {
   trip: Trip;
@@ -10,7 +10,7 @@ interface TripDetailProps {
 
 export function TripDetail({ trip, config }: TripDetailProps) {
   return (
-    <div className="trip-detail">
+    <div className={styles.tripDetail}>
       <ThemeRenderer trip={trip} config={config} />
     </div>
   );
