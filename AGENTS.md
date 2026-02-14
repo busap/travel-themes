@@ -434,3 +434,6 @@ When installing packages, tools, MCP servers, or any external dependencies:
 - Migrated to SCSS modules (`.module.scss`) with CSS Modules pattern (camelCase class names)
 - Adopted Tailwind-first approach: use `@apply` with Tailwind utilities in SCSS modules
 - Added `src/styles/_breakpoints.scss` with SCSS variables matching Tailwind breakpoints
+
+### Iteration 10
+- Implemented Aurora theme with animated gradient background and scroll-based photo reveals
