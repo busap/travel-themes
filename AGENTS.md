@@ -239,6 +239,8 @@ export function MyComponent({ variant }: Props) {
 - **Type safety**: TypeScript can validate imported style objects
 - **Clean markup**: No inline Tailwind classes cluttering JSX
 
+**Media Queries:** Add `@use "path/to/styles/breakpoints" as *;` to use `$breakpoint-{sm|md|lg|xl|2xl}` variables in custom media queries.
+
 ## Custom Hooks
 
 Reusable React hooks live in `src/hooks/` and encapsulate common behaviors across components.
@@ -429,13 +431,6 @@ When installing packages, tools, MCP servers, or any external dependencies:
 - Established pattern: extract config values as constants at component top
 
 ### Iteration 9
-- Established CSS-first styling approach using Tailwind's `@apply` directive
-- Created co-located CSS files for all components and pages
-- Implemented BEM-style naming convention for component classes
-
-### Iteration 10
-- Migrated from plain CSS to SCSS modules (`.module.scss`)
+- Migrated to SCSS modules (`.module.scss`) with CSS Modules pattern (camelCase class names)
 - Adopted Tailwind-first approach: use `@apply` with Tailwind utilities in SCSS modules
-- Switched from `@import` to `@reference` for globals.scss
-- Implemented CSS Modules pattern with scoped styles (camelCase class names)
-- Added SCSS to tech stack
+- Added `src/styles/_breakpoints.scss` with SCSS variables matching Tailwind breakpoints
