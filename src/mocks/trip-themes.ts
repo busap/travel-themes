@@ -12,6 +12,6 @@ export const tripThemes: TripTheme[] = [
   },
   {
     tripId: 'nordic-winter',
-    theme: Theme.Collage,
+    theme: Theme.Aurora,
   },
 ];

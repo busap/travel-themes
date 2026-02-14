@@ -1,0 +1,110 @@
+@reference "../../../../app/globals.scss";
+
+.layout {
+  @apply relative min-h-[400vh] overflow-hidden;
+  background: radial-gradient(ellipse at top, #1a0b2e 0%, #0d0523 40%, #000000 100%);
+}
+
+/* Vignette */
+.layout::after {
+  @apply fixed inset-0 pointer-events-none z-[99];
+  content: '';
+  background: radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(0,0,0,0.5) 100%);
+}
+
+.header {
+  @apply relative z-20 text-center py-20 px-4 min-h-screen flex flex-col items-center justify-center;
+}
+
+.title {
+  @apply text-white mb-8 font-semibold leading-tight tracking-wide;
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.3));
+}
+
+.subtitle {
+  @apply text-white/90 font-light tracking-widest;
+  font-size: clamp(0.9rem, 2vw, 1.3rem);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(52, 211, 153, 0.3);
+}
+
+.photos {
+  @apply relative z-10 flex flex-col gap-0;
+}
+
+.photoSection {
+  @apply relative flex items-center justify-center min-h-screen h-screen px-8 py-16 opacity-0 scale-95;
+}
+
+.photo {
+  @apply rounded-lg overflow-hidden relative max-h-[85vh] backdrop-blur-[10px] transition-transform duration-[400ms] ease-out hover:-translate-y-1.5;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(167, 139, 250, 0.15);
+}
+
+.photoNarrow {
+  @apply w-full;
+  max-width: 400px;
+}
+
+.photoMedium {
+  @apply w-full;
+  max-width: 650px;
+}
+
+.photoWide {
+  @apply w-full;
+  max-width: 900px;
+}
+
+.photoImage {
+  @apply w-full h-auto object-cover max-h-[75vh];
+}
+
+.photoCaption {
+  @apply px-6 py-4 text-white text-center text-lg font-normal h-[3.7rem] leading-normal overflow-hidden;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+@media (max-width: 768px) {
+  .header {
+    @apply py-12;
+  }
+
+  .photoSection {
+    @apply min-h-screen h-screen px-4 py-8;
+  }
+
+  .photo {
+    @apply max-w-full;
+  }
+
+  .photoImage {
+    @apply h-auto max-h-[70vh];
+  }
+
+  .title {
+    @apply text-3xl;
+  }
+
+  .subtitle {
+    @apply text-sm;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoSection {
+    @apply opacity-100 scale-100;
+    transform: none !important;
+  }
+}

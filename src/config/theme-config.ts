@@ -67,6 +67,39 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     }
   },
+  [Theme.Aurora]: {
+    component: 'aurora-theme',
+    layout: {
+      type: 'vertical-parallax',
+      scrollDirection: 'vertical',
+      spacing: 'gap-8',
+    },
+    animation: {
+      enabled: true,
+      scrollTrigger: {
+        scrub: 2,
+        pin: true,
+        start: 'center center',
+        end: '+=100%',
+      },
+      timeline: {
+        duration: 2,
+        ease: 'power2.out',
+        stagger: 0.3,
+      },
+    },
+    photos: {
+      arrangement: 'flow',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      colorScheme: 'aurora',
+      typography: {
+        titleClasses: 'text-4xl md:text-6xl font-light tracking-wide',
+        bodyClasses: 'text-base md:text-lg text-white/80',
+      },
+    },
+  },
 };
 
 export function getThemeConfig(theme: Theme): ThemeConfig {

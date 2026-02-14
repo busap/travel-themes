@@ -1,3 +1,4 @@
 export enum Theme {
-  Collage = 'collage'
+  Collage = 'collage',
+  Aurora = 'aurora'
 }
