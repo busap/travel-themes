@@ -1,40 +1,40 @@
-@reference "../../../../app/globals.css";
+@reference "../../../../app/globals.scss";
 
-.collage-theme {
+.theme {
   @apply h-screen w-screen overflow-hidden;
   @apply bg-gradient-to-br from-zinc-100 to-zinc-200;
 }
 
-.collage-theme__header {
+.header {
   @apply absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 md:p-8;
   @apply bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm pointer-events-none;
 }
 
-.collage-theme__title {
+.title {
   @apply text-lg sm:text-xl md:text-2xl font-bold;
 }
 
-.collage-theme__subtitle {
+.subtitle {
   @apply text-xs sm:text-sm text-zinc-600;
 }
 
-.collage-theme__scroll-container {
+.scrollContainer {
   @apply h-full overflow-x-auto overflow-y-hidden;
   @apply [&::-webkit-scrollbar]:hidden;
 }
 
-.collage-theme__cards-container {
+.cardsContainer {
   @apply h-full flex items-center min-w-max px-4 sm:px-8 md:px-16 lg:px-32;
 }
 
-.collage-theme__card-wrapper {
+.cardWrapper {
   @apply transition-all duration-700;
 }
 
-.collage-theme__card-wrapper--hidden {
+.cardWrapperHidden {
   @apply opacity-0 scale-95;
 }
 
-.collage-theme__card-wrapper--visible {
+.cardWrapperVisible {
   @apply opacity-100 scale-100;
 }

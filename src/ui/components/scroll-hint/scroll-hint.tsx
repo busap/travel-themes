@@ -1,12 +1,12 @@
-import './scroll-hint.css';
+import styles from './scroll-hint.module.scss';
 
 export function ScrollHint() {
     return (
-        <div className="scroll-hint">
-            <span className="scroll-hint__text--desktop">Scroll to explore</span>
-            <span className="scroll-hint__text--mobile">Scroll</span>
+        <div className={styles.scrollHint}>
+            <span className={styles.textDesktop}>Scroll to explore</span>
+            <span className={styles.textMobile}>Scroll</span>
             <svg
-                className="scroll-hint__icon"
+                className={styles.icon}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

@@ -1,0 +1,13 @@
+@reference "../../../app/globals.scss";
+
+.fallback {
+  @apply min-h-screen p-12;
+}
+
+.title {
+  @apply text-4xl font-bold;
+}
+
+.message {
+  @apply mt-4;
+}

@@ -9,7 +9,7 @@ import { ScrollHint } from '@/ui/components/scroll-hint/scroll-hint';
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
 import { useHorizontalScroll } from '@/hooks/use-horizontal-scroll';
 import { useScrollBasedReveal } from '@/hooks/use-scroll-based-reveal';
-import './collage-theme.css';
+import styles from './collage-theme.module.scss';
 
 interface CollageThemeProps {
   trip: Trip;
@@ -37,22 +37,22 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   });
 
   const titleClass = config.styling?.typography?.titleClasses
-    ? `collage-theme__title ${config.styling.typography.titleClasses}`
-    : 'collage-theme__title';
+    ? `${styles.title} ${config.styling.typography.titleClasses}`
+    : styles.title;
 
-  const subtitleClass = config.styling?.typography?.bodyClasses || 'collage-theme__subtitle';
+  const subtitleClass = config.styling?.typography?.bodyClasses || styles.subtitle;
 
-  const cardsContainerClass = `collage-theme__cards-container ${config.layout.spacing}`.trim();
+  const cardsContainerClass = `${styles.cardsContainer} ${config.layout.spacing}`.trim();
 
   const getCardWrapperClass = (isVisible: boolean) => {
     if (!isScrollBasedReveal) return '';
     return isVisible
-      ? 'collage-theme__card-wrapper collage-theme__card-wrapper--visible'
-      : 'collage-theme__card-wrapper collage-theme__card-wrapper--hidden';
+      ? `${styles.cardWrapper} ${styles.cardWrapperVisible}`
+      : `${styles.cardWrapper} ${styles.cardWrapperHidden}`;
   };
 
   const renderHeader = () => (
-    <div className="collage-theme__header">
+    <div className={styles.header}>
       <h1 className={titleClass}>
         {trip.name}
       </h1>
@@ -94,7 +94,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const renderScrollContainer = () => (
     <div
       ref={scrollContainerRef}
-      className="collage-theme__scroll-container"
+      className={styles.scrollContainer}
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -107,7 +107,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const renderScrollHint = () => <ScrollHint />;
 
   return (
-    <div className="collage-theme">
+    <div className={styles.theme}>
       {renderHeader()}
       {renderScrollContainer()}
       {renderScrollHint()}

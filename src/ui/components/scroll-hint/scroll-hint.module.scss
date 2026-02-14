@@ -1,21 +1,21 @@
-@reference "../../../app/globals.css";
+@reference "../../../app/globals.scss";
 
-.scroll-hint {
+.scrollHint {
   @apply absolute bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8;
   @apply flex items-center gap-2;
   @apply text-zinc-500 text-xs sm:text-sm;
   @apply pointer-events-none;
 }
 
-.scroll-hint__text--desktop {
+.textDesktop {
   @apply hidden sm:inline;
 }
 
-.scroll-hint__text--mobile {
+.textMobile {
   @apply sm:hidden;
 }
 
-.scroll-hint__icon {
+.icon {
   @apply w-4 h-4 sm:w-5 sm:h-5;
   @apply animate-[bounce-horizontal_1s_ease-in-out_infinite];
 }

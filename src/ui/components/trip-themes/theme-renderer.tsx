@@ -1,7 +1,7 @@
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
 import { CollageTheme } from './collage-theme/collage-theme';
-import './theme-renderer.css';
+import styles from './theme-renderer.module.scss';
 
 interface ThemeRendererProps {
   trip: Trip;
@@ -18,9 +18,9 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
     default:
       // Default fallback
       return (
-        <div className="theme-renderer-fallback">
-          <h1 className="theme-renderer-fallback__title">{trip.name}</h1>
-          <p className="theme-renderer-fallback__message">Theme not configured</p>
+        <div className={styles.fallback}>
+          <h1 className={styles.title}>{trip.name}</h1>
+          <p className={styles.message}>Theme not configured</p>
         </div>
       );
   }
