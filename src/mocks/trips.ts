@@ -167,59 +167,124 @@ export const trips: Trip[] = [
     coverPhoto: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80',
     photos: [
       {
-        src: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1200&q=80',
-        title: 'Marrakech Medina',
+        src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+        title: 'Mountain Landscape',
       },
       {
-        src: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80',
-        title: 'Sahara Dunes',
-        description: 'Golden hour in the desert',
+        src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
+        title: 'Lake View',
       },
       {
-        src: 'https://images.unsplash.com/photo-1548017871-f3f70db8b4c3?w=1200&q=80',
-        title: 'Blue City',
-        description: 'The streets of Chefchaouen',
+        src: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80',
+        title: 'Temple Gates',
       },
       {
-        src: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=1200&q=80',
-        title: 'Marrakech Souk',
-        description: 'Colorful spices and textiles',
+        src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80',
+        title: 'City Lights',
       },
       {
-        src: 'https://images.unsplash.com/photo-1508171878746-d47039ce2499?w=1200&q=80',
-        title: 'Ait Ben Haddou',
+        src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80',
+        title: 'Iconic Tower',
       },
       {
-        src: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=1200&q=80',
-        title: 'Fes Tannery',
-        description: 'Traditional leather dyeing',
+        src: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80',
+        title: 'Beach Paradise',
       },
       {
-        src: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
-        title: 'Essaouira Beach',
+        src: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1200&q=80',
+        title: 'Ice Lagoon',
       },
       {
-        src: 'https://images.unsplash.com/photo-1566995541428-6b4c21e30d08?w=1200&q=80',
-        title: 'Majorelle Garden',
-        description: 'Vibrant blue architecture',
+        src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80',
+        title: 'Fjord Vista',
       },
       {
-        src: 'https://images.unsplash.com/photo-1591178999816-af0b4de2b6a6?w=1200&q=80',
-        title: 'Casablanca Mosque',
+        src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
+        title: 'Mountain Peak',
       },
       {
-        src: 'https://images.unsplash.com/photo-1562519767-b9be97fa9a8a?w=1200&q=80',
-        title: 'Desert Caravan',
-        description: 'Camel trek at sunset',
+        src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+        title: 'Snowy Slopes',
       },
       {
-        src: 'https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=1200&q=80',
-        title: 'Moroccan Tea',
+        src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80',
+        title: 'Forest Path',
       },
       {
-        src: 'https://images.unsplash.com/photo-1555881603-5d88a0f5c6f4?w=1200&q=80',
-        title: 'Atlas Mountains',
-        description: 'Traditional Berber village',
+        src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80',
+        title: 'Wilderness Trail',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80',
+        title: 'Ocean Sunset',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80',
+        title: 'Rural Landscape',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+        title: 'Alpine Scene',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80',
+        title: 'Mountain Range',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80',
+        title: 'Scenic Valley',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+        title: 'Winter Wonderland',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
+        title: 'Modern Architecture',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
+        title: 'Urban Skyline',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80',
+        title: 'City Streets',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80',
+        title: 'Coastal Town',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80',
+        title: 'Harbor View',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80',
+        title: 'Waterfall',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80',
+        title: 'Golden Hour',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80',
+        title: 'Dramatic Sky',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80',
+        title: 'Coastal Cliffs',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80',
+        title: 'Mountain Lake',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80',
+        title: 'Desert Dunes',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80',
+        title: 'Forest Canopy',
       },
     ],
   },
