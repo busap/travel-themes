@@ -1,78 +1,78 @@
-@reference "../../../app/globals.css";
+@reference "../../../app/globals.scss";
 
-.polaroid-frame {
+.frame {
   @apply bg-white p-3 sm:p-4 rounded-sm shadow-2xl;
   @apply hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-shadow duration-300;
 }
 
-.polaroid-frame--trip {
+.frameTrip {
   @apply dark:bg-zinc-800;
 }
 
-.polaroid-container {
+.container {
   @apply relative flex-shrink-0 transition-transform duration-300;
 }
 
-.polaroid-container--photo {
+.containerPhoto {
   @apply hover:scale-105 hover:z-20;
 }
 
-.polaroid-trip-link {
+.tripLink {
   @apply block transition-all duration-500;
   @apply hover:rotate-0 hover:scale-105 hover:shadow-2xl;
 }
 
 /* Trip variant content */
-.polaroid-trip-image-container {
+.tripImageContainer {
   @apply relative aspect-square overflow-hidden;
   @apply bg-zinc-100 dark:bg-zinc-900;
 }
 
-.polaroid-trip-image {
+.tripImage {
   @apply object-cover transition-all duration-500;
   @apply group-hover:brightness-110;
 }
 
-.polaroid-trip-content {
+.tripContent {
   @apply mt-4 pb-2;
 }
 
-.polaroid-trip-title {
+.tripTitle {
   @apply text-xl font-semibold;
   @apply text-zinc-900 dark:text-white;
 }
 
-.polaroid-trip-subtitle {
+.tripSubtitle {
   @apply mt-1 text-sm;
   @apply text-zinc-600 dark:text-zinc-400;
 }
 
-.polaroid-trip-description {
+.tripDescription {
   @apply mt-2 text-xs line-clamp-2 italic;
   @apply text-zinc-500 dark:text-zinc-500;
 }
 
 /* Photo variant content */
-.polaroid-photo-image-container {
+.photoImageContainer {
   @apply relative overflow-hidden;
 }
 
-.polaroid-photo-image-container--square {
+.photoImageContainerSquare {
   @apply aspect-square;
 }
 
-.polaroid-photo-image-container--portrait {
+.photoImageContainerPortrait {
   @apply w-60 h-[300px] sm:w-72 sm:h-[360px] md:w-80 md:h-[400px];
 }
 
-.polaroid-photo-image {
+.photoImage {
   @apply object-cover;
 }
 
-.polaroid-photo-caption-container {
+.photoCaptionContainer {
   @apply mt-3 sm:mt-4 text-center h-5 sm:h-6;
 }
 
-.polaroid-photo-caption {
+.photoCaption {
   @apply text-xs sm:text-sm text-zinc-700;
 }

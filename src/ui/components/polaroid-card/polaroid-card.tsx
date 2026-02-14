@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { PolaroidCardVariant } from '@/enums/polaroid-card-variant';
 import { ImagePlaceholder } from '@/ui/components/image-placeholder/image-placeholder';
-import './polaroid-card.css';
+import styles from './polaroid-card.module.scss';
 
 interface BasePolaroidCardProps {
   variant?: PolaroidCardVariant;
@@ -65,8 +65,10 @@ export function PolaroidCard(props: PolaroidCardProps) {
   };
 
   const getPhotoImageContainerClass = (aspectRatio?: 'square' | 'portrait') => {
-    const modifier = aspectRatio === 'square' ? 'square' : 'portrait';
-    return `polaroid-photo-image-container polaroid-photo-image-container--${modifier}`;
+    if (aspectRatio === 'square') {
+      return `${styles.photoImageContainer} ${styles.photoImageContainerSquare}`;
+    }
+    return `${styles.photoImageContainer} ${styles.photoImageContainerPortrait}`;
   };
 
   const renderPolaroidContent = () => {
@@ -74,14 +76,14 @@ export function PolaroidCard(props: PolaroidCardProps) {
       const tripProps = props as TripPolaroidCardProps;
       return (
         <>
-          <div className="polaroid-trip-image-container">
+          <div className={styles.tripImageContainer}>
             {!imageError ? (
               <Image
                 src={tripProps.imageSrc}
                 alt={tripProps.title}
                 fill
                 priority={priority}
-                className="polaroid-trip-image"
+                className={styles.tripImage}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 onError={handleImageError}
               />
@@ -89,15 +91,15 @@ export function PolaroidCard(props: PolaroidCardProps) {
               <ImagePlaceholder />
             )}
           </div>
-          <div className="polaroid-trip-content">
-            <h2 className="polaroid-trip-title">
+          <div className={styles.tripContent}>
+            <h2 className={styles.tripTitle}>
               {tripProps.title}
             </h2>
-            <p className="polaroid-trip-subtitle">
+            <p className={styles.tripSubtitle}>
               {tripProps.subtitle}
             </p>
             {tripProps.description && (
-              <p className="polaroid-trip-description">
+              <p className={styles.tripDescription}>
                 {tripProps.description}
               </p>
             )}
@@ -116,7 +118,7 @@ export function PolaroidCard(props: PolaroidCardProps) {
               src={photoProps.imageSrc}
               alt={photoProps.imageAlt}
               fill
-              className="polaroid-photo-image"
+              className={styles.photoImage}
               sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
               onError={handleImageError}
             />
@@ -124,9 +126,9 @@ export function PolaroidCard(props: PolaroidCardProps) {
             <ImagePlaceholder />
           )}
         </div>
-        <div className="polaroid-photo-caption-container">
+        <div className={styles.photoCaptionContainer}>
           {photoProps.caption && (
-            <p className="polaroid-photo-caption">
+            <p className={styles.photoCaption}>
               {photoProps.caption}
             </p>
           )}
@@ -136,8 +138,8 @@ export function PolaroidCard(props: PolaroidCardProps) {
   };
 
   const frameClass = variant === PolaroidCardVariant.Trip
-    ? 'polaroid-frame polaroid-frame--trip'
-    : 'polaroid-frame';
+    ? `${styles.frame} ${styles.frameTrip}`
+    : styles.frame;
 
   const polaroidFrame = (
     <div className={frameClass}>
@@ -147,7 +149,7 @@ export function PolaroidCard(props: PolaroidCardProps) {
 
   if (variant === PolaroidCardVariant.Trip) {
     const tripProps = props as TripPolaroidCardProps;
-    const linkClass = `polaroid-container polaroid-trip-link ${className}`.trim();
+    const linkClass = `${styles.container} ${styles.tripLink} ${className}`.trim();
     return (
       <Link
         href={tripProps.href}
@@ -159,7 +161,7 @@ export function PolaroidCard(props: PolaroidCardProps) {
     );
   }
 
-  const containerClass = `polaroid-container polaroid-container--photo ${className}`.trim();
+  const containerClass = `${styles.container} ${styles.containerPhoto} ${className}`.trim();
   return (
     <div
       className={containerClass}

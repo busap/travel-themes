@@ -1,11 +1,11 @@
-import './image-placeholder.css';
+import styles from './image-placeholder.module.scss';
 
 export function ImagePlaceholder() {
     return (
-        <div className="image-placeholder">
-            <div className="image-placeholder__content">
+        <div className={styles.imagePlaceholder}>
+            <div className={styles.content}>
                 <svg
-                    className="image-placeholder__icon"
+                    className={styles.icon}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
