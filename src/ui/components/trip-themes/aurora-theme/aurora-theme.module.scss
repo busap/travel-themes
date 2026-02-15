@@ -42,22 +42,42 @@
 }
 
 .photo {
-  @apply rounded-lg overflow-hidden relative max-h-[85vh] backdrop-blur-[10px] transition-transform duration-[400ms] ease-out hover:-translate-y-1.5;
+  @apply rounded-lg overflow-hidden relative backdrop-blur-[10px] ease-out;
   background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(167, 139, 250, 0.25);
+  max-height: min(85vh, 90vh / 1.05);
+  transition: transform 400ms ease-out, box-shadow 400ms ease-out;
+
+  /* Simple 3-layer shadow: depth + subtle aurora glow */
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(167, 139, 250, 0.15);
+    0 20px 50px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(167, 139, 250, 0.15),
+    0 0 15px rgba(52, 211, 153, 0.1);
+
+  &:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow:
+      0 25px 60px rgba(0, 0, 0, 0.7),
+      0 0 40px rgba(167, 139, 250, 0.25),
+      0 0 20px rgba(52, 211, 153, 0.15);
+  }
 }
 
 .photoNarrow {
   @apply w-full;
-  max-width: 400px;
+  max-width: 500px;
+
+  &:hover {
+    transform: translateY(-4px) scale(1.1);
+  }
 }
 
 .photoMedium {
   @apply w-full;
   max-width: 650px;
+
+  &:hover {
+    transform: translateY(-4px) scale(1.15);
+  }
 }
 
 .photoWide {
