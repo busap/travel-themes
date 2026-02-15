@@ -437,3 +437,9 @@ When installing packages, tools, MCP servers, or any external dependencies:
 
 ### Iteration 10
 - Implemented Aurora theme with animated gradient background and scroll-based photo reveals
+
+### Iteration 11
+- Implemented Mosaic theme with fullscreen masonry grid layout
+- Created `src/utils/mosaic-layout.ts` utility for aspect ratio-based grid cell sizing
+- Created `src/hooks/use-mouse-position.ts` hook for cursor-tracking effects
+- Implemented expand-in-place photo interaction with GSAP animations

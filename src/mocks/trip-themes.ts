@@ -8,7 +8,7 @@ export const tripThemes: TripTheme[] = [
   },
   {
     tripId: 'morocco-markets',
-    theme: Theme.Collage,
+    theme: Theme.Mosaic,
   },
   {
     tripId: 'nordic-winter',

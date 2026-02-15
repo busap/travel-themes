@@ -100,6 +100,36 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.Mosaic]: {
+    component: 'mosaic-theme',
+    layout: {
+      type: 'masonry',
+      scrollDirection: 'vertical',
+      spacing: 'gap-4',
+    },
+    animation: {
+      enabled: true,
+      scrollTrigger: {
+        start: 'top 85%',
+        end: 'top 60%',
+      },
+      timeline: {
+        duration: 0.4,
+        ease: 'power2.out',
+        stagger: 0.1,
+      },
+    },
+    photos: {
+      arrangement: 'grid',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-4xl font-bold',
+        bodyClasses: 'text-base text-zinc-600',
+      },
+    },
+  },
 };
 
 export function getThemeConfig(theme: Theme): ThemeConfig {
