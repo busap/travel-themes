@@ -24,6 +24,7 @@ interface TripPolaroidCardProps extends BasePolaroidCardProps {
   subtitle: string;
   description?: string;
   href: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 interface PhotoPolaroidCardProps extends BasePolaroidCardProps {
@@ -155,6 +156,7 @@ export function PolaroidCard(props: PolaroidCardProps) {
         href={tripProps.href}
         className={linkClass}
         style={{ transform: getTransform() }}
+        onClick={tripProps.onClick}
       >
         {polaroidFrame}
       </Link>

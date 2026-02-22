@@ -10,6 +10,7 @@ interface TripCardProps {
   rotation?: number;
   scale?: number;
   offset?: { x: number; y: number };
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export function TripCard({
@@ -18,7 +19,8 @@ export function TripCard({
   variant = TripCardVariant.Immersive,
   rotation,
   scale,
-  offset
+  offset,
+  onClick,
 }: TripCardProps) {
   if (variant === TripCardVariant.Polaroid) {
     return (
@@ -28,6 +30,7 @@ export function TripCard({
         rotation={rotation}
         scale={scale}
         offset={offset}
+        onClick={onClick}
       />
     );
   }

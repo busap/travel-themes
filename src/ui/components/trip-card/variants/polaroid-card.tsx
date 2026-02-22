@@ -9,6 +9,7 @@ interface PolaroidCardProps {
   rotation?: number;
   scale?: number;
   offset?: { x: number; y: number };
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export function PolaroidCard({
@@ -16,7 +17,8 @@ export function PolaroidCard({
   priority,
   rotation,
   scale,
-  offset
+  offset,
+  onClick,
 }: PolaroidCardProps) {
   return (
     <BasePolaroidCard
@@ -30,6 +32,7 @@ export function PolaroidCard({
       rotation={rotation}
       scale={scale}
       offset={offset}
+      onClick={onClick}
     />
   );
 }
