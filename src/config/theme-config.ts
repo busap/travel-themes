@@ -130,6 +130,26 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.Feed]: {
+    component: 'feed-theme',
+    layout: {
+      type: 'card-grid',
+      scrollDirection: 'vertical',
+      spacing: 'gap-4',
+    },
+    animation: {
+      enabled: true,
+      timeline: {
+        duration: 0.5,
+        ease: 'power2.out',
+        stagger: 0.1,
+      },
+    },
+    photos: {
+      arrangement: 'flow',
+      revealPattern: 'scroll-based',
+    },
+  },
 };
 
 export function getThemeConfig(theme: Theme): ThemeConfig {

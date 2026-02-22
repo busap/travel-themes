@@ -1,0 +1,146 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+// --- Page wrapper ---
+.theme {
+  @apply min-h-screen w-full bg-zinc-100 flex justify-center items-center;
+}
+
+// --- Phone frame container ---
+.phoneFrameWrapper {
+  @apply flex justify-center items-center;
+  min-height: 100vh;
+}
+
+.phoneFrame {
+  @apply relative bg-black;
+  height: 90vh;
+  max-height: 812px;
+  aspect-ratio: 9 / 19.5;
+  border-radius: 60px;
+  box-shadow:
+    0 0 0 3px #1a1a1a,
+    0 0 0 6px #333,
+    0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+// Dynamic island notch
+.phoneNotch {
+  @apply absolute top-3 left-1/2 bg-black rounded-full z-20;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 36px;
+}
+
+// The scrollable phone screen
+.phoneViewport {
+  @apply absolute inset-0 overflow-y-auto bg-white;
+  border-radius: 60px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// --- Feed content inside the phone ---
+.feedContent {
+  padding-top: 56px;
+  padding-bottom: 40px;
+}
+
+// --- Trip header (IG profile style) ---
+.tripHeader {
+  @apply text-center py-6 px-4;
+}
+
+.tripName {
+  @apply text-lg font-bold text-zinc-900;
+}
+
+.tripMeta {
+  @apply text-xs text-zinc-500 mt-1;
+}
+
+.tripDescription {
+  @apply text-xs text-zinc-600 mt-2 leading-relaxed;
+}
+
+// --- Feed card ---
+.feedCard {
+  @apply mb-3;
+}
+
+.feedCardImage {
+  @apply relative w-full;
+  aspect-ratio: 4 / 5;
+}
+
+.feedCardFooter {
+  @apply px-3 py-2;
+}
+
+.heartIcon {
+  @apply mb-1;
+  color: #262626;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.feedCardCaption {
+  @apply text-xs text-zinc-800;
+}
+
+.feedCardTitle {
+  @apply font-semibold;
+}
+
+// --- Empty state ---
+.emptyState {
+  @apply flex items-center justify-center py-24 text-zinc-400 text-lg;
+}
+
+// --- Mobile: strip phone frame, show simple feed ---
+@media (max-width: $breakpoint-sm) {
+  .theme {
+    @apply bg-white block;
+  }
+
+  .phoneFrameWrapper {
+    min-height: auto;
+  }
+
+  .phoneFrame {
+    @apply bg-transparent;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .phoneNotch {
+    display: none;
+  }
+
+  .phoneViewport {
+    position: relative;
+    inset: auto;
+    overflow: visible;
+    border-radius: 0;
+  }
+
+  .feedContent {
+    padding-top: 0;
+    padding-bottom: 40px;
+  }
+}

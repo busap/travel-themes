@@ -3,6 +3,7 @@ import { ThemeConfig } from '@/config/theme-config';
 import { CollageTheme } from './collage-theme/collage-theme';
 import { AuroraTheme } from './aurora-theme/aurora-theme';
 import { MosaicTheme } from './mosaic-theme/mosaic-theme';
+import { FeedTheme } from './feed-theme/feed-theme';
 import styles from './theme-renderer.module.scss';
 
 interface ThemeRendererProps {
@@ -22,6 +23,9 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
     case 'mosaic-theme':
       return <MosaicTheme trip={trip} config={config} />;
+
+    case 'feed-theme':
+      return <FeedTheme trip={trip} config={config} />;
 
     default:
       // Default fallback

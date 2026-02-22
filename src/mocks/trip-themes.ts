@@ -14,4 +14,8 @@ export const tripThemes: TripTheme[] = [
     tripId: 'nordic-winter',
     theme: Theme.Aurora,
   },
+  {
+    tripId: 'greek-islands',
+    theme: Theme.Feed,
+  },
 ];
