@@ -85,22 +85,22 @@ describe('trip utilities', () => {
       expect(theme).toBe(Theme.Collage);
     });
 
-    it('should return Immersive theme for Morocco trip', () => {
+    it('should return Mosaic theme for Morocco trip', () => {
       const theme = getThemeForTrip('morocco-markets');
-      expect(theme).toBe(Theme.Collage);
+      expect(theme).toBe(Theme.Mosaic);
     });
 
-    it('should return Editorial theme for Nordic trip', () => {
+    it('should return Aurora theme for Nordic trip', () => {
       const theme = getThemeForTrip('nordic-winter');
-      expect(theme).toBe(Theme.Collage);
+      expect(theme).toBe(Theme.Aurora);
     });
 
-    it('should return Minimal theme as fallback for unknown trip', () => {
+    it('should return Collage theme as fallback for unknown trip', () => {
       const theme = getThemeForTrip('unknown-trip');
       expect(theme).toBe(Theme.Collage);
     });
 
-    it('should return Minimal theme for empty string trip ID', () => {
+    it('should return Collage theme for empty string trip ID', () => {
       const theme = getThemeForTrip('');
       expect(theme).toBe(Theme.Collage);
     });
