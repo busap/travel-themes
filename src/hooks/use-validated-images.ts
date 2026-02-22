@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Photo } from '@/types/photo';
 
 interface UseValidatedImagesResult {
@@ -10,7 +10,9 @@ interface UseValidatedImagesResult {
 export function useValidatedImages(photos: Photo[]): UseValidatedImagesResult {
   const [failedSrcs, setFailedSrcs] = useState<Set<string>>(new Set());
 
-  const photosWithSrc = photos.filter(photo => photo.src?.trim());
+  const photosWithSrc = useMemo(() => {
+      return photos.filter(photo => photo.src?.trim());
+  }, [photos])
 
   const handleImageError = useCallback((src: string) => {
     setFailedSrcs(prev => new Set(prev).add(src));
