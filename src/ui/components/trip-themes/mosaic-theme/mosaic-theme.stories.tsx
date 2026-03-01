@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { MosaicTheme } from './mosaic-theme';
-import { trips } from '@/mocks/trips';
+import { randomTrip } from '@/mocks/trips';
 import { getThemeConfig } from '@/config/theme-config';
 import { Theme } from '@/enums/theme';
 
@@ -20,7 +20,7 @@ const config = getThemeConfig(Theme.Mosaic);
 
 export const Default: Story = {
   args: {
-    trip: trips[1],
+    trip: randomTrip(),
     config,
   },
 };

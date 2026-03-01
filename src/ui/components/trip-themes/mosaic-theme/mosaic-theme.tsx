@@ -53,36 +53,39 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
   useEffect(() => {
     if (!animationEnabled || !gridRef.current) return;
 
-    const photoItems = gridRef.current.querySelectorAll('[data-photo-item]');
+    const gridEl = gridRef.current;
+    const photoItems = gridEl.querySelectorAll('[data-photo-item]');
 
-    photoItems.forEach((item, index) => {
-      gsap.fromTo(
-        item,
-        {
-          opacity: 0,
-          scale: 0.9,
-        },
-        {
-          opacity: 1,
-          scale: 1,
-          duration,
-          ease,
-          scrollTrigger: {
-            trigger: item,
-            start: scrollTriggerStart,
-            end: scrollTriggerEnd,
-            toggleActions: 'play none none none',
+    gsap.set(photoItems, { clearProps: 'opacity,scale,transform,zIndex' });
+
+    const ctx = gsap.context(() => {
+      photoItems.forEach((item, index) => {
+        gsap.fromTo(
+          item,
+          {
+            opacity: 0,
+            scale: 0.9,
           },
-          // Stagger in groups of 6 to create a wave effect across grid rows
-          delay: (index % 6) * stagger,
-        }
-      );
-    });
+          {
+            opacity: 1,
+            scale: 1,
+            duration,
+            ease,
+            scrollTrigger: {
+              trigger: item,
+              start: scrollTriggerStart,
+              end: scrollTriggerEnd,
+              toggleActions: 'play none none none',
+            },
+            delay: (index % 6) * stagger,
+          }
+        );
+      });
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, [animationEnabled, validatedPhotos.length, duration, ease, stagger, scrollTriggerStart, scrollTriggerEnd]);
+    }, gridEl);
+
+    return () => ctx.revert();
+  }, [animationEnabled, validatedPhotos.length, failedSrcs.size, duration, ease, stagger, scrollTriggerStart, scrollTriggerEnd]);
 
   const scrollToKeepPhotoInView = (photoRef: HTMLDivElement) => {
     const rect = photoRef.getBoundingClientRect();

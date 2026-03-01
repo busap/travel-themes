@@ -107,7 +107,7 @@
   }
 }
 
-@media (min-width: 1400px) {
+@media (min-width: $breakpoint-xl) {
   .photoGrid {
     grid-auto-rows: 140px;
   }
