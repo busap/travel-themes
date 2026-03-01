@@ -130,6 +130,34 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.Drift]: {
+    component: 'drift-theme',
+    layout: {
+      scrollDirection: 'vertical',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+      scrollTrigger: {
+        start: 'top 85%',
+      },
+      timeline: {
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.12,
+      },
+    },
+    photos: {
+      arrangement: 'scatter',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-5xl font-light tracking-wide',
+        bodyClasses: 'text-lg text-zinc-600',
+      },
+    },
+  },
   [Theme.Feed]: {
     component: 'feed-theme',
     layout: {

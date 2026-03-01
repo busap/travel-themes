@@ -5,6 +5,7 @@ import { AuroraTheme } from './aurora-theme/aurora-theme';
 import { MosaicTheme } from './mosaic-theme/mosaic-theme';
 import { FeedTheme } from './feed-theme/feed-theme';
 import styles from './theme-renderer.module.scss';
+import {DriftTheme} from "@/ui/components/trip-themes/drift-theme/drift-theme";
 
 interface ThemeRendererProps {
   trip: Trip;
@@ -26,6 +27,9 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
     case 'feed-theme':
       return <FeedTheme trip={trip} config={config} />;
+
+  case 'drift-theme':
+      return <DriftTheme trip={trip} config={config} />;
 
     default:
       // Default fallback

@@ -2,5 +2,6 @@ export enum Theme {
   Collage = 'collage',
   Aurora = 'aurora',
   Mosaic = 'mosaic',
-  Feed = 'feed'
+  Feed = 'feed',
+  Drift = 'drift',
 }
