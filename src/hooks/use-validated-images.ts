@@ -15,7 +15,10 @@ export function useValidatedImages(photos: Photo[]): UseValidatedImagesResult {
   }, [photos])
 
   const handleImageError = useCallback((src: string) => {
-    setFailedSrcs(prev => new Set(prev).add(src));
+    setFailedSrcs(prev => {
+      if (prev.has(src)) return prev;
+      return new Set(prev).add(src);
+    });
   }, []);
 
   return { photos: photosWithSrc, failedSrcs, handleImageError };
