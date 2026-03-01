@@ -348,6 +348,7 @@ export function MyTheme({ trip, config }: ThemeProps) {
 - Don't use inline Tailwind classes - create SCSS modules (`.module.scss`) with `@apply`
 - Don't use `@import` in SCSS - use `@reference` for globals
 - Don't use plain `<img>` tags - always use Next.js `<Image>` from `next/image` for lazy loading, optimization, and correct `sizes` hints
+- Don't commit design plans or documentation in `docs/plans/` - create them locally for planning, but delete them after implementation is complete
 
 ## When Adding Dependencies
 
@@ -443,3 +444,6 @@ When installing packages, tools, MCP servers, or any external dependencies:
 - Created `src/utils/mosaic-layout.ts` utility for aspect ratio-based grid cell sizing
 - Created `src/hooks/use-mouse-position.ts` hook for cursor-tracking effects
 - Implemented expand-in-place photo interaction with GSAP animations
+
+### Iteration 12
+- Rebuilt Drift theme as wave-based magazine editorial layout
