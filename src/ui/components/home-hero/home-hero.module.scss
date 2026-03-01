@@ -1,0 +1,105 @@
+@reference "../../../app/globals.scss";
+
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero {
+  @apply relative w-full overflow-hidden;
+  background-color: #0f0f0f;
+}
+
+.backgroundImage {
+  @apply absolute inset-0 object-cover;
+}
+
+.overlay {
+  @apply absolute inset-0;
+}
+
+.content {
+  @apply relative z-10 flex flex-col items-center justify-center;
+  @apply px-6 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16;
+}
+
+.title {
+  font-family: var(--font-playfair-display), serif;
+  @apply text-5xl md:text-6xl lg:text-7xl xl:text-8xl;
+  @apply font-bold tracking-wide uppercase;
+  color: #f5f0eb;
+}
+
+.subtitle {
+  @apply mt-4 text-lg md:text-xl lg:text-2xl;
+  @apply font-light tracking-wider;
+  color: #d4ccc4;
+}
+
+.titleAnimated {
+  animation: heroReveal 0.8s ease-out forwards;
+}
+
+.subtitleAnimated {
+  animation: heroReveal 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .titleAnimated,
+  .subtitleAnimated {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.heroMap {
+  @apply h-[50vh] md:h-[60vh];
+}
+
+.heroCollage {
+  @apply h-[60vh] md:h-[70vh];
+}
+
+.heroFullscreen {
+  @apply h-screen;
+}
+
+.heroHeader {
+  @apply h-[45vh] md:h-[40vh];
+}
+
+.overlayDark {
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.overlayGradient {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+.overlayMedium {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.collageGrid {
+  @apply absolute inset-0 grid grid-cols-4 gap-1;
+  filter: blur(12px);
+  opacity: 0.55;
+}
+
+.collageImageWrapper {
+  @apply relative w-full h-full;
+}
+
+.fullscreenFixedDesktop {
+  @media (min-width: 1024px) {
+    background-attachment: fixed;
+  }
+}
+
