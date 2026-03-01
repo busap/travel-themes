@@ -58,3 +58,11 @@ export const Header: Story = {
   },
 };
 
+export const ClipText: Story = {
+  args: {
+    variant: HeroVariant.ClipText,
+    trips: defaultTrips,
+    featuredTripId: defaultTrips[0]?.id,
+  },
+};
+
