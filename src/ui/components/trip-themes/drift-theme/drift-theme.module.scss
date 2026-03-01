@@ -1,0 +1,283 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+.layout {
+  @apply relative min-h-screen;
+  overflow-x: clip;
+  background: linear-gradient(135deg, #fafaf9 0%, #f0f0ee 50%, #e8e6e3 100%);
+}
+
+.header {
+  @apply py-16 px-8 text-center;
+}
+
+.title {
+  @apply text-5xl font-light tracking-wide text-zinc-900;
+
+  @media (max-width: $breakpoint-md) {
+    @apply text-3xl;
+  }
+}
+
+.subtitle {
+  @apply mt-2 text-lg text-zinc-500 tracking-wider;
+
+  @media (max-width: $breakpoint-md) {
+    @apply text-base;
+  }
+}
+
+// --- Wave sections ---
+
+.wave {
+  @apply relative w-full flex items-center justify-center px-8;
+  min-height: 75vh;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: $breakpoint-md) {
+    @apply px-4;
+    min-height: 60vh;
+  }
+}
+
+// --- Photo element ---
+
+.photo {
+  @apply rounded-lg overflow-hidden;
+  height: fit-content;
+  will-change: transform, opacity;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 300ms ease;
+
+  &:hover {
+    box-shadow:
+      0 20px 50px rgba(0, 0, 0, 0.18),
+      0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.photoImage {
+  @apply w-full h-auto object-cover;
+}
+
+.caption {
+  @apply mt-2 px-3 pb-2 text-sm text-zinc-600 italic;
+}
+
+// --- 1-photo compositions ---
+
+.singleLeft {
+  @apply flex justify-start w-full;
+
+  .photo {
+    width: 55%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 85%;
+    }
+  }
+}
+
+.singleRight {
+  @apply flex justify-end w-full;
+
+  .photo {
+    width: 55%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 85%;
+    }
+  }
+}
+
+.singleCenter {
+  @apply flex justify-center w-full;
+
+  .photo {
+    width: 70%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 90%;
+    }
+  }
+}
+
+// --- 2-photo compositions ---
+
+.duoStaggered {
+  @apply flex gap-6 w-full items-start;
+
+  .photo:nth-child(1) {
+    width: 45%;
+    margin-top: 0;
+
+    @media (max-width: $breakpoint-md) {
+      width: 50%;
+    }
+  }
+
+  .photo:nth-child(2) {
+    width: 40%;
+    margin-top: 60px;
+
+    @media (max-width: $breakpoint-md) {
+      width: 45%;
+      margin-top: 30px;
+    }
+  }
+}
+
+.duoBigSmallLeft {
+  @apply flex gap-6 w-full items-start;
+
+  .photo:nth-child(1) {
+    width: 50%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 55%;
+    }
+  }
+
+  .photo:nth-child(2) {
+    width: 30%;
+    margin-top: 80px;
+
+    @media (max-width: $breakpoint-md) {
+      width: 38%;
+      margin-top: 40px;
+    }
+  }
+}
+
+.duoBigSmallRight {
+  @apply flex gap-6 w-full items-start;
+
+  .photo:nth-child(1) {
+    width: 30%;
+    margin-top: 80px;
+
+    @media (max-width: $breakpoint-md) {
+      width: 38%;
+      margin-top: 40px;
+    }
+  }
+
+  .photo:nth-child(2) {
+    width: 50%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 55%;
+    }
+  }
+}
+
+.duoDiagonal {
+  @apply flex flex-col w-full gap-6;
+
+  .photo:nth-child(1) {
+    width: 42%;
+    align-self: flex-start;
+
+    @media (max-width: $breakpoint-md) {
+      width: 65%;
+    }
+  }
+
+  .photo:nth-child(2) {
+    width: 42%;
+    align-self: flex-end;
+
+    @media (max-width: $breakpoint-md) {
+      width: 65%;
+    }
+  }
+}
+
+// --- 3-photo compositions ---
+
+.trioOneTwo {
+  @apply flex flex-col items-center gap-6 w-full;
+
+  .photo:nth-child(1) {
+    width: 55%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 85%;
+    }
+  }
+
+  // Bottom row
+  .trioBottomRow {
+    @apply flex gap-6 w-full justify-center;
+  }
+
+  .photo:nth-child(2),
+  .photo:nth-child(3) {
+    width: 35%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 45%;
+    }
+  }
+}
+
+.trioTwoOne {
+  @apply flex flex-col items-center gap-6 w-full;
+
+  // Top row
+  .trioTopRow {
+    @apply flex gap-6 w-full justify-center;
+  }
+
+  .photo:nth-child(1),
+  .photo:nth-child(2) {
+    width: 35%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 45%;
+    }
+  }
+
+  .photo:nth-child(3) {
+    width: 55%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 85%;
+    }
+  }
+}
+
+.trioLShape {
+  @apply flex gap-6 w-full items-start;
+
+  .photo:nth-child(1) {
+    width: 45%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 50%;
+    }
+  }
+
+  .trioRightStack {
+    @apply flex flex-col gap-6;
+    width: 35%;
+
+    @media (max-width: $breakpoint-md) {
+      width: 45%;
+    }
+  }
+
+  .trioRightStack .photo {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo {
+    @apply opacity-100;
+    transform: none !important;
+  }
+}
