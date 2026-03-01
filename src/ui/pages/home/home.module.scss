@@ -20,7 +20,8 @@
 }
 
 .main {
-  @apply px-6 pb-16 md:px-12 md:pb-24;
+  @apply relative z-10 px-6 pb-16 md:px-12 md:pb-24;
+  margin-top: -20vh;
 }
 
 .grid {

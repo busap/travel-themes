@@ -1,12 +1,13 @@
 'use client';
 
+import React from 'react';
 import { TripCard } from '@/ui/components/trip-card/trip-card';
+import { HomeHero } from '@/ui/components/home-hero/home-hero';
 import { TripCardVariant } from '@/enums/trip-card-variant';
 import { getAllTrips } from '@/utils/trip';
 import { getPolaroidTransform } from '@/utils/polaroid-layout';
 import { usePageTransition } from '@/hooks/use-page-transition';
 import styles from './home.module.scss';
-import React from "react";
 
 export function Home() {
   const trips = getAllTrips();
@@ -19,14 +20,7 @@ export function Home() {
 
   return (
     <div className={styles.home}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>
-          TravelThemes
-        </h1>
-        <p className={styles.subtitle}>
-          Adventures through the lens
-        </p>
-      </header>
+      <HomeHero />
 
       <main className={styles.main}>
         <div className={styles.grid}>
