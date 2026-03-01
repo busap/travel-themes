@@ -101,3 +101,6 @@ Photo-centric travel website where trips are displayed through themed visual pre
 
 ### Iteration 12
 - Rebuilt Drift theme as wave-based magazine editorial layout
+
+### Iteration 13
+- 2026-03-01: HomeHero refinement – editorial + cinematic design, ClipText variant (image through letters), Playfair Display, entrance animation
