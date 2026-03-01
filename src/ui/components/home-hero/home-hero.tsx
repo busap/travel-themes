@@ -63,8 +63,12 @@ export function HomeHero({ variant, trips, featuredTripId }: HomeHeroProps) {
       </div>
       <div className={`${styles.overlay} ${styles.overlayDark}`} />
       <div className={styles.content}>
-        <h1 className={styles.title}>TravelThemes</h1>
-        <p className={styles.subtitle}>Adventures through the lens</p>
+        <h1 className={`${styles.title} ${styles.titleAnimated}`}>
+          TravelThemes
+        </h1>
+        <p className={`${styles.subtitle} ${styles.subtitleAnimated}`}>
+          Adventures through the lens
+        </p>
       </div>
     </section>
   );
@@ -91,8 +95,12 @@ export function HomeHero({ variant, trips, featuredTripId }: HomeHeroProps) {
         )}
         <div className={`${styles.overlay} ${styles.overlayDark}`} />
         <div className={styles.content}>
-          <h1 className={styles.title}>TravelThemes</h1>
-          <p className={styles.subtitle}>Adventures through the lens</p>
+          <h1 className={`${styles.title} ${styles.titleAnimated}`}>
+            TravelThemes
+          </h1>
+          <p className={`${styles.subtitle} ${styles.subtitleAnimated}`}>
+            Adventures through the lens
+          </p>
         </div>
       </section>
     );
@@ -117,8 +125,12 @@ export function HomeHero({ variant, trips, featuredTripId }: HomeHeroProps) {
         )}
         <div className={`${styles.overlay} ${styles.overlayGradient}`} />
         <div className={styles.content}>
-          <h1 className={styles.title}>TravelThemes</h1>
-          <p className={styles.subtitle}>Adventures through the lens</p>
+          <h1 className={`${styles.title} ${styles.titleAnimated}`}>
+            TravelThemes
+          </h1>
+          <p className={`${styles.subtitle} ${styles.subtitleAnimated}`}>
+            Adventures through the lens
+          </p>
         </div>
       </section>
     );
@@ -141,8 +153,59 @@ export function HomeHero({ variant, trips, featuredTripId }: HomeHeroProps) {
         )}
         <div className={`${styles.overlay} ${styles.overlayMedium}`} />
         <div className={styles.content}>
-          <h1 className={styles.title}>TravelThemes</h1>
-          <p className={styles.subtitle}>Adventures through the lens</p>
+          <h1 className={`${styles.title} ${styles.titleAnimated}`}>
+            TravelThemes
+          </h1>
+          <p className={`${styles.subtitle} ${styles.subtitleAnimated}`}>
+            Adventures through the lens
+          </p>
+        </div>
+      </section>
+    );
+  };
+
+  const renderClipTextVariant = () => {
+    const featuredTrip = getFeaturedTrip(trips, featuredTripId);
+    const imageSrc =
+      featuredTrip?.coverPhoto ??
+      trips?.[0]?.coverPhoto ??
+      MAP_BACKGROUND_URL;
+    const fallbackGradient =
+      'linear-gradient(135deg, #8B7355 0%, #5C4A3A 50%, #2C2C2C 100%)';
+
+    return (
+      <section className={`${styles.hero} ${styles.heroClipText}`}>
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt="ClipText hero background"
+            fill
+            priority
+            sizes="100vw"
+            className={styles.backgroundImage}
+          />
+        ) : (
+          <div
+            className={styles.backgroundImage}
+            style={{ background: fallbackGradient }}
+          />
+        )}
+        <div className={styles.content}>
+          <h1
+            className={styles.titleClipText}
+            style={{
+              backgroundImage: imageSrc
+                ? `url(${imageSrc})`
+                : fallbackGradient,
+            }}
+          >
+            TravelThemes
+          </h1>
+          <p
+            className={`${styles.subtitleClipText} ${styles.subtitleAnimated}`}
+          >
+            Adventures through the lens
+          </p>
         </div>
       </section>
     );
@@ -157,6 +220,8 @@ export function HomeHero({ variant, trips, featuredTripId }: HomeHeroProps) {
       return renderFullscreenVariant();
     case HeroVariant.Header:
       return renderHeaderVariant();
+    case HeroVariant.ClipText:
+      return renderClipTextVariant();
     default:
       return renderMapVariant();
   }
