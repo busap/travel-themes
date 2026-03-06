@@ -24,8 +24,8 @@
 
 .stack {
   @apply relative;
-  width: min(760px, 88vw);
-  height: min(480px, 62vh);
+  width: min(900px, 90vw);
+  height: min(700px, 70vh);
 }
 
 .card {
@@ -58,6 +58,7 @@
 .card:nth-child(3) {
   inset: 28% 30% 20% 30%;
   transform: rotate(-3deg);
+  z-index: 1;
 }
 
 .card:nth-child(4) {
