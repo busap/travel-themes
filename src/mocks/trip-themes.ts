@@ -22,4 +22,8 @@ export const tripThemes: TripTheme[] = [
     tripId: 'italian-escape',
     theme: Theme.Drift,
   },
+  {
+    tripId: 'thailand-adventure',
+    theme: Theme.Trail,
+  },
 ];

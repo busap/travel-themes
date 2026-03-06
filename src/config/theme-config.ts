@@ -158,6 +158,27 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.Trail]: {
+    component: 'trail-theme',
+    layout: {
+      type: 'photo-trail',
+      scrollDirection: 'none',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+    },
+    photos: {
+      arrangement: 'trail',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-5xl font-light tracking-wide',
+        bodyClasses: 'text-lg text-zinc-500',
+      },
+    },
+  },
   [Theme.Feed]: {
     component: 'feed-theme',
     layout: {

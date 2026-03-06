@@ -4,4 +4,5 @@ export enum Theme {
   Mosaic = 'mosaic',
   Feed = 'feed',
   Drift = 'drift',
+  Trail = 'trail',
 }

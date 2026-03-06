@@ -5,7 +5,8 @@ import { AuroraTheme } from './aurora-theme/aurora-theme';
 import { MosaicTheme } from './mosaic-theme/mosaic-theme';
 import { FeedTheme } from './feed-theme/feed-theme';
 import styles from './theme-renderer.module.scss';
-import {DriftTheme} from "@/ui/components/trip-themes/drift-theme/drift-theme";
+import { DriftTheme } from '@/ui/components/trip-themes/drift-theme/drift-theme';
+import { TrailTheme } from '@/ui/components/trip-themes/trail-theme/trail-theme';
 
 interface ThemeRendererProps {
   trip: Trip;
@@ -28,8 +29,11 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
     case 'feed-theme':
       return <FeedTheme trip={trip} config={config} />;
 
-  case 'drift-theme':
+    case 'drift-theme':
       return <DriftTheme trip={trip} config={config} />;
+
+    case 'trail-theme':
+      return <TrailTheme trip={trip} config={config} />;
 
     default:
       // Default fallback

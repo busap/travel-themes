@@ -104,6 +104,11 @@ describe('trip utilities', () => {
       const theme = getThemeForTrip('');
       expect(theme).toBe(Theme.Collage);
     });
+
+    it('should return Trail theme for Thailand trip', () => {
+      const theme = getThemeForTrip('thailand-adventure');
+      expect(theme).toBe(Theme.Trail);
+    });
   });
 
   describe('getTripThemeConfig', () => {

@@ -1,0 +1,83 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+.layout {
+  @apply relative w-full h-screen overflow-hidden;
+  background: radial-gradient(circle at top left, #fefcf8 0%, #f3f0ea 32%, #e4dfd7 72%, #d4cdc2 100%);
+}
+
+.content {
+  @apply relative z-20 h-full flex items-center justify-center px-6 md:px-12;
+}
+
+.meta {
+  @apply absolute top-6 left-6 md:top-10 md:left-10 z-30;
+}
+
+.title {
+  @apply text-3xl md:text-4xl lg:text-5xl font-light tracking-wide text-zinc-900;
+}
+
+.subtitle {
+  @apply mt-1 text-sm md:text-base text-zinc-600 tracking-wide;
+}
+
+.stack {
+  @apply relative;
+  width: min(760px, 88vw);
+  height: min(480px, 62vh);
+}
+
+.card {
+  @apply absolute rounded-3xl overflow-hidden;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.35),
+    0 10px 28px rgba(15, 23, 42, 0.25);
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.cardInner {
+  @apply w-full h-full;
+}
+
+.cardImage {
+  @apply w-full h-full object-cover;
+}
+
+.card:nth-child(1) {
+  inset: 16% 52% 44% 4%;
+  transform: rotate(-10deg);
+}
+
+.card:nth-child(2) {
+  inset: 10% 10% 50% 42%;
+  transform: rotate(8deg);
+}
+
+.card:nth-child(3) {
+  inset: 28% 30% 20% 30%;
+  transform: rotate(-3deg);
+}
+
+.card:nth-child(4) {
+  inset: 46% 54% 6% 8%;
+  transform: rotate(12deg);
+}
+
+.card:nth-child(5) {
+  inset: 40% 8% 10% 52%;
+  transform: rotate(-14deg);
+}
+
+@media (max-width: $breakpoint-md) {
+  .meta {
+    @apply top-4 left-4;
+  }
+
+  .stack {
+    width: min(520px, 88vw);
+    height: min(360px, 60vh);
+  }
+}
+
