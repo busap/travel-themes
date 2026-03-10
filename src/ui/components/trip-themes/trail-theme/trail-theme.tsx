@@ -72,9 +72,9 @@ export function TrailTheme({ trip, config }: TrailThemeProps) {
         {trailImages.length > 0 && (
           <CursorImageTrail
             images={trailImages}
-            spawnThreshold={110}
+            spawnThreshold={200}
             smoothing={0.14}
-            lifespan={3200}
+            lifespan={4000}
             maxItems={26}
           />
         )}
