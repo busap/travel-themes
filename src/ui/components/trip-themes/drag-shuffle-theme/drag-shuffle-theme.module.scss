@@ -233,6 +233,6 @@
   }
 
   .progressRow {
-    @apply gap-1.5;
+    @apply gap-1.5 justify-around px-2;
   }
 }
