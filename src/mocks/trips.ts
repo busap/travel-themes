@@ -156,8 +156,6 @@ export const trips: Trip[] = [
     photos: [
       { src: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1200&q=80', title: 'Moroccan Market', description: 'Vibrant colors of the souk' },
       { src: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80', title: 'Sahara Desert', description: 'Golden dunes at sunset' },
-      { src: 'https://images.unsplash.com/photo-1548017871-f3f70db8b4c3?w=1200&q=80', title: 'Chefchaouen', description: 'The Blue Pearl of Morocco' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Medina Alley' },
       { src: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80', title: 'Spice Market' },
       { src: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80', title: 'Moroccan Door' },
       { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Desert Campfire', description: 'Under the Saharan stars' },

@@ -56,8 +56,6 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
     const gridEl = gridRef.current;
     const photoItems = gridEl.querySelectorAll('[data-photo-item]');
 
-    gsap.set(photoItems, { clearProps: 'opacity,scale,transform,zIndex' });
-
     const ctx = gsap.context(() => {
       photoItems.forEach((item, index) => {
         gsap.fromTo(
@@ -213,6 +211,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
               style={{
                 gridColumn: gridSize.gridColumn,
                 gridRow: gridSize.gridRow,
+                opacity: 0
               }}
               onClick={(e) => handlePhotoClick(index, e.currentTarget as HTMLDivElement)}
             >
