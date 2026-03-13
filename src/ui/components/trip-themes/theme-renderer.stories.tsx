@@ -21,3 +21,10 @@ export const CollageTheme: Story = {
     config: getThemeConfig(Theme.Collage)
   },
 };
+
+export const DragShuffleTheme: Story = {
+  args: {
+    trip: trips.find((trip) => trip.id === 'swiss-alps') ?? trips[0],
+    config: getThemeConfig(Theme.DragShuffle),
+  },
+};

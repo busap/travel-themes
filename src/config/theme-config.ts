@@ -179,6 +179,31 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.DragShuffle]: {
+    component: 'drag-shuffle-theme',
+    layout: {
+      scrollDirection: 'none',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+      timeline: {
+        duration: 0.45,
+        ease: 'power3.out',
+      },
+    },
+    photos: {
+      arrangement: 'stack',
+      revealPattern: 'sequential',
+      count: 3,
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-3xl md:text-4xl font-black',
+        bodyClasses: 'text-sm md:text-base text-white/70',
+      },
+    },
+  },
   [Theme.Feed]: {
     component: 'feed-theme',
     layout: {

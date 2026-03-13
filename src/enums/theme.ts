@@ -5,4 +5,5 @@ export enum Theme {
   Feed = 'feed',
   Drift = 'drift',
   Trail = 'trail',
+  DragShuffle = 'drag-shuffle',
 }
