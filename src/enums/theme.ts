@@ -7,4 +7,5 @@ export enum Theme {
   Trail = 'trail',
   SmoothScroll = 'smooth-scroll',
   DragShuffle = 'drag-shuffle',
+  Showcase = 'showcase',
 }

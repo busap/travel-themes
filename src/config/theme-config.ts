@@ -254,6 +254,26 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       revealPattern: 'scroll-based',
     },
   },
+  [Theme.Showcase]: {
+    component: 'showcase-theme',
+    layout: {
+      scrollDirection: 'none',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+    },
+    photos: {
+      arrangement: 'grid',
+      revealPattern: 'sequential',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-4xl font-light tracking-wide',
+        bodyClasses: 'text-sm',
+      },
+    },
+  }
 };
 
 export function getThemeConfig(theme: Theme): ThemeConfig {
