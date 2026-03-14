@@ -7,6 +7,7 @@ import { FeedTheme } from './feed-theme/feed-theme';
 import styles from './theme-renderer.module.scss';
 import { DriftTheme } from '@/ui/components/trip-themes/drift-theme/drift-theme';
 import { TrailTheme } from '@/ui/components/trip-themes/trail-theme/trail-theme';
+import { SmoothScrollTheme } from '@/ui/components/trip-themes/smooth-scroll-theme/smooth-scroll-theme';
 import { DragShuffleTheme } from '@/ui/components/trip-themes/drag-shuffle-theme/drag-shuffle-theme';
 
 interface ThemeRendererProps {
@@ -35,6 +36,9 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
     case 'trail-theme':
       return <TrailTheme trip={trip} config={config} />;
+
+    case 'smooth-scroll-theme':
+      return <SmoothScrollTheme trip={trip} config={config} />;
 
     case 'drag-shuffle-theme':
       return <DragShuffleTheme trip={trip} config={config} />;

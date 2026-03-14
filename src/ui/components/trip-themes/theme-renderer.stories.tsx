@@ -22,6 +22,13 @@ export const CollageTheme: Story = {
   },
 };
 
+export const SmoothScrollTheme: Story = {
+  args: {
+    trip: trips.find((trip) => trip.id === 'paris-romance') ?? trips[0],
+    config: getThemeConfig(Theme.SmoothScroll),
+  },
+};
+
 export const DragShuffleTheme: Story = {
   args: {
     trip: trips.find((trip) => trip.id === 'swiss-alps') ?? trips[0],

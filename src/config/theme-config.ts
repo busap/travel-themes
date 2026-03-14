@@ -19,7 +19,7 @@ export interface ThemeConfig {
       trigger?: string;
       start?: string;
       end?: string;
-      scrub?: boolean | number;
+      scrub?: number;
       pin?: boolean;
     };
     timeline?: {
@@ -176,6 +176,36 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       typography: {
         titleClasses: 'text-5xl font-light tracking-wide',
         bodyClasses: 'text-lg text-zinc-500',
+      },
+    },
+  },
+  [Theme.SmoothScroll]: {
+    component: 'smooth-scroll-theme',
+    layout: {
+      type: 'vertical-parallax',
+      scrollDirection: 'vertical',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+      scrollTrigger: {
+        scrub: 5,
+        start: 'top top',
+        end: 'bottom top',
+      },
+      timeline: {
+        duration: 1,
+        ease: 'none',
+      },
+    },
+    photos: {
+      arrangement: 'flow',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-4xl font-light tracking-wide',
+        bodyClasses: 'text-base text-zinc-400',
       },
     },
   },

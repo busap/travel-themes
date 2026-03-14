@@ -27,6 +27,10 @@ export const tripThemes: TripTheme[] = [
     theme: Theme.Trail,
   },
   {
+    tripId: 'paris-romance',
+    theme: Theme.SmoothScroll,
+  },
+  {
     tripId: 'swiss-alps',
     theme: Theme.DragShuffle,
   },
