@@ -4,7 +4,6 @@ import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
 import { useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import styles from './feed-theme.module.scss';
@@ -27,7 +26,7 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
   const ease = config.animation?.timeline?.ease ?? 'power2.out';
   const stagger = config.animation?.timeline?.stagger ?? 0.5;
 
-  const { photos: validatedPhotos, handleImageError } = useValidatedImages(trip.photos);
+  const validatedPhotos = trip.photos.filter((p) => p.src?.trim());
 
   useEffect(() => {
     if (!animationEnabled || !feedRef.current || !viewportRef.current) return;
@@ -92,7 +91,6 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
             fill
             sizes="375px"
             style={{ objectFit: 'cover' }}
-            onError={() => handleImageError(photo.src)}
           />
         </div>
         <div className={styles.feedCardFooter}>

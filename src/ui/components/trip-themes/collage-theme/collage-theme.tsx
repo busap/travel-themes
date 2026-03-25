@@ -9,7 +9,6 @@ import { ScrollHint } from '@/ui/components/scroll-hint/scroll-hint';
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
 import { useHorizontalScroll } from '@/hooks/use-horizontal-scroll';
 import { useScrollBasedReveal } from '@/hooks/use-scroll-based-reveal';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import styles from './collage-theme.module.scss';
 
 interface CollageThemeProps {
@@ -23,7 +22,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const animationEnabled = config.animation.enabled;
   const revealPattern = config.photos.revealPattern;
   const isScrollBasedReveal = animationEnabled && revealPattern === 'scroll-based';
-  const { photos: photosWithSrc, handleImageError } = useValidatedImages(trip.photos);
+  const photosWithSrc = trip.photos.filter((p) => p.src?.trim());
   const photosToShow = config.photos?.count
     ? photosWithSrc.slice(0, config.photos.count)
     : photosWithSrc;
@@ -84,7 +83,6 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
                 rotation={rotation}
                 verticalOffset={offset.y}
                 aspectRatio="portrait"
-                onImageError={() => handleImageError(photo.src)}
               />
             </div>
           );

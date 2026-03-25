@@ -11,7 +11,6 @@ import {
 import Image from 'next/image';
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import styles from './drag-shuffle-theme.module.scss';
 
 type SwipeDirection = 'left' | 'right';
@@ -41,8 +40,9 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
   const pointerStartRef = useRef<DragPoint | null>(null);
 
-  const { photos: validatedPhotos, handleImageError } = useValidatedImages(
-    trip.photos,
+  const validatedPhotos = useMemo(
+    () => trip.photos.filter((p) => p.src?.trim()),
+    [trip.photos],
   );
 
   const animationEnabled = config.animation?.enabled ?? true;
@@ -234,7 +234,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
           priority={isTopCard}
           className={styles.cardImage}
           sizes="(max-width: 768px) 78vw, 420px"
-          onError={() => handleImageError(photo.src)}
         />
         <div className={styles.imageShade} />
         <footer className={styles.cardFooter}>
