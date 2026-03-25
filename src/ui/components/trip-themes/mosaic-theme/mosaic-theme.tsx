@@ -46,7 +46,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
   const scrollTriggerStart = config.animation?.scrollTrigger?.start ?? 'top 85%';
   const scrollTriggerEnd = config.animation?.scrollTrigger?.end ?? 'top 60%';
 
-  const validatedPhotos = trip.photos.filter((p) => p.src?.trim());
+  const validatedPhotos = trip.photos;
   const mousePosition = useMousePosition(gridRef);
 
   useEffect(() => {

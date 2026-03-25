@@ -40,11 +40,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
   const pointerStartRef = useRef<DragPoint | null>(null);
 
-  const validatedPhotos = useMemo(
-    () => trip.photos.filter((p) => p.src?.trim()),
-    [trip.photos],
-  );
-
   const animationEnabled = config.animation?.enabled ?? true;
   const animationDurationMs = Math.max(
     260,
@@ -54,9 +49,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
   const bodyClasses =
     config.styling?.typography?.bodyClasses ?? styles.tripDescription;
 
-  const deckPhotos = useMemo(() => {
-    return validatedPhotos.slice(0, 24);
-  }, [validatedPhotos]);
+  const deckPhotos = useMemo(() => trip.photos.slice(0, 24), [trip.photos]);
 
   const hasCards = deckPhotos.length > 0;
   const isFirstItem = activeIndex === 0;

@@ -39,21 +39,14 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
   const progressFillRef = useRef<HTMLDivElement>(null);
 
   const scrub = config.animation?.scrollTrigger?.scrub ?? 1;
-  const validatedPhotos = useMemo(
-    () => trip.photos.filter((p) => p.src?.trim()),
-    [trip.photos],
-  );
 
   const mainPhotoSrc = useMemo(() => {
-    if (trip.coverPhoto?.trim()) {
-      return trip.coverPhoto;
-    }
-    return validatedPhotos[0]?.src ?? '';
-  }, [trip.coverPhoto, validatedPhotos]);
+    return trip.coverPhoto?.trim() || trip.photos[0]?.src ?? '';
+  }, [trip.coverPhoto, trip.photos]);
 
   const nonMainPhotos = useMemo(() => {
-    return validatedPhotos.filter((photo) => photo.src !== mainPhotoSrc);
-  }, [validatedPhotos, mainPhotoSrc]);
+    return trip.photos.filter((photo) => photo.src !== mainPhotoSrc);
+  }, [trip.photos, mainPhotoSrc]);
 
   const photoAnimations = useMemo<PhotoAnimation[]>(
     () => buildPhotosAnimations(nonMainPhotos), 

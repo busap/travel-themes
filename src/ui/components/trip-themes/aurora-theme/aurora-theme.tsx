@@ -40,10 +40,7 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
   const titleClasses = config.styling?.typography?.titleClasses ?? '';
   const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
 
-  const validatedPhotos = useMemo(
-    () => trip.photos.filter((p) => p.src?.trim()),
-    [trip.photos],
-  );
+  const validatedPhotos = trip.photos;
 
   useAuroraAnimation(svgRef, {
     enabled: animationEnabled,

@@ -26,7 +26,7 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
   const ease = config.animation?.timeline?.ease ?? 'power2.out';
   const stagger = config.animation?.timeline?.stagger ?? 0.5;
 
-  const validatedPhotos = trip.photos.filter((p) => p.src?.trim());
+  const validatedPhotos = trip.photos;
 
   useEffect(() => {
     if (!animationEnabled || !feedRef.current || !viewportRef.current) return;

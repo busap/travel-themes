@@ -22,7 +22,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
   const animationEnabled = config.animation.enabled;
   const revealPattern = config.photos.revealPattern;
   const isScrollBasedReveal = animationEnabled && revealPattern === 'scroll-based';
-  const photosWithSrc = trip.photos.filter((p) => p.src?.trim());
+  const photosWithSrc = trip.photos;
   const photosToShow = config.photos?.count
     ? photosWithSrc.slice(0, config.photos.count)
     : photosWithSrc;

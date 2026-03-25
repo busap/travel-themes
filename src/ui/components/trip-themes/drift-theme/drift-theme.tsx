@@ -84,11 +84,6 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
   const titleClasses = config.styling?.typography?.titleClasses ?? '';
   const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
 
-  const validatedPhotos = useMemo(
-    () => trip.photos.filter((p) => p.src?.trim()),
-    [trip.photos],
-  );
-
   const idSeed = useMemo(() => {
     let hash = 0;
     for (let i = 0; i < trip.id.length; i++) {
@@ -99,7 +94,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
   }, [trip.id]);
 
   const waves = useMemo(() => {
-    const activePhotos = validatedPhotos;
+    const activePhotos = trip.photos;
     const result: Wave[] = [];
     let photoIndex = 0;
     let waveIndex = 0;
@@ -155,7 +150,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
     }
 
     return result;
-  }, [validatedPhotos, idSeed]);
+  }, [trip.photos, idSeed]);
 
   // Set up GSAP ScrollTrigger per wave
   useEffect(() => {

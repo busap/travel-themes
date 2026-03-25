@@ -13,20 +13,8 @@ interface TrailThemeProps {
 }
 
 export function TrailTheme({ trip, config }: TrailThemeProps) {
-  const photos = useMemo(
-    () => trip.photos.filter((p) => p.src?.trim()),
-    [trip.photos],
-  );
-
-  const stackPhotos = useMemo(
-    () => photos.slice(0, 5),
-    [photos],
-  );
-
-  const trailImages = useMemo(
-    () => photos.map((photo) => photo.src),
-    [photos],
-  );
+  const stackPhotos = useMemo(() => trip.photos.slice(0, 5), [trip.photos]);
+  const trailImages = useMemo(() => trip.photos.map((photo) => photo.src), [trip.photos]);
 
   const titleClasses =
     config.styling?.typography?.titleClasses || styles.title;
