@@ -1,0 +1,164 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+/* ─── Theme Shell ─────────────────────────────────────── */
+
+.theme {
+  @apply relative w-full overflow-hidden;
+  height: 100svh;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(30, 30, 50, 0.92), transparent),
+    linear-gradient(170deg, #0c0d14 0%, #131520 55%, #0a0b11 100%);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+/* ─── Carousel Grid ───────────────────────────────────── */
+
+.carouselGrid {
+  @apply absolute inset-0 flex flex-col justify-center;
+  gap: 12px;
+  padding-block: 12px;
+}
+
+/* ─── Carousel Rows ───────────────────────────────────── */
+
+.rowWrapper {
+  @apply relative overflow-hidden;
+  flex: 1;
+  min-height: 0;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.rowTrack {
+  @apply absolute top-0 left-0 flex items-stretch;
+  gap: 12px;
+  will-change: transform;
+  /* will not wrap – it's wider than viewport intentionally */
+  white-space: nowrap;
+  height: 100%;
+}
+
+/* ─── Image Cards ─────────────────────────────────────── */
+
+.imageCard {
+  @apply relative flex-shrink-0 overflow-hidden rounded-2xl;
+  /* Fixed width; height fills the row */
+  width: clamp(160px, 22vw, 300px);
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 200ms ease;
+
+  &:hover {
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.55),
+      0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.image {
+  @apply object-cover;
+  pointer-events: none;
+  /* Slight desaturation for a cohesive look; brightens on row hover */
+  filter: saturate(0.85) brightness(0.92);
+  transition: filter 600ms ease;
+}
+
+.rowWrapper:hover .image {
+  filter: saturate(1) brightness(0.98);
+}
+
+/* ─── Edge Fades ──────────────────────────────────────── */
+
+.edgeFadeLeft,
+.edgeFadeRight {
+  @apply absolute top-0 bottom-0 z-10 pointer-events-none;
+  width: clamp(60px, 12vw, 160px);
+}
+
+.edgeFadeLeft {
+  left: 0;
+  background: linear-gradient(to right, #0c0d14 0%, transparent 100%);
+}
+
+.edgeFadeRight {
+  right: 0;
+  background: linear-gradient(to left, #0c0d14 0%, transparent 100%);
+}
+
+/* ─── Center Overlay ──────────────────────────────────── */
+
+.overlay {
+  @apply absolute inset-0 z-20 flex flex-col items-center justify-center gap-4;
+  pointer-events: none;
+  padding-inline: 1.5rem;
+
+  /* Radial dark spot behind text */
+  &::before {
+    content: '';
+    @apply absolute inset-0;
+    background: radial-gradient(
+      ellipse 60% 55% at 50% 50%,
+      rgba(10, 11, 17, 0.82) 0%,
+      rgba(10, 11, 17, 0.48) 55%,
+      transparent 100%
+    );
+  }
+}
+
+.pill {
+  @apply relative z-10 text-xs font-semibold uppercase tracking-[0.28em];
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 0.35em 1.1em;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.28em;
+}
+
+.title {
+  @apply relative z-10 text-center font-bold text-white;
+  font-size: clamp(2.4rem, 6vw, 5.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-shadow:
+    0 2px 40px rgba(0, 0, 0, 0.8),
+    0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.subtitle {
+  @apply relative z-10 text-center;
+  font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.04em;
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+
+@media (max-width: $breakpoint-md) {
+  .carouselGrid {
+    gap: 8px;
+    padding-block: 8px;
+  }
+
+  .rowTrack {
+    gap: 8px;
+  }
+
+  .imageCard {
+    border-radius: 0.875rem;
+  }
+
+  .edgeFadeLeft,
+  .edgeFadeRight {
+    width: 40px;
+  }
+}
