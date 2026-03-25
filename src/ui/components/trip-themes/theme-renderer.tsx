@@ -9,6 +9,7 @@ import { DriftTheme } from '@/ui/components/trip-themes/drift-theme/drift-theme'
 import { TrailTheme } from '@/ui/components/trip-themes/trail-theme/trail-theme';
 import { SmoothScrollTheme } from '@/ui/components/trip-themes/smooth-scroll-theme/smooth-scroll-theme';
 import { DragShuffleTheme } from '@/ui/components/trip-themes/drag-shuffle-theme/drag-shuffle-theme';
+import { ImageGridHeroTheme } from '@/ui/components/trip-themes/image-grid-hero-theme/image-grid-hero-theme';
 
 interface ThemeRendererProps {
   trip: Trip;
@@ -42,6 +43,9 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
     case 'drag-shuffle-theme':
       return <DragShuffleTheme trip={trip} config={config} />;
+
+    case 'image-grid-hero-theme':
+      return <ImageGridHeroTheme trip={trip} config={config} />;
 
     default:
       // Default fallback

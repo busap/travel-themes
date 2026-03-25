@@ -1,0 +1,274 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+// ─── Page wrapper ─────────────────────────────────────────────────────────────
+
+.theme {
+  @apply min-h-screen w-full;
+  background: #f7f5f2;
+  color: #1a1614;
+}
+
+// ─── Hero section ─────────────────────────────────────────────────────────────
+
+.hero {
+  display: grid;
+  grid-template-columns: 44fr 56fr;
+  min-height: 100vh;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+}
+
+// ─── Left: text content ───────────────────────────────────────────────────────
+
+.heroText {
+  @apply flex flex-col justify-center;
+  padding: 80px 64px 80px 72px;
+  background: #f7f5f2;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: $breakpoint-lg) {
+    padding: 64px 48px;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: 56px 32px 40px;
+  }
+}
+
+.eyebrow {
+  @apply text-xs font-semibold tracking-widest uppercase;
+  color: #b5651d;
+  margin-bottom: 20px;
+  letter-spacing: 0.18em;
+}
+
+.year {
+  @apply font-normal;
+  color: #b5651d;
+}
+
+.title {
+  font-size: clamp(36px, 4.5vw, 72px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #1a1614;
+  margin-bottom: 24px;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: clamp(32px, 8vw, 56px);
+    margin-bottom: 20px;
+  }
+}
+
+.description {
+  @apply text-base leading-relaxed;
+  color: #6b6460;
+  max-width: 360px;
+  margin-bottom: 52px;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 36px;
+  }
+}
+
+// Scroll hint
+.scrollHint {
+  @apply flex items-center gap-3;
+  color: #9b928c;
+}
+
+.arrowIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  animation: bounceDown 2s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(5px); }
+}
+
+.scrollLabel {
+  @apply text-xs tracking-wider uppercase;
+  letter-spacing: 0.14em;
+}
+
+// ─── Right: photo grid ────────────────────────────────────────────────────────
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr 2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  background: #e8e0d8;
+  padding: 3px;
+  min-height: 100vh;
+
+  @media (max-width: $breakpoint-md) {
+    min-height: 60vw;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    padding: 2px;
+    gap: 2px;
+  }
+}
+
+// Cell base
+.gridCell {
+  @apply relative overflow-hidden;
+  cursor: pointer;
+
+  &:hover .cellInner img {
+    transform: scale(1.06);
+  }
+
+  &:hover .cellOverlay {
+    opacity: 1;
+  }
+}
+
+// Cell 1 – large left, spans 2 rows
+.cell1 {
+  grid-column: 1;
+  grid-row: 1 / 3;
+
+  @media (max-width: $breakpoint-md) {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+}
+
+// Cell 2 – top center
+.cell2 {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+// Cell 3 – top right
+.cell3 {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+// Cell 4 – bottom center
+.cell4 {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+// Cell 5 – bottom right
+.cell5 {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.cellInner {
+  @apply absolute inset-0;
+
+  img {
+    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+}
+
+.cellOverlay {
+  @apply absolute inset-0 flex items-end p-3;
+  background: linear-gradient(to top, rgba(20, 14, 10, 0.62) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.cellTitle {
+  @apply text-xs font-medium text-white;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+// ─── Gallery section ──────────────────────────────────────────────────────────
+
+.gallery {
+  @apply w-full;
+  padding: 80px 72px;
+  background: #f7f5f2;
+
+  @media (max-width: $breakpoint-lg) {
+    padding: 64px 48px;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 48px 20px;
+  }
+}
+
+.galleryHeader {
+  @apply flex items-center gap-6 mb-10;
+}
+
+.galleryHeading {
+  @apply text-sm font-semibold tracking-widest uppercase flex-shrink-0;
+  color: #9b928c;
+  letter-spacing: 0.18em;
+}
+
+.galleryDivider {
+  @apply flex-1 h-px;
+  background: #e0d8d0;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.galleryItem {
+  @apply relative overflow-hidden;
+  aspect-ratio: 4 / 3;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover .galleryItemInner img {
+    transform: scale(1.07);
+  }
+
+  &:hover .galleryOverlay {
+    opacity: 1;
+  }
+}
+
+.galleryItemInner {
+  @apply absolute inset-0;
+
+  img {
+    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+}
+
+.galleryOverlay {
+  @apply absolute inset-0 flex items-end p-4;
+  background: linear-gradient(to top, rgba(20, 14, 10, 0.58) 0%, transparent 52%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.galleryItemTitle {
+  @apply text-sm font-medium text-white;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
