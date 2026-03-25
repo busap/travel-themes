@@ -234,6 +234,36 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.Trippy]: {
+    component: 'trippy-theme',
+    layout: {
+      type: 'vertical-parallax',
+      scrollDirection: 'vertical',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+      scrollTrigger: {
+        scrub: 2,
+        start: 'top top',
+        end: 'bottom bottom',
+      },
+      timeline: {
+        duration: 1,
+        ease: 'power2.out',
+      },
+    },
+    photos: {
+      arrangement: 'stack',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-5xl font-black tracking-wide',
+        bodyClasses: 'text-sm text-white/40',
+      },
+    },
+  },
   [Theme.Feed]: {
     component: 'feed-theme',
     layout: {
