@@ -1,0 +1,276 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+// ─── Theme Shell ──────────────────────────────────────────────────────────────
+
+.theme {
+  @apply min-h-screen w-full;
+  background: #08080c;
+  color: white;
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+.hero {
+  @apply relative w-full overflow-hidden;
+  height: 100svh;
+  min-height: 600px;
+  cursor: crosshair;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #12101a 0%, #08080c 70%);
+}
+
+// Amber spotlight that tracks the cursor
+.spotlight {
+  @apply absolute inset-0 pointer-events-none;
+  z-index: 4;
+  background: radial-gradient(
+    ellipse 520px 400px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(251, 191, 36, 0.09) 0%,
+    rgba(251, 191, 36, 0.03) 45%,
+    transparent 75%
+  );
+  transition: background 0.05s ease;
+}
+
+// ─── 3-D Perspective Wrapper ──────────────────────────────────────────────────
+
+.perspectiveWrapper {
+  @apply absolute inset-0;
+  transform-origin: center center;
+  will-change: transform;
+  // Static fallback (no JS / animation disabled)
+  transform: perspective(1200px) rotateX(0deg) rotateY(0deg);
+}
+
+// ─── Grid ─────────────────────────────────────────────────────────────────────
+
+.grid {
+  @apply w-full h-full;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+}
+
+// ─── Cell ─────────────────────────────────────────────────────────────────────
+
+.cell {
+  @apply relative overflow-hidden;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  background: transparent;
+  transition:
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+
+  // Faint inner dot — hints that something is "inside"
+  &.hasPhoto::before {
+    content: '';
+    @apply absolute inset-0;
+    background: radial-gradient(
+      circle 6px at 50% 50%,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 100%
+    );
+    transition: opacity 0.35s ease;
+  }
+
+  // Hover state — photo unlocks
+  &.active {
+    border-color: rgba(251, 191, 36, 0.55);
+    background: rgba(251, 191, 36, 0.025);
+    box-shadow:
+      inset 0 0 24px rgba(251, 191, 36, 0.07),
+      0 0 40px rgba(251, 191, 36, 0.1);
+    z-index: 2;
+
+    &.hasPhoto::before {
+      opacity: 0;
+    }
+
+    .photoReveal {
+      opacity: 1;
+      transform: scale(1);
+      clip-path: inset(0% 0% 0% 0%);
+    }
+  }
+}
+
+// ─── Photo Reveal ─────────────────────────────────────────────────────────────
+
+// Clip-path animates from center-collapsed → fully open
+.photoReveal {
+  @apply absolute inset-0;
+  opacity: 0;
+  transform: scale(1.07);
+  clip-path: inset(50% 50% 50% 50%);
+  transition:
+    opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    clip-path 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Subtle glare sheen over the revealed photo
+.photoSheen {
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+  z-index: 1;
+}
+
+// ─── Title Layer ──────────────────────────────────────────────────────────────
+
+.titleLayer {
+  @apply absolute inset-0 flex flex-col items-center justify-center pointer-events-none;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem;
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  font-weight: 300;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(251, 191, 36, 0.75);
+  margin-bottom: 1.25rem;
+}
+
+.title {
+  font-weight: 800;
+  font-size: clamp(3rem, 8.5vw, 8.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: white;
+  text-shadow:
+    0 0 80px rgba(255, 255, 255, 0.12),
+    0 0 160px rgba(251, 191, 36, 0.08);
+  // Dark drop-shadow so the title stays legible over revealed photos
+  filter: drop-shadow(0 2px 40px rgba(0, 0, 0, 0.7));
+}
+
+.hint {
+  font-size: 0.65rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  margin-top: 1.5rem;
+  animation: hintPulse 3s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+// Soft gradient that bleeds the background into the gallery below
+.bottomFade {
+  @apply absolute bottom-0 left-0 right-0 pointer-events-none;
+  z-index: 20;
+  height: 180px;
+  background: linear-gradient(to top, #08080c 0%, transparent 100%);
+}
+
+// ─── Touch / no-hover fallback ────────────────────────────────────────────────
+
+// On devices without hover, reveal photos at 60% opacity so content is visible
+@media (hover: none) {
+  .photoReveal {
+    opacity: 0.6;
+    transform: scale(1);
+    clip-path: inset(0% 0% 0% 0%);
+  }
+
+  .cell.active .photoReveal {
+    opacity: 1;
+  }
+}
+
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+
+.gallery {
+  @apply w-full;
+  background: #08080c;
+  padding: 5rem 2rem 7rem;
+}
+
+.galleryGrid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 310px;
+  gap: 3px;
+}
+
+.galleryItem {
+  @apply relative overflow-hidden;
+
+  &:hover .galleryImage {
+    transform: scale(1.05);
+  }
+
+  &:hover .caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.galleryImage {
+  @apply w-full h-full;
+  object-fit: cover;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.caption {
+  @apply absolute bottom-0 left-0 right-0;
+  padding: 1rem 1.25rem 0.875rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  span {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $breakpoint-md) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+  }
+
+  .eyebrow {
+    font-size: 0.6rem;
+  }
+
+  .hint {
+    font-size: 0.6rem;
+  }
+
+  .galleryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 220px;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .gallery {
+    padding: 3rem 0.75rem 5rem;
+    gap: 2px;
+  }
+
+  .galleryGrid {
+    grid-auto-rows: 180px;
+    gap: 2px;
+  }
+}

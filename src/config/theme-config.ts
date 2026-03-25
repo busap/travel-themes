@@ -234,6 +234,27 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       },
     },
   },
+  [Theme.GridHover]: {
+    component: 'grid-hover-theme',
+    layout: {
+      type: 'card-grid',
+      scrollDirection: 'vertical',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+    },
+    photos: {
+      arrangement: 'grid',
+      revealPattern: 'scroll-based',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-7xl font-extrabold tracking-tight',
+        bodyClasses: 'text-sm font-light text-white/50',
+      },
+    },
+  },
   [Theme.Feed]: {
     component: 'feed-theme',
     layout: {
