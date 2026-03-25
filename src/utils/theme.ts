@@ -4,10 +4,6 @@ export function isScrollTheme(config: ThemeConfig): boolean {
   return config.layout.scrollDirection !== 'none';
 }
 
-export function requiresGSAP(config: ThemeConfig): boolean {
-  return config.animation.enabled;
-}
-
 export function getScrollContainer(config: ThemeConfig): string {
   return config.layout.scrollDirection === 'horizontal'
     ? 'overflow-x-auto'
