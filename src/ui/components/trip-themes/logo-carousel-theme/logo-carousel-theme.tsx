@@ -4,8 +4,8 @@ import { useRef, useMemo, useEffect, CSSProperties, PointerEvent } from 'react';
 import Image from 'next/image';
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import styles from './logo-carousel-theme.module.scss';
+import {Photo} from "@/types/photo";
 
 interface LogoCarouselThemeProps {
   trip: Trip;
@@ -22,8 +22,8 @@ interface RowState {
   lastTime: number;
 }
 
-// Positive = scroll right, negative = scroll left
-const ROW_SPEEDS = [-1.3, 1.0, -1.5] as const;
+// Speed ratios per row (sign = direction, magnitude = relative speed)
+const ROW_SPEED_RATIOS = [-1.3, 1.0, -1.5] as const;
 
 function makeRowState(): RowState {
   return {
@@ -48,21 +48,19 @@ function clamp(position: number, halfWidth: number): number {
 }
 
 export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
-  const { photos: validatedPhotos, handleImageError } = useValidatedImages(trip.photos);
-
-  const titleClasses = config.styling?.typography?.titleClasses ?? styles.title;
-  const bodyClasses = config.styling?.typography?.bodyClasses ?? styles.subtitle;
-
+  const titleClasses = 'text-5xl font-bold tracking-tight';
+  const bodyClasses = 'text-base text-white/60';
+  const baseSpeed = config.animation.timeline?.duration ?? 1.0;
   // Split photos across 3 rows; fall back to all photos if a row would be empty
   const rows = useMemo(() => {
-    const photos = validatedPhotos;
+    const photos = trip.photos;
     if (photos.length === 0) return [[], [], []] as (typeof photos)[];
 
     const rowData: (typeof photos)[] = [[], [], []];
     photos.forEach((photo, i) => rowData[i % 3].push(photo));
 
     return rowData.map((row) => (row.length > 0 ? row : photos));
-  }, [validatedPhotos]);
+  }, [trip.photos]);
 
   const trackRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
   const wrapperRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
@@ -72,9 +70,11 @@ export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
+    const speeds = ROW_SPEED_RATIOS.map((r) => r * baseSpeed);
+
     // Initialize right-scroll rows so they start mid-track for seamless entry
     rowStates.current.forEach((state, i) => {
-      if (ROW_SPEEDS[i] > 0) {
+      if (speeds[i] > 0) {
         const el = trackRefs.current[i];
         if (el) {
           const halfWidth = el.scrollWidth / 2;
@@ -98,7 +98,7 @@ export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
             state.velocity *= 0.93;
           } else {
             state.velocity = 0;
-            state.position += ROW_SPEEDS[i];
+            state.position += speeds[i];
           }
         }
 
@@ -111,7 +111,7 @@ export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  }, [baseSpeed]);
 
   const getPointerHandlers = (rowIndex: number) => ({
     onPointerDown(e: PointerEvent<HTMLDivElement>) {
@@ -157,7 +157,7 @@ export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
     },
   });
 
-  const renderRow = (rowPhotos: typeof validatedPhotos, rowIndex: number) => {
+  const renderRow = (rowPhotos: Photo[], rowIndex: number) => {
     // Duplicate the photos so the track is seamlessly loopable
     const items = [...rowPhotos, ...rowPhotos];
 
@@ -185,7 +185,6 @@ export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
                 draggable={false}
                 className={styles.image}
                 sizes="(max-width: 768px) 180px, 280px"
-                onError={() => handleImageError(photo.src)}
               />
             </div>
           ))}

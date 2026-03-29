@@ -187,17 +187,14 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-0',
     },
     animation: {
-      enabled: true,
+      timeline: {
+        duration: 1.0,
+        ease: 'linear',
+      },
     },
     photos: {
       arrangement: 'flow',
       revealPattern: 'sequential',
-    },
-    styling: {
-      typography: {
-        titleClasses: 'text-5xl font-bold tracking-tight',
-        bodyClasses: 'text-base text-white/60',
-      },
     },
   },
   [Theme.Feed]: {
