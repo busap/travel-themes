@@ -64,9 +64,10 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
     );
 
     const ctx = gsap.context(() => {
-      // Initial state: all layers hidden, frames zoomed far in
+      // Prevent flash: all layers start invisible.
+      // Only the entry fromTo at position 0 has immediateRender:true,
+      // so it re-applies autoAlpha:0 — consistent and conflict-free.
       gsap.set(layers, { autoAlpha: 0 });
-      gsap.set(frames, { scale: 3, rotate: 0 });
 
       // Background hue cycles through full 360° as user scrolls
       if (bgEl) {
@@ -96,56 +97,54 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
         const exitRotate = -(entryRotate * 0.6);
 
         const sectionStart = i * PHOTO_SECTION_PX;
-        const entryEnd = sectionStart + PHOTO_SECTION_PX * ENTRY_RATIO;
-        const exitStart = sectionStart + PHOTO_SECTION_PX * EXIT_START_RATIO;
         const sectionEnd = (i + 1) * PHOTO_SECTION_PX;
 
-        // ── Entry: tunnel zoom-in + rotate in + desaturate ──────────────────
+        // ── Single timeline per photo spanning the full section ────────────
+        // Using absolute positions so entry, hold, and exit are one coherent
+        // scrubbed sequence. This avoids the two-separate-timelines bug where
+        // the exit timeline's fromTo at time=0 would immediately render
+        // autoAlpha:1 on every layer (overriding the initial set).
         gsap
           .timeline({
             scrollTrigger: {
               trigger: container,
               start: `top+=${sectionStart} top`,
-              end: `top+=${entryEnd} top`,
+              end: `top+=${sectionEnd} top`,
               scrub,
             },
           })
-          .fromTo(layer, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 })
+          // Entry phase: 0 → ENTRY_RATIO
+          .fromTo(layer, { autoAlpha: 0 }, { autoAlpha: 1, duration: ENTRY_RATIO, ease: 'none' })
           .fromTo(
             frame,
             { scale: 3, rotate: entryRotate },
-            { scale: 1, rotate: 0, ease: 'power2.out', duration: 1 },
+            { scale: 1, rotate: 0, ease: 'power2.out', duration: ENTRY_RATIO },
             0,
           )
           .fromTo(
             img,
             { scale: 1.5, filter: 'saturate(2.5) hue-rotate(80deg)' },
-            { scale: 1.05, filter: 'saturate(1) hue-rotate(0deg)', ease: 'power2.out', duration: 1 },
+            { scale: 1.05, filter: 'saturate(1) hue-rotate(0deg)', ease: 'power2.out', duration: ENTRY_RATIO },
             0,
-          );
-
-        // ── Exit: shrink to void + counter-rotate + re-saturate ─────────────
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: container,
-              start: `top+=${exitStart} top`,
-              end: `top+=${sectionEnd} top`,
-              scrub,
-            },
-          })
-          .fromTo(layer, { autoAlpha: 1 }, { autoAlpha: 0, duration: 1 })
+          )
+          // Exit phase: EXIT_START_RATIO → 1.0  (hold is the implicit gap between)
+          .fromTo(
+            layer,
+            { autoAlpha: 1 },
+            { autoAlpha: 0, ease: 'none', duration: 1 - EXIT_START_RATIO },
+            EXIT_START_RATIO,
+          )
           .fromTo(
             frame,
             { scale: 1, rotate: 0 },
-            { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: 1 },
-            0,
+            { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: 1 - EXIT_START_RATIO },
+            EXIT_START_RATIO,
           )
           .fromTo(
             img,
             { scale: 1.05, filter: 'saturate(1) hue-rotate(0deg)' },
-            { scale: 1.4, filter: 'saturate(2) hue-rotate(-60deg)', ease: 'power2.in', duration: 1 },
-            0,
+            { scale: 1.4, filter: 'saturate(2) hue-rotate(-60deg)', ease: 'power2.in', duration: 1 - EXIT_START_RATIO },
+            EXIT_START_RATIO,
           );
       });
     }, container);
