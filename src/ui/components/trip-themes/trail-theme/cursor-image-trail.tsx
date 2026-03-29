@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./cursor-image-trail.module.scss";
 
 interface CursorImageTrailProps {
@@ -23,8 +23,12 @@ export function CursorImageTrail({
 	lifespan = 2400,
 	maxItems = 20,
 }: CursorImageTrailProps) {
+	const [hasPointer] = useState(() => {
+		if (typeof window === "undefined") return true;
+		return window.matchMedia("(hover: hover)").matches;
+	});
+
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const mountedRef = useRef(false);
 	const mouseRef = useRef<Point>({ x: 0, y: 0 });
 	const interpRef = useRef<Point>({ x: 0, y: 0 });
 	const lastSpawnRef = useRef<Point>({ x: 0, y: 0 });
@@ -39,8 +43,6 @@ export function CursorImageTrail({
 			"(prefers-reduced-motion: reduce)"
 		).matches;
 		if (prefersReduced) return;
-
-		mountedRef.current = true;
 
 		const container = containerRef.current;
 
@@ -160,12 +162,7 @@ export function CursorImageTrail({
 		};
 	}, [images, spawnThreshold, smoothing, lifespan, maxItems]);
 
-	if (!mountedRef.current && typeof window !== "undefined") {
-		const hasPointer = window.matchMedia("(hover: hover)").matches;
-		if (!hasPointer) {
-			return null;
-		}
-	}
+	if (!hasPointer) return null;
 
 	return <div ref={containerRef} className={styles.container} />;
 }
