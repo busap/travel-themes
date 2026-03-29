@@ -4,13 +4,12 @@ import React from "react";
 import { TripCard } from "@/ui/components/trip-card/trip-card";
 import { HomeHero } from "@/ui/components/home-hero/home-hero";
 import { TripCardVariant } from "@/enums/trip-card-variant";
-import { getAllTrips } from "@/utils/trip";
+import { Trip } from "@/types/trip";
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
 import { usePageTransition } from "@/hooks/use-page-transition";
 import styles from "./home.module.scss";
 
-export function Home() {
-	const trips = getAllTrips();
+export function Home({ trips }: { trips: Trip[] }) {
 	const { navigateToTrip } = usePageTransition();
 
 	const handleCardClick =

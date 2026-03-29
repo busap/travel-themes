@@ -1,4 +1,8 @@
-import { getTripById, getAllTrips, getThemeForTrip } from "@/utils/trip";
+import {
+	getTripByIdFromDb,
+	getAllTripsFromDb,
+	getThemeForTripFromDb,
+} from "@/utils/trip";
 import { getThemeConfig } from "@/config/theme-config";
 import { TripDetail } from "@/ui/pages/trip-detail/trip-detail";
 import { notFound } from "next/navigation";
@@ -9,13 +13,13 @@ export default async function TripPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const trip = getTripById(id);
+	const trip = await getTripByIdFromDb(id);
 
 	if (!trip) {
 		notFound();
 	}
 
-	const theme = getThemeForTrip(trip.id);
+	const theme = await getThemeForTripFromDb(trip.id);
 	const config = getThemeConfig(theme);
 
 	return <TripDetail trip={trip} config={config} />;
@@ -23,7 +27,7 @@ export default async function TripPage({
 
 // Generate static params for all trips
 export async function generateStaticParams() {
-	const trips = getAllTrips();
+	const trips = await getAllTripsFromDb();
 	return trips.map((trip) => ({
 		id: trip.id,
 	}));

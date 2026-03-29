@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Trip {
+  id          String     @id
+  name        String
+  countries   String[]
+  year        Int?
+  description String?
+  coverPhoto  String
+  photos      Photo[]
+  tripTheme   TripTheme?
+}
+
+model Photo {
+  id          Int     @id @default(autoincrement())
+  tripId      String
+  src         String
+  title       String?
+  description String?
+  order       Int     @default(0)
+  trip        Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model TripTheme {
+  tripId String @id
+  theme  String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
