@@ -41,7 +41,7 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
   const scrub = config.animation?.scrollTrigger?.scrub ?? 1;
 
   const mainPhotoSrc = useMemo(() => {
-    return trip.coverPhoto?.trim() || trip.photos[0]?.src ?? '';
+    return trip.coverPhoto || (trip.photos.length > 0 ? trip.photos[0].src : null);
   }, [trip.coverPhoto, trip.photos]);
 
   const nonMainPhotos = useMemo(() => {
@@ -227,6 +227,7 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
   ]);
 
   function renderMainPhotoLayer() {
+    if (!mainPhotoSrc) return null;
     return (
       <div className={styles.mainPhotoLayer}>
         <div className={styles.mainPhotoMask} data-main-photo-mask>
