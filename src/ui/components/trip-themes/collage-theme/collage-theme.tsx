@@ -68,14 +68,15 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
           <path d="M19 12H5" />
           <path d="M12 19l-7-7 7-7" />
         </svg>
-        Back
       </button>
-      <h1 className={styles.title}>
-        {trip.name}
-      </h1>
-      <p className={styles.subtitle}>
-        {trip.countries.join(', ')} {trip.year && `• ${trip.year}`}
-      </p>
+      <div className={styles.headerInfo}>
+          <h1 className={styles.title}>
+              {trip.name}
+          </h1>
+          <p className={styles.subtitle}>
+              {trip.countries.join(', ')} {trip.year && `• ${trip.year}`}
+          </p>
+      </div>
     </div>
   );
 

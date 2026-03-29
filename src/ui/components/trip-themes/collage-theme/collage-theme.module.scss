@@ -6,8 +6,12 @@
 }
 
 .header {
-  @apply absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 md:p-8;
+  @apply absolute top-0 left-0 right-0 z-10 flex gap-4 items-baseline p-4 sm:p-6 md:p-8;
   @apply bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm pointer-events-none;
+}
+
+.headerInfo {
+  @apply flex flex-col;
 }
 
 .backButton {
