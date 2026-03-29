@@ -32,7 +32,7 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 
 		const cards = feedRef.current.querySelectorAll("[data-feed-card]");
 
-		cards.forEach((card, index) => {
+		cards.forEach((card) => {
 			gsap.fromTo(
 				card,
 				{ opacity: 0, scale: 0.95 },

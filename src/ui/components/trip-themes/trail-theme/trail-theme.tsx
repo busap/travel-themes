@@ -12,7 +12,7 @@ interface TrailThemeProps {
 	config: ThemeConfig;
 }
 
-export function TrailTheme({ trip, config }: TrailThemeProps) {
+export function TrailTheme({ trip }: TrailThemeProps) {
 	const stackPhotos = useMemo(() => trip.photos.slice(0, 5), [trip.photos]);
 	const trailImages = useMemo(
 		() => trip.photos.map((photo) => photo.src),

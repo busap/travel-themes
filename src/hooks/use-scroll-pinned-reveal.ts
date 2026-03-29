@@ -32,7 +32,7 @@ export function useScrollPinnedReveal({
 
 		const triggers: ScrollTrigger[] = [];
 
-		sections.forEach((section, index) => {
+		sections.forEach((section) => {
 			gsap.set(section, {
 				opacity: 0,
 				scale: 0.95,
