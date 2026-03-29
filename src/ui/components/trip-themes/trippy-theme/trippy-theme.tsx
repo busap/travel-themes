@@ -52,7 +52,6 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
     if (!containerRef.current || validPhotos.length === 0) return;
     const container = containerRef.current;
 
-    const bgEl = container.querySelector<HTMLElement>('[data-bg]');
     const layers = Array.from(
       container.querySelectorAll<HTMLElement>('[data-photo-layer]'),
     );
@@ -67,34 +66,17 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
     const EXIT_D = 1 - EXIT_START_RATIO;           // 0.35
 
     const ctx = gsap.context(() => {
-      // Hide all layers. Photo 0 is immediately revealed below so the
-      // user sees content on load rather than a blank screen.
+      // Hide all layers. Photo 0 is immediately revealed below.
       gsap.set(layers, { autoAlpha: 0 });
 
-      // Photo 0: skip the entry animation — show it straight away in hold state.
+      // Photo 0: already in hold state on load — no entry animation.
       if (layers[0] && frames[0] && imgs[0]) {
         gsap.set(layers[0], { autoAlpha: 1 });
         gsap.set(frames[0], { scale: 1, rotate: 0 });
         gsap.set(imgs[0], { scale: 1.05 });
       }
 
-      // Background hue cycles through full 360° as user scrolls
-      if (bgEl) {
-        gsap.fromTo(
-          bgEl,
-          { filter: 'hue-rotate(0deg)' },
-          {
-            filter: 'hue-rotate(360deg)',
-            ease: 'none',
-            scrollTrigger: {
-              trigger: container,
-              start: 'top top',
-              end: 'bottom bottom',
-              scrub: 1,
-            },
-          },
-        );
-      }
+      // Background hue is now a pure CSS animation — no GSAP needed.
 
       layers.forEach((layer, i) => {
         const frame = frames[i];
@@ -116,9 +98,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
         });
 
         if (i === 0) {
-          // Photo 0 is already in hold state — only wire up the exit.
-          // The fromTo vars here are explicit so scrubbing backward
-          // correctly restores the visible hold state.
+          // Photo 0: visible on load, only needs exit.
           tl
             .fromTo(layer,
               { autoAlpha: 1 },
@@ -136,28 +116,34 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
               EXIT_START_RATIO,
             );
         } else {
-          // Photos 1+: entry → explicit hold → exit.
-          // The explicit hold tween (.to at the same value) fills the gap
-          // between entry and exit so GSAP never has an ambiguous state.
+          // Photos 1+: entry → hold → exit.
+          //
+          // immediateRender:false on frame and img entry tweens is critical:
+          // without it, GSAP would apply scale:2.5 to every frame at page load
+          // (immediateRender:true is default for fromTo at position 0).
+          // That pre-allocates GPU textures at 2.5× size for all hidden photos,
+          // causing the "pixelated square" artefacts and GPU memory pressure.
+          // With false, scale:2.5 is only set when that section's trigger fires,
+          // at which point the layer is still autoAlpha:0 so nothing is visible.
           tl
-            // ── Entry: tunnel zoom-in (0 → ENTRY_RATIO) ─────────────────────
+            // ── Entry (0 → ENTRY_RATIO) ──────────────────────────────────────
             .fromTo(layer,
               { autoAlpha: 0 },
               { autoAlpha: 1, duration: ENTRY_RATIO, ease: 'none' },
             )
             .fromTo(frame,
-              { scale: 3, rotate: entryRotate },
+              { immediateRender: false, scale: 2.5, rotate: entryRotate },
               { scale: 1, rotate: 0, ease: 'power2.out', duration: ENTRY_RATIO },
               0,
             )
             .fromTo(img,
-              { scale: 1.5 },
+              { immediateRender: false, scale: 1.4 },
               { scale: 1.05, ease: 'power2.out', duration: ENTRY_RATIO },
               0,
             )
-            // ── Hold: maintain visible state (ENTRY_RATIO → EXIT_START_RATIO) ─
+            // ── Hold (ENTRY_RATIO → EXIT_START_RATIO) ────────────────────────
             .to(layer, { autoAlpha: 1, duration: HOLD_D, ease: 'none' })
-            // ── Exit: shrink to void + counter-rotate (EXIT_START_RATIO → 1) ──
+            // ── Exit (EXIT_START_RATIO → 1) ──────────────────────────────────
             .to(layer,  { autoAlpha: 0, ease: 'none', duration: EXIT_D })
             .to(frame,  { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: EXIT_D }, '<')
             .to(img,    { scale: 1.4, ease: 'power2.in', duration: EXIT_D }, '<');
@@ -201,6 +187,8 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
                 data-photo-img
                 fill
                 sizes="(max-width: 768px) 95vw, 88vw"
+                priority={i < 2}
+                loading={i < 2 ? undefined : 'eager'}
                 onError={() => handleImageError(photo.src)}
               />
               {/* Chromatic colour wash */}

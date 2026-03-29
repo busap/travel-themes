@@ -18,7 +18,9 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  will-change: filter;
+  // Own compositing layer so hue-rotate runs on the GPU compositor thread
+  // without triggering layout/paint of the rest of the page.
+  transform: translateZ(0);
   background:
     radial-gradient(ellipse 90% 70% at 50% 50%,
       rgba(140, 20, 255, 0.35) 0%,
@@ -28,10 +30,8 @@
       transparent 55%),
     radial-gradient(ellipse 50% 55% at 85% 15%,
       rgba(0, 200, 255, 0.20) 0%,
-      transparent 55%),
-    radial-gradient(ellipse 40% 40% at 70% 70%,
-      rgba(255, 220, 0, 0.10) 0%,
-      transparent 50%);
+      transparent 55%);
+  animation: hueShift 12s linear infinite;
 }
 
 // ── Scroll / sticky layout ─────────────────────────────────────────────────────
@@ -105,7 +105,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: opacity;
 }
 
 // The visible photo card with glow
@@ -115,18 +114,14 @@
   height: min(67vh, 680px);
   border-radius: 1.5rem;
   overflow: hidden;
-  will-change: transform;
 
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 
-  // Layered glow — purple bloom + cyan corona
+  // Two-layer glow — kept minimal to reduce GPU compositing cost
   box-shadow:
-    0 0   0 1px rgba(255, 255, 255, 0.07),
-    0 0  60px rgba(160,  40, 255, 0.55),
-    0 0 130px rgba(160,  40, 255, 0.28),
-    0 0 220px rgba(  0, 180, 255, 0.18),
-    inset 0 0 50px rgba(0, 0, 0, 0.50);
+    0 0  60px rgba(160,  40, 255, 0.50),
+    0 0 180px rgba(  0, 180, 255, 0.15);
 }
 
 .photoImg {
@@ -134,10 +129,9 @@
   width: 100%;
   height: 100%;
   transform-origin: center;
-  // filter is no longer animated on the image — only scale is.
-  // backface-visibility + translateZ force a stable compositing layer
-  // from the start, eliminating the mid-animation flicker.
-  will-change: transform;
+  // backface-visibility forces a stable compositing layer per image,
+  // eliminating mid-animation flicker without pre-allocating GPU textures
+  // for all photos up-front (no will-change: transform here).
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -149,11 +143,12 @@
   pointer-events: none;
   background: linear-gradient(
     135deg,
-    rgba(255,   0, 160, 0.14)  0%,
+    rgba(255,   0, 160, 0.12)  0%,
     rgba(255,   0, 160, 0.00) 38%,
-    rgba(  0, 220, 255, 0.10) 100%
+    rgba(  0, 220, 255, 0.08) 100%
   );
-  mix-blend-mode: screen;
+  // mix-blend-mode removed — it forces a stacking context and compositing
+  // pass for every frame even when the layer is invisible.
   z-index: 2;
 }
 
@@ -216,4 +211,9 @@
     opacity: 1;
     transform: translateX(-50%) translateY(-6px);
   }
+}
+
+@keyframes hueShift {
+  from { filter: hue-rotate(0deg); }
+  to   { filter: hue-rotate(360deg); }
 }
