@@ -10,6 +10,13 @@
   @apply bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm pointer-events-none;
 }
 
+.backButton {
+  @apply pointer-events-auto inline-flex items-center gap-1.5 mb-2;
+  @apply text-sm font-medium text-zinc-600 hover:text-zinc-900;
+  @apply transition-colors duration-150;
+  @apply bg-transparent border-none cursor-pointer p-0;
+}
+
 .title {
   @apply text-lg sm:text-xl md:text-2xl font-bold;
 }

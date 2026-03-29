@@ -3,6 +3,7 @@
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
 import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { PolaroidCard } from '@/ui/components/polaroid-card/polaroid-card';
 import { PolaroidCardVariant } from '@/enums/polaroid-card-variant';
 import { ScrollHint } from '@/ui/components/scroll-hint/scroll-hint';
@@ -18,6 +19,7 @@ interface CollageThemeProps {
 
 export function CollageTheme({ trip, config }: CollageThemeProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const isHorizontalScroll = config.layout.scrollDirection === 'horizontal';
   const revealPattern = config.photos.revealPattern;
   const isScrollBasedReveal = revealPattern === 'scroll-based';
@@ -46,6 +48,28 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
 
   const renderHeader = () => (
     <div className={styles.header}>
+      <button
+        className={styles.backButton}
+        onClick={() => router.back()}
+        aria-label="Go back"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M19 12H5" />
+          <path d="M12 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
       <h1 className={styles.title}>
         {trip.name}
       </h1>
