@@ -2,9 +2,8 @@
 
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import styles from './showcase-theme.module.scss';
 
 interface ShowcaseThemeProps {
@@ -17,13 +16,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const { photos: validatedPhotos, failedSrcs, handleImageError } = useValidatedImages(trip.photos);
-
-  const displayPhotos = useMemo(
-    () => validatedPhotos.filter((p) => !failedSrcs.has(p.src)),
-    [validatedPhotos, failedSrcs]
-  );
+  const displayPhotos = trip.photos;
 
   const animationEnabled = config.animation?.enabled ?? true;
 
@@ -101,7 +94,6 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
                 sizes="100vw"
                 style={{ objectFit: 'cover' }}
                 priority={index === 0}
-                onError={() => handleImageError(photo.src)}
               />
             </div>
           ))}
@@ -149,7 +141,6 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
                 width={110}
                 height={78}
                 style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                onError={() => handleImageError(photo.src)}
               />
             </div>
           ))}
