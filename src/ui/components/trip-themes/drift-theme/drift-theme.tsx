@@ -6,7 +6,6 @@ import { ThemeConfig } from '@/config/theme-config';
 import { useRef, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Playfair_Display, Crimson_Pro } from 'next/font/google';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import { seededRandom } from '@/utils/random';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -85,8 +84,6 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
   const titleClasses = config.styling?.typography?.titleClasses ?? '';
   const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
 
-  const { photos: validatedPhotos, failedSrcs, handleImageError } = useValidatedImages(trip.photos);
-
   const idSeed = useMemo(() => {
     let hash = 0;
     for (let i = 0; i < trip.id.length; i++) {
@@ -97,7 +94,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
   }, [trip.id]);
 
   const waves = useMemo(() => {
-    const activePhotos = validatedPhotos;
+    const activePhotos = trip.photos;
     const result: Wave[] = [];
     let photoIndex = 0;
     let waveIndex = 0;
@@ -153,7 +150,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
     }
 
     return result;
-  }, [validatedPhotos, idSeed]);
+  }, [trip.photos, idSeed]);
 
   // Set up GSAP ScrollTrigger per wave
   useEffect(() => {
@@ -253,27 +250,23 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
   );
 
   const renderPhoto = (photo: Photo, rotation: number, direction: SlideDirection, index: number) => {
-    const isFailed = failedSrcs.has(photo.src);
     return (
       <div
         key={`${photo.src}-${index}`}
         data-entrance="photo"
         data-direction={direction}
         className={styles.photo}
-        style={{ transform: `rotate(${rotation}deg)`, ...(isFailed ? { display: 'none' } : {}) }}
+        style={{ transform: `rotate(${rotation}deg)` }}
       >
-        {!isFailed && (
-          <Image
-            src={photo.src}
-            alt={photo.title || `Photo ${index + 1}`}
-            className={styles.photoImage}
-            width={600}
-            height={450}
-            sizes="(max-width: 768px) 90vw, 550px"
-            onError={() => handleImageError(photo.src)}
-          />
-        )}
-        {photo.title && !isFailed && (
+        <Image
+          src={photo.src}
+          alt={photo.title || `Photo ${index + 1}`}
+          className={styles.photoImage}
+          width={600}
+          height={450}
+          sizes="(max-width: 768px) 90vw, 550px"
+        />
+        {photo.title && (
           <p
             data-entrance="caption"
             className={`${styles.caption} ${crimson.className}`}

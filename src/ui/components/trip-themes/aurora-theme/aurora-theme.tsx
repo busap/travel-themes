@@ -8,7 +8,6 @@ import { Playfair_Display, Crimson_Pro } from 'next/font/google';
 import { AuroraBackground } from './aurora-background';
 import { useAuroraAnimation } from '@/hooks/use-aurora-animation';
 import { useScrollPinnedReveal } from '@/hooks/use-scroll-pinned-reveal';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import { seededRandom } from '@/utils/random';
 import styles from './aurora-theme.module.scss';
 
@@ -41,7 +40,7 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
   const titleClasses = config.styling?.typography?.titleClasses ?? '';
   const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
 
-  const { photos: validatedPhotos, failedSrcs, handleImageError } = useValidatedImages(trip.photos);
+  const validatedPhotos = trip.photos;
 
   useAuroraAnimation(svgRef, {
     enabled: animationEnabled,
@@ -102,10 +101,6 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
     return (
       <div className={`${styles.photos} ${spacing}`}>
         {validatedPhotos.map((photo, index) => {
-          if (failedSrcs.has(photo.src)) {
-            return <div key={index} data-photo-index={index} style={{ display: 'none' }} />;
-          }
-
           const layout = getPhotoLayout(index);
           const photoClass = getPhotoClass(layout.width);
 
@@ -127,7 +122,6 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
                   width={800}
                   height={600}
                   sizes="(max-width: 768px) 90vw, 900px"
-                  onError={() => handleImageError(photo.src)}
                 />
                 <p className={`${styles.photoCaption} ${crimson.className}`}>{photo.title || ''}</p>
               </div>

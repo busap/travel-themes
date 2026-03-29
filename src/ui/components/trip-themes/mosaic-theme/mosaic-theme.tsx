@@ -5,7 +5,6 @@ import { ThemeConfig } from '@/config/theme-config';
 import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Inter, Bebas_Neue } from 'next/font/google';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import { useMousePosition } from '@/hooks/use-mouse-position';
 import { getGridCellSize } from '@/utils/mosaic-layout';
 import gsap from 'gsap';
@@ -47,7 +46,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
   const scrollTriggerStart = config.animation?.scrollTrigger?.start ?? 'top 85%';
   const scrollTriggerEnd = config.animation?.scrollTrigger?.end ?? 'top 60%';
 
-  const { photos: validatedPhotos, failedSrcs, handleImageError } = useValidatedImages(trip.photos);
+  const validatedPhotos = trip.photos;
   const mousePosition = useMousePosition(gridRef);
 
   useEffect(() => {
@@ -83,7 +82,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
     }, gridEl);
 
     return () => ctx.revert();
-  }, [animationEnabled, validatedPhotos.length, failedSrcs.size, duration, ease, stagger, scrollTriggerStart, scrollTriggerEnd]);
+  }, [animationEnabled, validatedPhotos.length, duration, ease, stagger, scrollTriggerStart, scrollTriggerEnd]);
 
   const scrollToKeepPhotoInView = (photoRef: HTMLDivElement) => {
     const rect = photoRef.getBoundingClientRect();
@@ -195,10 +194,6 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
         } as React.CSSProperties}
       >
         {validatedPhotos.map((photo, index) => {
-          if (failedSrcs.has(photo.src)) {
-            return null;
-          }
-
           const gridSize = getGridCellSize(photo, index);
           const isExpanded = expandedPhotoIndex === index;
 
@@ -222,7 +217,6 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
                 fill
                 sizes="(max-width: 768px) 90vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: 'cover' }}
-                onError={() => handleImageError(photo.src)}
               />
             </div>
           );

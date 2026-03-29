@@ -4,7 +4,6 @@ import { CSSProperties, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -40,21 +39,14 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
   const progressFillRef = useRef<HTMLDivElement>(null);
 
   const scrub = config.animation?.scrollTrigger?.scrub ?? 1;
-  const { photos: validatedPhotos, failedSrcs, handleImageError } =
-    useValidatedImages(trip.photos);
 
   const mainPhotoSrc = useMemo(() => {
-    if (trip.coverPhoto?.trim() && !failedSrcs.has(trip.coverPhoto)) {
-      return trip.coverPhoto;
-    }
-    return validatedPhotos.find((photo) => !failedSrcs.has(photo.src))?.src ?? '';
-  }, [trip.coverPhoto, validatedPhotos, failedSrcs]);
+    return trip.coverPhoto || (trip.photos.length > 0 ? trip.photos[0].src : null);
+  }, [trip.coverPhoto, trip.photos]);
 
   const nonMainPhotos = useMemo(() => {
-    return validatedPhotos.filter(
-      (photo) => photo.src !== mainPhotoSrc && !failedSrcs.has(photo.src),
-    );
-  }, [validatedPhotos, mainPhotoSrc, failedSrcs]);
+    return trip.photos.filter((photo) => photo.src !== mainPhotoSrc);
+  }, [trip.photos, mainPhotoSrc]);
 
   const photoAnimations = useMemo<PhotoAnimation[]>(
     () => buildPhotosAnimations(nonMainPhotos), 
@@ -235,6 +227,7 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
   ]);
 
   function renderMainPhotoLayer() {
+    if (!mainPhotoSrc) return null;
     return (
       <div className={styles.mainPhotoLayer}>
         <div className={styles.mainPhotoMask} data-main-photo-mask>
@@ -246,7 +239,6 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
             fill
             priority
             sizes="100vw"
-            onError={() => handleImageError(mainPhotoSrc)}
           />
         </div>
       </div>
@@ -270,7 +262,6 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
               data-animated-photo
               fill
               sizes="100vw"
-              onError={() => handleImageError(item.photo.src)}
             />
           </div>
         ))}

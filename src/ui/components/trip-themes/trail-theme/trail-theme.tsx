@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
 import { useMemo } from 'react';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import { CursorImageTrail } from './cursor-image-trail';
 import styles from './trail-theme.module.scss';
 
@@ -14,19 +13,8 @@ interface TrailThemeProps {
 }
 
 export function TrailTheme({ trip, config }: TrailThemeProps) {
-  const { photos: validatedPhotos, handleImageError } = useValidatedImages(
-    trip.photos,
-  );
-
-  const stackPhotos = useMemo(
-    () => validatedPhotos.slice(0, 5),
-    [validatedPhotos],
-  );
-
-  const trailImages = useMemo(
-    () => validatedPhotos.map((photo) => photo.src),
-    [validatedPhotos],
-  );
+  const stackPhotos = useMemo(() => trip.photos.slice(0, 5), [trip.photos]);
+  const trailImages = useMemo(() => trip.photos.map((photo) => photo.src), [trip.photos]);
 
   const titleClasses =
     config.styling?.typography?.titleClasses || styles.title;
@@ -56,7 +44,6 @@ export function TrailTheme({ trip, config }: TrailThemeProps) {
               className={styles.cardImage}
               fill
               sizes="(max-width: 768px) 90vw, 640px"
-              onError={() => handleImageError(photo.src)}
             />
           </div>
         </div>
