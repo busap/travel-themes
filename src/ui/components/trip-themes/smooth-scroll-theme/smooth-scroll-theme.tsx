@@ -40,17 +40,9 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 
   const scrub = config.animation?.scrollTrigger?.scrub ?? 1;
 
-  const mainPhotoSrc = useMemo(() => {
-    return trip.coverPhoto || (trip.photos.length > 0 ? trip.photos[0].src : null);
-  }, [trip.coverPhoto, trip.photos]);
-
-  const nonMainPhotos = useMemo(() => {
-    return trip.photos.filter((photo) => photo.src !== mainPhotoSrc);
-  }, [trip.photos, mainPhotoSrc]);
-
   const photoAnimations = useMemo<PhotoAnimation[]>(
-    () => buildPhotosAnimations(nonMainPhotos), 
-    [nonMainPhotos]
+    () => buildPhotosAnimations(trip.photos),
+    [trip.photos]
   );
 
   const layoutScrollHeight = useMemo(
@@ -59,7 +51,7 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
   );
 
   useEffect(() => {
-    if (!containerRef.current || !mainPhotoSrc) return;
+    if (!containerRef.current) return;
 
     const container = containerRef.current;
     const mainPhotoMask = container.querySelector('[data-main-photo-mask]');
@@ -219,20 +211,17 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 
     return () => ctx.revert();
   }, [
-    mainPhotoSrc,
     layoutScrollHeight,
     photoAnimations,
-    scrub,
-    trip.id,
+    scrub
   ]);
 
   function renderMainPhotoLayer() {
-    if (!mainPhotoSrc) return null;
     return (
       <div className={styles.mainPhotoLayer}>
         <div className={styles.mainPhotoMask} data-main-photo-mask>
           <Image
-            src={mainPhotoSrc}
+            src={trip.coverPhoto}
             alt={trip.name}
             className={styles.mainPhoto}
             data-main-photo
@@ -292,10 +281,6 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
         {renderAnimatedPhotosLayer()}
       </section>
     );
-  }
-
-  if (!mainPhotoSrc) {
-    return null;
   }
 
   return (

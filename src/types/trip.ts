@@ -6,6 +6,6 @@ export interface Trip {
   countries: string[];
   year?: number;
   description?: string;
-  coverPhoto?: string;
+  coverPhoto: string;
   photos: Photo[];
 }
