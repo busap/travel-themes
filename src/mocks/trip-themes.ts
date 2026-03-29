@@ -40,6 +40,6 @@ export const tripThemes: TripTheme[] = [
   },
   {
     tripId: 'australian-outback',
-    theme: Theme.LogoCarousel,
+    theme: Theme.PhotoCarousel,
   },
 ];

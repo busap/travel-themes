@@ -4,10 +4,10 @@ import { useRef, useMemo, useEffect, CSSProperties, PointerEvent } from 'react';
 import Image from 'next/image';
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import styles from './logo-carousel-theme.module.scss';
+import styles from './photo-carousel-theme.module.scss';
 import {Photo} from "@/types/photo";
 
-interface LogoCarouselThemeProps {
+interface PhotoCarouselThemeProps {
   trip: Trip;
   config: ThemeConfig;
 }
@@ -47,7 +47,7 @@ function clamp(position: number, halfWidth: number): number {
   return pos;
 }
 
-export function LogoCarouselTheme({ trip, config }: LogoCarouselThemeProps) {
+export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
   const titleClasses = 'text-5xl font-bold tracking-tight';
   const bodyClasses = 'text-base text-white/60';
   const baseSpeed = config.animation.timeline?.duration ?? 1.0;

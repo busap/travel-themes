@@ -180,8 +180,8 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       count: 3,
     },
   },
-  [Theme.LogoCarousel]: {
-    component: 'logo-carousel-theme',
+  [Theme.PhotoCarousel]: {
+    component: 'photo-carousel-theme',
     layout: {
       scrollDirection: 'none',
       spacing: 'gap-0',

@@ -8,5 +8,5 @@ export enum Theme {
   SmoothScroll = 'smooth-scroll',
   DragShuffle = 'drag-shuffle',
   Showcase = 'showcase',
-  LogoCarousel = 'logo-carousel',
+  PhotoCarousel = 'photo-carousel',
 }
