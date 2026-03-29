@@ -16,10 +16,8 @@ export function TrailTheme({ trip, config }: TrailThemeProps) {
   const stackPhotos = useMemo(() => trip.photos.slice(0, 5), [trip.photos]);
   const trailImages = useMemo(() => trip.photos.map((photo) => photo.src), [trip.photos]);
 
-  const titleClasses =
-    config.styling?.typography?.titleClasses || styles.title;
-  const subtitleClasses =
-    config.styling?.typography?.bodyClasses || styles.subtitle;
+  const titleClasses = 'text-5xl font-light tracking-wide';
+  const subtitleClasses = 'text-lg text-zinc-500';
 
   const renderInfo = () => (
     <div className={styles.meta}>

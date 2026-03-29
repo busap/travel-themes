@@ -21,7 +21,6 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
 
-  const animationEnabled = config.animation?.enabled ?? true;
   const duration = config.animation?.timeline?.duration ?? 0.5;
   const ease = config.animation?.timeline?.ease ?? 'power2.out';
   const stagger = config.animation?.timeline?.stagger ?? 0.5;
@@ -29,7 +28,7 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
   const validatedPhotos = trip.photos;
 
   useEffect(() => {
-    if (!animationEnabled || !feedRef.current || !viewportRef.current) return;
+    if (!feedRef.current || !viewportRef.current) return;
 
     const cards = feedRef.current.querySelectorAll('[data-feed-card]');
 
@@ -55,7 +54,7 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, [animationEnabled, validatedPhotos.length, duration, ease, stagger]);
+  }, [validatedPhotos.length, duration, ease, stagger]);
 
   const renderHeader = () => (
     <div className={styles.tripHeader}>

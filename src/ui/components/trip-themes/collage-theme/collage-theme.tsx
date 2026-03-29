@@ -19,9 +19,8 @@ interface CollageThemeProps {
 export function CollageTheme({ trip, config }: CollageThemeProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isHorizontalScroll = config.layout.scrollDirection === 'horizontal';
-  const animationEnabled = config.animation.enabled;
   const revealPattern = config.photos.revealPattern;
-  const isScrollBasedReveal = animationEnabled && revealPattern === 'scroll-based';
+  const isScrollBasedReveal = revealPattern === 'scroll-based';
   const photosWithSrc = trip.photos;
   const photosToShow = config.photos?.count
     ? photosWithSrc.slice(0, config.photos.count)
@@ -36,11 +35,8 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
     itemCount: photosToShow.length,
   });
 
-  const titleClass = config.styling?.typography?.titleClasses
-    ? `${styles.title} ${config.styling.typography.titleClasses}`
-    : styles.title;
-
-  const subtitleClass = config.styling?.typography?.bodyClasses || styles.subtitle;
+  const titleClass = `${styles.title} text-2xl font-bold`;
+  const subtitleClass = 'text-sm text-zinc-600';
 
   const cardsContainerClass = `${styles.cardsContainer} ${config.layout.spacing}`.trim();
 

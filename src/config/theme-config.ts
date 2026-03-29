@@ -14,7 +14,6 @@ export interface ThemeConfig {
 
   // Animation configuration (GSAP)
   animation: {
-    enabled: boolean;
     scrollTrigger?: {
       trigger?: string;
       start?: string;
@@ -39,10 +38,6 @@ export interface ThemeConfig {
   // Styling hints (can override in component)
   styling?: {
     colorScheme?: string; // For CSS variables
-    typography?: {
-      titleClasses: string;
-      bodyClasses: string;
-    };
   };
 }
 
@@ -54,18 +49,10 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       scrollDirection: 'horizontal',
       spacing: 'gap-16',
     },
-    animation: {
-      enabled: true,
-    },
+    animation: {},
     photos: {
       revealPattern: 'scroll-based',
     },
-    styling: {
-      typography: {
-        titleClasses: 'text-2xl font-bold',
-        bodyClasses: 'text-sm text-zinc-600',
-      },
-    }
   },
   [Theme.Aurora]: {
     component: 'aurora-theme',
@@ -75,7 +62,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-8',
     },
     animation: {
-      enabled: true,
       scrollTrigger: {
         scrub: 2,
         pin: true,
@@ -94,10 +80,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
     },
     styling: {
       colorScheme: 'aurora',
-      typography: {
-        titleClasses: 'text-4xl md:text-6xl font-light tracking-wide',
-        bodyClasses: 'text-base md:text-lg text-white/80',
-      },
     },
   },
   [Theme.Mosaic]: {
@@ -108,7 +90,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-4',
     },
     animation: {
-      enabled: true,
       scrollTrigger: {
         start: 'top 85%',
         end: 'top 60%',
@@ -123,12 +104,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       arrangement: 'grid',
       revealPattern: 'scroll-based',
     },
-    styling: {
-      typography: {
-        titleClasses: 'text-4xl font-bold',
-        bodyClasses: 'text-base text-zinc-600',
-      },
-    },
   },
   [Theme.Drift]: {
     component: 'drift-theme',
@@ -137,7 +112,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-0',
     },
     animation: {
-      enabled: true,
       scrollTrigger: {
         start: 'top 85%',
       },
@@ -151,12 +125,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       arrangement: 'scatter',
       revealPattern: 'scroll-based',
     },
-    styling: {
-      typography: {
-        titleClasses: 'text-5xl font-light tracking-wide',
-        bodyClasses: 'text-lg text-zinc-600',
-      },
-    },
   },
   [Theme.Trail]: {
     component: 'trail-theme',
@@ -165,18 +133,10 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       scrollDirection: 'none',
       spacing: 'gap-0',
     },
-    animation: {
-      enabled: true,
-    },
+    animation: {},
     photos: {
       arrangement: 'trail',
       revealPattern: 'scroll-based',
-    },
-    styling: {
-      typography: {
-        titleClasses: 'text-5xl font-light tracking-wide',
-        bodyClasses: 'text-lg text-zinc-500',
-      },
     },
   },
   [Theme.SmoothScroll]: {
@@ -187,7 +147,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-0',
     },
     animation: {
-      enabled: true,
       scrollTrigger: {
         scrub: 5,
         start: 'top top',
@@ -202,12 +161,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       arrangement: 'flow',
       revealPattern: 'scroll-based',
     },
-    styling: {
-      typography: {
-        titleClasses: 'text-4xl font-light tracking-wide',
-        bodyClasses: 'text-base text-zinc-400',
-      },
-    },
   },
   [Theme.DragShuffle]: {
     component: 'drag-shuffle-theme',
@@ -216,7 +169,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-0',
     },
     animation: {
-      enabled: true,
       timeline: {
         duration: 0.45,
         ease: 'power3.out',
@@ -227,12 +179,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       revealPattern: 'sequential',
       count: 3,
     },
-    styling: {
-      typography: {
-        titleClasses: 'text-3xl md:text-4xl font-black',
-        bodyClasses: 'text-sm md:text-base text-white/70',
-      },
-    },
   },
   [Theme.Feed]: {
     component: 'feed-theme',
@@ -242,7 +188,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       spacing: 'gap-4',
     },
     animation: {
-      enabled: true,
       timeline: {
         duration: 0.5,
         ease: 'power2.out',

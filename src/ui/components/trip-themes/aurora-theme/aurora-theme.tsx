@@ -32,18 +32,17 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const animationEnabled = config.animation?.enabled ?? true;
   const timelineDuration = config.animation?.timeline?.duration ?? 20;
   const scrollTriggerConfig = config.animation?.scrollTrigger;
   const pinDuration = scrollTriggerConfig?.end ?? '+=80%';
   const spacing = config.layout?.spacing ?? 'gap-8';
-  const titleClasses = config.styling?.typography?.titleClasses ?? '';
-  const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
+  const titleClasses = 'text-4xl md:text-6xl font-light tracking-wide';
+  const bodyClasses = 'text-base md:text-lg text-white/80';
 
   const validatedPhotos = trip.photos;
 
   useAuroraAnimation(svgRef, {
-    enabled: animationEnabled,
+    enabled: true,
     duration: timelineDuration,
   });
 
@@ -54,7 +53,7 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 
   useScrollPinnedReveal({
     containerRef,
-    enabled: animationEnabled,
+    enabled: true,
     itemCount: validatedPhotos.length,
     pinDuration,
     config: scrollConfig,

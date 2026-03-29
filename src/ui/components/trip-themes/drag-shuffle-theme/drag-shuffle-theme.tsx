@@ -37,17 +37,13 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
   const [swipeDirection, setSwipeDirection] = useState<SwipeDirection | null>(
     null,
   );
-
   const pointerStartRef = useRef<DragPoint | null>(null);
-
-  const animationEnabled = config.animation?.enabled ?? true;
   const animationDurationMs = Math.max(
     260,
     Math.round((config.animation?.timeline?.duration ?? 0.45) * 1000),
   );
-  const titleClasses = config.styling?.typography?.titleClasses ?? styles.tripName;
-  const bodyClasses =
-    config.styling?.typography?.bodyClasses ?? styles.tripDescription;
+  const titleClasses = 'text-3xl md:text-4xl font-black';
+  const bodyClasses = 'text-sm md:text-base text-white/70';
 
   const deckPhotos = useMemo(() => trip.photos.slice(0, 24), [trip.photos]);
 
@@ -99,7 +95,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
   const triggerSwipe = (direction: SwipeDirection) => {
     if (!hasCards || isAnimating) return;
 
-    if (!animationEnabled || prefersReducedMotion()) {
+    if (prefersReducedMotion()) {
       finalizeSwipe();
       return;
     }

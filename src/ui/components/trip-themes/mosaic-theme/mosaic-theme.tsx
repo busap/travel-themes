@@ -36,10 +36,9 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const [expandedPhotoIndex, setExpandedPhotoIndex] = useState<number | null>(null);
 
-  const animationEnabled = config.animation?.enabled ?? true;
   const spacing = config.layout?.spacing ?? 'gap-4';
-  const titleClasses = config.styling?.typography?.titleClasses ?? '';
-  const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
+  const titleClasses = 'text-4xl font-bold';
+  const bodyClasses = 'text-base text-zinc-600';
   const stagger = config.animation?.timeline?.stagger ?? 0.1;
   const duration = config.animation?.timeline?.duration ?? 0.4;
   const ease = config.animation?.timeline?.ease ?? 'power2.out';
@@ -50,7 +49,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
   const mousePosition = useMousePosition(gridRef);
 
   useEffect(() => {
-    if (!animationEnabled || !gridRef.current) return;
+    if (!gridRef.current) return;
 
     const gridEl = gridRef.current;
     const photoItems = gridEl.querySelectorAll('[data-photo-item]');
@@ -82,7 +81,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
     }, gridEl);
 
     return () => ctx.revert();
-  }, [animationEnabled, validatedPhotos.length, duration, ease, stagger, scrollTriggerStart, scrollTriggerEnd]);
+  }, [validatedPhotos.length, duration, ease, stagger, scrollTriggerStart, scrollTriggerEnd]);
 
   const scrollToKeepPhotoInView = (photoRef: HTMLDivElement) => {
     const rect = photoRef.getBoundingClientRect();
@@ -133,7 +132,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
   };
 
   const handlePhotoClick = (index: number, photoRef: HTMLDivElement | null) => {
-    if (!photoRef || !animationEnabled) return;
+    if (!photoRef) return;
 
     if (expandedPhotoIndex === index) {
       gsap.to(photoRef, {

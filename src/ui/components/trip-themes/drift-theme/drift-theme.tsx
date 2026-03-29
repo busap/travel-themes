@@ -76,13 +76,12 @@ function getDirectionOffset(direction: SlideDirection): { x: number; y: number }
 export function DriftTheme({ trip, config }: DriftThemeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const animationEnabled = config.animation?.enabled ?? true;
   const duration = config.animation?.timeline?.duration ?? 0.8;
   const ease = config.animation?.timeline?.ease ?? 'power3.out';
   const stagger = config.animation?.timeline?.stagger ?? 0.12;
   const triggerStart = config.animation?.scrollTrigger?.start ?? 'top 85%';
-  const titleClasses = config.styling?.typography?.titleClasses ?? '';
-  const bodyClasses = config.styling?.typography?.bodyClasses ?? '';
+  const titleClasses = 'text-5xl font-light tracking-wide';
+  const bodyClasses = 'text-lg text-zinc-600';
 
   const idSeed = useMemo(() => {
     let hash = 0;
@@ -164,7 +163,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
     const header = container.querySelector('[data-entrance="header"]');
     const subtitle = container.querySelector('[data-entrance="subtitle"]');
 
-    if (!animationEnabled || prefersReduced) {
+    if (prefersReduced) {
       const allPhotos = container.querySelectorAll('[data-entrance="photo"]');
       const allCaptions = container.querySelectorAll('[data-entrance="caption"]');
       gsap.set(
@@ -230,7 +229,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, [waves.length, animationEnabled, triggerStart, stagger, duration, ease]);
+  }, [waves.length, triggerStart, stagger, duration, ease]);
 
   const renderHeader = () => (
     <div className={styles.header}>
