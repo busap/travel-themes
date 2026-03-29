@@ -17,11 +17,11 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const displayPhotos = trip.photos;
-
-  const animationEnabled = config.animation?.enabled ?? true;
-
   const effectiveIndex =
     displayPhotos.length > 0 ? Math.min(activeIndex, displayPhotos.length - 1) : 0;
+  const timeline = config.animation.timeline;
+  const titleClasses = 'text-4xl font-light tracking-wide';
+  const bodyClasses = 'text-sm';
 
   const updateScrollButtons = useCallback(() => {
     const el = scrollRef.current;
@@ -85,7 +85,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
               className={`${styles.activePhoto} ${
                 index === effectiveIndex ? styles.activePhotoVisible : styles.activePhotoHidden
               }`}
-              style={!animationEnabled ? { transition: 'none' } : undefined}
+              style={timeline ? { transition: `opacity ${timeline.duration}s ${timeline.ease}` } : undefined}
             >
               <Image
                 src={photo.src}
@@ -102,8 +102,8 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
         <div className={styles.gradientOverlay} />
 
         <div className={styles.tripInfo}>
-          <h1 className={styles.tripTitle}>{trip.name}</h1>
-          <p className={styles.tripMeta}>
+          <h1 className={`${styles.tripTitle} ${titleClasses}`}>{trip.name}</h1>
+          <p className={`${styles.tripMeta} ${bodyClasses}`}>
             {trip.countries.join(', ')} {trip.year && `· ${trip.year}`}
           </p>
         </div>
