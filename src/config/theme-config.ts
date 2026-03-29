@@ -180,6 +180,26 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
       count: 3,
     },
   },
+  [Theme.LogoCarousel]: {
+    component: 'logo-carousel-theme',
+    layout: {
+      scrollDirection: 'none',
+      spacing: 'gap-0',
+    },
+    animation: {
+      enabled: true,
+    },
+    photos: {
+      arrangement: 'flow',
+      revealPattern: 'sequential',
+    },
+    styling: {
+      typography: {
+        titleClasses: 'text-5xl font-bold tracking-tight',
+        bodyClasses: 'text-base text-white/60',
+      },
+    },
+  },
   [Theme.Feed]: {
     component: 'feed-theme',
     layout: {

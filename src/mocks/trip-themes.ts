@@ -38,4 +38,8 @@ export const tripThemes: TripTheme[] = [
     tripId: 'spain-fiesta',
     theme: Theme.Showcase,
   },
+  {
+    tripId: '',
+    theme: Theme.LogoCarousel,
+  },
 ];
