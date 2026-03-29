@@ -10,7 +10,7 @@ import { TrailTheme } from "@/ui/components/trip-themes/trail-theme/trail-theme"
 import { SmoothScrollTheme } from "@/ui/components/trip-themes/smooth-scroll-theme/smooth-scroll-theme";
 import { DragShuffleTheme } from "@/ui/components/trip-themes/drag-shuffle-theme/drag-shuffle-theme";
 import { ShowcaseTheme } from "@/ui/components/trip-themes/showcase-theme/showcase-theme";
-import { PhotoCarouselTheme } from '@/ui/components/trip-themes/photo-carousel-theme/photo-carousel-theme';
+import { PhotoCarouselTheme } from "@/ui/components/trip-themes/photo-carousel-theme/photo-carousel-theme";
 
 interface ThemeRendererProps {
 	trip: Trip;
@@ -48,16 +48,16 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 		case "showcase-theme":
 			return <ShowcaseTheme trip={trip} config={config} />;
 
-		case 'photo-carousel-theme':
-            return <PhotoCarouselTheme trip={trip} config={config} />;
+		case "photo-carousel-theme":
+			return <PhotoCarouselTheme trip={trip} config={config} />;
 
-    default:
-      // Default fallback
-      return (
-        <div className={styles.fallback}>
-          <h1 className={styles.title}>{trip.name}</h1>
-          <p className={styles.message}>Theme not configured</p>
-        </div>
-      );
-  }
+		default:
+			// Default fallback
+			return (
+				<div className={styles.fallback}>
+					<h1 className={styles.title}>{trip.name}</h1>
+					<p className={styles.message}>Theme not configured</p>
+				</div>
+			);
+	}
 }

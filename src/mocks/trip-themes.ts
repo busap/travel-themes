@@ -38,8 +38,8 @@ export const tripThemes: TripTheme[] = [
 		tripId: "spain-fiesta",
 		theme: Theme.Showcase,
 	},
-    {
-        tripId: 'australian-outback',
-        theme: Theme.PhotoCarousel,
-    },
+	{
+		tripId: "australian-outback",
+		theme: Theme.PhotoCarousel,
+	},
 ];

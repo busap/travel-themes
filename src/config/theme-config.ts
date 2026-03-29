@@ -186,23 +186,23 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 		},
 	},
 	[Theme.PhotoCarousel]: {
-    component: 'photo-carousel-theme',
-    layout: {
-      scrollDirection: 'none',
-      spacing: 'gap-0',
-    },
-    animation: {
-      timeline: {
-        duration: 1.0,
-        ease: 'linear',
-      },
-    },
-    photos: {
-      arrangement: 'flow',
-      revealPattern: 'sequential',
-    },
-  },
-  [Theme.Feed]: {
+		component: "photo-carousel-theme",
+		layout: {
+			scrollDirection: "none",
+			spacing: "gap-0",
+		},
+		animation: {
+			timeline: {
+				duration: 1.0,
+				ease: "linear",
+			},
+		},
+		photos: {
+			arrangement: "flow",
+			revealPattern: "sequential",
+		},
+	},
+	[Theme.Feed]: {
 		component: "feed-theme",
 		layout: {
 			type: "card-grid",
