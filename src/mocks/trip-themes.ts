@@ -39,7 +39,7 @@ export const tripThemes: TripTheme[] = [
     theme: Theme.Showcase,
   },
   {
-    tripId: '',
+    tripId: 'australian-outback',
     theme: Theme.LogoCarousel,
   },
 ];
