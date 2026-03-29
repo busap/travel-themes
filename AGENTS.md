@@ -65,6 +65,7 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 **Flow**: Trip ID -> `getThemeForTrip()` -> Theme enum -> `getThemeConfig()` -> ThemeRenderer -> Theme component
 
 **Rules**:
+
 - Themes are config-driven via `theme-config.ts`, not hardcoded
 - Extract config values as constants at the top of the component
 - Only specify config options that the theme actually uses (all ThemeConfig fields are optional)

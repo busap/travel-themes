@@ -1,11 +1,11 @@
-import { Photo } from './photo';
+import { Photo } from "./photo";
 
 export interface Trip {
-  id: string;
-  name: string;
-  countries: string[];
-  year?: number;
-  description?: string;
-  coverPhoto: string;
-  photos: Photo[];
+	id: string;
+	name: string;
+	countries: string[];
+	year?: number;
+	description?: string;
+	coverPhoto: string;
+	photos: Photo[];
 }

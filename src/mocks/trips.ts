@@ -1,70 +1,92 @@
-import { Trip } from '@/types/trip';
-import { pickRandom, pickMultiple, randomBoolean, randomInt } from './mock-utils';
+import { Trip } from "@/types/trip";
+import {
+	pickRandom,
+	pickMultiple,
+	randomBoolean,
+	randomInt,
+} from "./mock-utils";
 
 // Mock data for generating random trips
 const tripNames = [
-  'Parisian Dreams',
-  'Tokyo Nights',
-  'Icelandic Wonders',
-  'Sahara Sunset',
-  'Alpine Adventure',
-  'Mediterranean Magic',
-  'Tropical Paradise',
-  'Nordic Explorer',
-  'Ancient Ruins',
-  'City of Lights',
-  'Mountain Escape',
-  'Coastal Journey',
-  'Desert Odyssey',
-  'Island Hopping',
-  'Urban Discovery',
-  'Wilderness Trek',
-  'Cultural Immersion',
-  'Culinary Quest',
-  'Architectural Marvels',
-  'Hidden Gems',
+	"Parisian Dreams",
+	"Tokyo Nights",
+	"Icelandic Wonders",
+	"Sahara Sunset",
+	"Alpine Adventure",
+	"Mediterranean Magic",
+	"Tropical Paradise",
+	"Nordic Explorer",
+	"Ancient Ruins",
+	"City of Lights",
+	"Mountain Escape",
+	"Coastal Journey",
+	"Desert Odyssey",
+	"Island Hopping",
+	"Urban Discovery",
+	"Wilderness Trek",
+	"Cultural Immersion",
+	"Culinary Quest",
+	"Architectural Marvels",
+	"Hidden Gems",
 ];
 
 const countriesPool = [
-  'France', 'Japan', 'Iceland', 'Morocco', 'Switzerland', 'Italy', 'Greece',
-  'Thailand', 'Norway', 'Peru', 'New Zealand', 'Spain', 'Portugal', 'Croatia',
-  'Turkey', 'Mexico', 'Canada', 'Australia', 'Vietnam', 'Indonesia',
+	"France",
+	"Japan",
+	"Iceland",
+	"Morocco",
+	"Switzerland",
+	"Italy",
+	"Greece",
+	"Thailand",
+	"Norway",
+	"Peru",
+	"New Zealand",
+	"Spain",
+	"Portugal",
+	"Croatia",
+	"Turkey",
+	"Mexico",
+	"Canada",
+	"Australia",
+	"Vietnam",
+	"Indonesia",
 ];
 
 const descriptions = [
-  'An unforgettable journey through stunning landscapes',
-  'Where ancient tradition meets modern wonder',
-  'A culinary and cultural adventure',
-  'Exploring hidden corners and local secrets',
-  'Breathtaking views at every turn',
-  'An immersive experience in local culture',
-  'Nature\'s masterpiece revealed',
-  'Urban exploration and countryside charm',
-  'From bustling markets to serene mountains',
-  'A photographer\'s dream destination',
-  'Historical treasures and contemporary delights',
-  'Crystal waters and golden sunsets',
-  'Adventure, relaxation, and everything between',
-  'Architectural wonders and artistic inspiration',
-  'A perfect blend of excitement and tranquility',
+	"An unforgettable journey through stunning landscapes",
+	"Where ancient tradition meets modern wonder",
+	"A culinary and cultural adventure",
+	"Exploring hidden corners and local secrets",
+	"Breathtaking views at every turn",
+	"An immersive experience in local culture",
+	"Nature's masterpiece revealed",
+	"Urban exploration and countryside charm",
+	"From bustling markets to serene mountains",
+	"A photographer's dream destination",
+	"Historical treasures and contemporary delights",
+	"Crystal waters and golden sunsets",
+	"Adventure, relaxation, and everything between",
+	"Architectural wonders and artistic inspiration",
+	"A perfect blend of excitement and tranquility",
 ];
 
 const unsplashPhotos = [
-  'photo-1502602898657-3e91760cbb34', // Paris
-  'photo-1493976040374-85c8e12f0c0e', // Japan
-  'photo-1504893524553-b855bce32c67', // Iceland
-  'photo-1489749798305-4fea3ae63d43', // Morocco
-  'photo-1531366936337-7c912a4589a7', // Mountains
-  'photo-1533105079780-92b9be482077', // Beach
-  'photo-1476514525535-07fb3b4ae5f1', // Lake
-  'photo-1506905925346-21bda4d32df4', // Mountains snow
-  'photo-1520769669658-f07657f5a307', // Northern lights
-  'photo-1539020140153-e479b8c22e70', // Desert
-  'photo-1548017871-f3f70db8b4c3', // Blue city
-  'photo-1528360983277-13d401cdc186', // Mount Fuji
-  'photo-1499856871958-5b9627545d1a', // Paris Eiffel
-  'photo-1513635269975-59663e0ac1ad', // London
-  'photo-1467269204594-9661b134dd2b', // Countryside
+	"photo-1502602898657-3e91760cbb34", // Paris
+	"photo-1493976040374-85c8e12f0c0e", // Japan
+	"photo-1504893524553-b855bce32c67", // Iceland
+	"photo-1489749798305-4fea3ae63d43", // Morocco
+	"photo-1531366936337-7c912a4589a7", // Mountains
+	"photo-1533105079780-92b9be482077", // Beach
+	"photo-1476514525535-07fb3b4ae5f1", // Lake
+	"photo-1506905925346-21bda4d32df4", // Mountains snow
+	"photo-1520769669658-f07657f5a307", // Northern lights
+	"photo-1539020140153-e479b8c22e70", // Desert
+	"photo-1548017871-f3f70db8b4c3", // Blue city
+	"photo-1528360983277-13d401cdc186", // Mount Fuji
+	"photo-1499856871958-5b9627545d1a", // Paris Eiffel
+	"photo-1513635269975-59663e0ac1ad", // London
+	"photo-1467269204594-9661b134dd2b", // Countryside
 ];
 
 /**
@@ -73,521 +95,1721 @@ const unsplashPhotos = [
  * @returns A randomly generated Trip object
  */
 export const randomTrip = (seed?: string): Trip => {
-  const id = seed || `trip-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-  const name = pickRandom(tripNames);
-  const countryCount = randomBoolean(0.3) ? 2 : 1;
-  const countries = pickMultiple(countriesPool, countryCount);
-  const year = randomBoolean(0.8) ? randomInt(2020, 2024) : undefined;
-  const description = randomBoolean(0.7) ? pickRandom(descriptions) : undefined;
-  const coverPhoto = `https://images.unsplash.com/${pickRandom(unsplashPhotos)}?w=800&q=80`;
+	const id =
+		seed || `trip-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+	const name = pickRandom(tripNames);
+	const countryCount = randomBoolean(0.3) ? 2 : 1;
+	const countries = pickMultiple(countriesPool, countryCount);
+	const year = randomBoolean(0.8) ? randomInt(2020, 2024) : undefined;
+	const description = randomBoolean(0.7)
+		? pickRandom(descriptions)
+		: undefined;
+	const coverPhoto = `https://images.unsplash.com/${pickRandom(unsplashPhotos)}?w=800&q=80`;
 
-  const photoCount = randomInt(1, 4);
-  const selectedPhotos = pickMultiple(unsplashPhotos, photoCount);
-  const photos = selectedPhotos.map((photoId, i) => ({
-    src: `https://images.unsplash.com/${photoId}?w=1200&q=80`,
-    title: randomBoolean(0.5) ? `Photo ${i + 1}` : undefined,
-    description: randomBoolean(0.33) ? 'A beautiful moment captured' : undefined,
-  }));
+	const photoCount = randomInt(1, 4);
+	const selectedPhotos = pickMultiple(unsplashPhotos, photoCount);
+	const photos = selectedPhotos.map((photoId, i) => ({
+		src: `https://images.unsplash.com/${photoId}?w=1200&q=80`,
+		title: randomBoolean(0.5) ? `Photo ${i + 1}` : undefined,
+		description: randomBoolean(0.33)
+			? "A beautiful moment captured"
+			: undefined,
+	}));
 
-  return {
-    id,
-    name,
-    countries,
-    year,
-    description,
-    coverPhoto,
-    photos,
-  };
+	return {
+		id,
+		name,
+		countries,
+		year,
+		description,
+		coverPhoto,
+		photos,
+	};
 };
 
 export const trips: Trip[] = [
-  {
-    id: 'japan-2023',
-    name: 'Japan Adventures',
-    countries: ['Japan'],
-    year: 2023,
-    description: 'Cherry blossoms, ancient temples, and neon-lit streets',
-    coverPhoto: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80', title: 'Fushimi Inari Shrine', description: 'Thousands of vermillion torii gates' },
-      { src: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=80', title: 'Tokyo at Night' },
-      { src: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80', title: 'Mount Fuji', description: 'Early morning view from Lake Kawaguchi' },
-      { src: 'https://images.unsplash.com/photo-1504109586057-7a2ae83d1338?w=1200&q=80', title: 'Japanese Garden' },
-      { src: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&q=80', title: 'Tokyo Skyline' },
-      { src: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=1200&q=80', title: 'Shibuya Crossing' },
-      { src: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=1200&q=80', title: 'Shinjuku Streets' },
-      { src: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=1200&q=80', title: 'Cherry Blossoms' },
-      { src: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=1200&q=80', title: 'Tokyo Tower' },
-      { src: 'https://images.unsplash.com/photo-1552888968-e9a4302d3d4c?w=1200&q=80', title: 'Japanese Architecture' },
-      { src: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=1200&q=80', title: 'Bamboo Forest', description: 'Arashiyama bamboo grove' },
-      { src: 'https://images.unsplash.com/photo-1554797589-7241bb691973?w=1200&q=80', title: 'Osaka Castle' },
-      { src: 'https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=1200&q=80', title: 'Torii Gate' },
-      { src: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1200&q=80', title: 'Tokyo Cityscape', description: 'Neon lights of Shinjuku' },
-      { src: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=1200&q=80', title: 'Japanese Countryside' },
-      { src: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1200&q=80', title: 'Kyoto Temple' },
-      { src: 'https://images.unsplash.com/photo-1528164344885-47b1492f7cf4?w=1200&q=80', title: 'Tokyo Alley' },
-      { src: 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=1200&q=80', title: 'Floating Torii' },
-      { src: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80', title: 'Japanese Cuisine' },
-      { src: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80', title: 'Senso-ji Temple', description: 'Asakusa thunder gate' },
-      { src: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=80', title: 'Night Market' },
-      { src: 'https://images.unsplash.com/photo-1551641506-ee5bf4cb45f1?w=1200&q=80', title: 'Tea Ceremony' },
-      { src: 'https://images.unsplash.com/photo-1570521462033-3015e76e7432?w=1200&q=80', title: 'Zen Garden' },
-      { src: 'https://images.unsplash.com/photo-1576675784201-0e142b423571?w=1200&q=80', title: 'Kinkaku-ji', description: 'Golden Pavilion in Kyoto' },
-      { src: 'https://images.unsplash.com/photo-1505069190533-40aea9ad55a4?w=1200&q=80', title: 'Nara Deer Park' },
-      { src: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?w=1200&q=80', title: 'Himeji Castle' },
-      { src: 'https://images.unsplash.com/photo-1546874177-9e664107314e?w=1200&q=80', title: 'Street Food Stall' },
-      { src: 'https://images.unsplash.com/photo-1547234856-2bfdd14e6e5a?w=1200&q=80', title: 'Rain in Tokyo' },
-      { src: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=1200&q=80', title: 'Mountain Temple' },
-      { src: 'https://images.unsplash.com/photo-1558862107-d49ef2451048?w=1200&q=80', title: 'Osaka Night', description: 'Dotonbori district' },
-      { src: 'https://images.unsplash.com/photo-1524311842165-9e3e8d5e3435?w=1200&q=80', title: 'Japanese Bridge' },
-      { src: 'https://images.unsplash.com/photo-1585830300667-a7fde89f7449?w=1200&q=80', title: 'Spring in Kyoto' },
-      { src: 'https://images.unsplash.com/photo-1557409518-691ebcd96038?w=1200&q=80', title: 'Bullet Train', description: 'Shinkansen at the station' },
-      { src: 'https://images.unsplash.com/photo-1503640538573-148065ba6f84?w=1200&q=80', title: 'Japanese Lanterns' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Sushi Platter' },
-    ],
-  },
-  {
-    id: 'morocco-markets',
-    name: 'Colors of Morocco',
-    countries: ['Morocco'],
-    year: 2022,
-    description: 'Vibrant souks, desert sunsets, and timeless medinas',
-    coverPhoto: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1200&q=80', title: 'Moroccan Market', description: 'Vibrant colors of the souk' },
-      { src: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80', title: 'Sahara Desert', description: 'Golden dunes at sunset' },
-      { src: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80', title: 'Spice Market' },
-      { src: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80', title: 'Moroccan Door' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Desert Campfire', description: 'Under the Saharan stars' },
-      { src: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80', title: 'Moroccan Tiles' },
-      { src: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1200&q=80', title: 'Atlas Mountains' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Desert Night Sky' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Sand Dunes' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Mountain Valley' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Mountain Peak' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Foggy Forest' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Cedar Forest' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Essaouira Beach' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Rural Landscape' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Mountain Range' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Golden Hour' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Dramatic Sky' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Coastal Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Mountain Oasis' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Palm Grove' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Harbor Sunset' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'City Streets' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Rooftop View' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Modern Marrakech' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Riad Interior' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Ouzoud Waterfalls' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'High Atlas', description: 'Snow-capped peaks above the desert' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Mountain Lake' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Minaret Tower' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Night Lights' },
-      { src: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80', title: 'Ornate Gateway' },
-      { src: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80', title: 'Coastal Paradise' },
-    ],
-  },
-  {
-    id: 'nordic-winter',
-    name: 'Nordic Winter',
-    countries: ['Norway', 'Iceland'],
-    year: 2024,
-    description: 'Northern lights, frozen waterfalls, and snowy fjords',
-    coverPhoto: 'https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=1200&q=80', title: 'Aurora Borealis', description: 'Dancing lights over Tromsø' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Seljalandsfoss' },
-      { src: 'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=1200&q=80', title: 'Norwegian Fjord' },
-      { src: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=1200&q=80', title: 'Reykjavik', description: 'Colorful houses in the winter' },
-      { src: 'https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1200&q=80', title: 'Lofoten Islands', description: 'Dramatic peaks and fishing villages' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Snowy Mountains' },
-      { src: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80', title: 'Snow-Covered Peak', description: 'Winter wonderland' },
-      { src: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1200&q=80', title: 'Jökulsárlón', description: 'Glacier lagoon with ice diamonds' },
-      { src: 'https://images.unsplash.com/photo-1516850228053-8a97f7ff8a1a?w=1200&q=80', title: 'Blue Lagoon' },
-      { src: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=80', title: 'Northern Lights', description: 'Green aurora over snowy landscape' },
-      { src: 'https://images.unsplash.com/photo-1539717232966-433d38e36962?w=1200&q=80', title: 'Hallgrímskirkja', description: 'Iconic Reykjavik church' },
-      { src: 'https://images.unsplash.com/photo-1467816574367-9a652a7c1a4f?w=1200&q=80', title: 'Geirangerfjord' },
-      { src: 'https://images.unsplash.com/photo-1579033461380-adb47c3eb938?w=1200&q=80', title: 'Frozen Waterfall', description: 'Ice formations at Skógafoss' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Mountain Summit' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Misty Valley' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Dramatic Arctic Sky' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Glacial Lake' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Snowy Plateau' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Fjord Vista' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Mountain Range' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Coastal Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Arctic Sunset' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Pine Forest' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Tundra Landscape' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Frozen Lake' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Snow Forest' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Black Sand Beach', description: 'Reynisfjara volcanic beach' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Harbor at Dusk' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Bergen Streets' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Coastal Village' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Modern Architecture' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Cozy Cabin' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Starry Night', description: 'Milky Way over the glacier' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Northern Camp' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Icy Path' },
-    ],
-  },
-  {
-    id: 'italian-escape',
-    name: 'Italian Escape',
-    countries: ['Italy'],
-    year: 2023,
-    description: 'Renaissance art, rolling hills, and coastal beauty',
-    coverPhoto: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&q=80', title: 'Venice Canals', description: 'Gondolas on the Grand Canal' },
-      { src: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80', title: 'Roman Colosseum' },
-      { src: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1200&q=80', title: 'Tuscan Countryside', description: 'Rolling hills and vineyards' },
-      { src: 'https://images.unsplash.com/photo-1534445538923-ab38438550d8?w=1200&q=80', title: 'Florence Cathedral' },
-      { src: 'https://images.unsplash.com/photo-1529260830199-42c24126f198?w=1200&q=80', title: 'Amalfi Coast' },
-      { src: 'https://images.unsplash.com/photo-1515859005217-8a1f08870f59?w=1200&q=80', title: 'Cinque Terre', description: 'Colorful villages on the cliffs' },
-      { src: 'https://images.unsplash.com/photo-1543429776-2782f8f19a50?w=1200&q=80', title: 'Roman Forum' },
-      { src: 'https://images.unsplash.com/photo-1549988004-0d7e0a5a0a3b?w=1200&q=80', title: 'Positano' },
-      { src: 'https://images.unsplash.com/photo-1498307833015-e7b400441eb8?w=1200&q=80', title: 'Ponte Vecchio' },
-      { src: 'https://images.unsplash.com/photo-1543785734-4b6e564642f8?w=1200&q=80', title: 'Italian Piazza' },
-      { src: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80', title: 'Mediterranean Coast' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Cascading Falls' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Italian Alps' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Dolomites' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Misty Morning' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Olive Grove' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Sardinian Beach' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Tuscan Landscape' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Mountain Vista' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Lake Como', description: 'Crystal-clear alpine lake' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic View' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Sunset over Tuscany' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Dramatic Clouds' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Alpine Lake' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Countryside Road' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Forest Canopy' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Coastal Rocks' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Harbor View' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'City Streets' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Rooftop Terrace' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Modern Milan' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Historic Monument' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Evening Stroll' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Italian Seafood' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'Bridge at Night' },
-    ],
-  },
-  {
-    id: 'greek-islands',
-    name: 'Greek Islands',
-    countries: ['Greece'],
-    year: 2022,
-    description: 'White-washed villages, azure waters, and ancient history',
-    coverPhoto: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80', title: 'Santorini Sunset', description: 'Iconic blue domes of Oia' },
-      { src: 'https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80', title: 'Mykonos Windmills' },
-      { src: 'https://images.unsplash.com/photo-1555993539-1732b0258235?w=1200&q=80', title: 'Athens Acropolis' },
-      { src: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1200&q=80', title: 'Greek Coast' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Navagio Beach', description: 'Shipwreck Bay in Zakynthos' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Meteor Valley' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Turquoise Bay' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Mount Olympus' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Island Mountains' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Olive Groves' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Forest Path' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Countryside' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic View' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Golden Hour' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Dramatic Sky' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Crystal Waters' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Sandy Cove' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Hilltop View' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Sea Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Fishing Harbor' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Athens Streets' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Island Village' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Modern Athens' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Waterfall' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Ancient Temple' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Evening Promenade' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'City Lights' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Fresh Seafood' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Taverna' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Beach Bonfire' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Narrow Street' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Starlit Night' },
-      { src: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80', title: 'Mosaic Detail' },
-    ],
-  },
-  {
-    id: 'thailand-adventure',
-    name: 'Tropical Thailand',
-    countries: ['Thailand'],
-    year: 2024,
-    description: 'Golden temples, jungle adventures, and island paradise',
-    coverPhoto: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=1200&q=80', title: 'Wat Arun', description: 'Temple of Dawn at sunrise' },
-      { src: 'https://images.unsplash.com/photo-1537458224466-780fe92b8338?w=1200&q=80', title: 'Phi Phi Islands' },
-      { src: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80', title: 'Phuket Beach' },
-      { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&q=80', title: 'Chiang Mai', description: 'Mountain temples and night markets' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Railay Beach', description: 'Limestone cliffs and turquoise water' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Jungle Valley' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Island Lagoon' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Tropical Forest' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Jungle Trek' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Rice Paddies' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Mountain Peak' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Hilltop Temple' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic Vista' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Tropical Sunset' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Monsoon Sky' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Emerald Pool' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Coastal View' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Canopy Walk' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Rocky Shore' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Sunset Beach' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Bangkok Streets' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Floating Market' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Erawan Falls' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Golden Stupa' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Night Scene' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Thai Street Food' },
-      { src: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80', title: 'Pad Thai' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Beachside Bar' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Beach Campfire' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Alleyway' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Night Sky' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Bangkok Skyline' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'City at Night' },
-      { src: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80', title: 'Temple Mosaic' },
-      { src: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80', title: 'Ornate Gateway' },
-    ],
-  },
-  {
-    id: 'paris-romance',
-    name: 'Parisian Dreams',
-    countries: ['France'],
-    year: 2023,
-    description: 'Art, architecture, and timeless elegance',
-    coverPhoto: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Paris at Dusk', description: 'The City of Lights awakens' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Eiffel Tower' },
-      { src: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=1200&q=80', title: 'Louvre Museum' },
-      { src: 'https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=1200&q=80', title: 'Montmartre' },
-      { src: 'https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1200&q=80', title: 'Arc de Triomphe', description: 'View down the Champs-Élysées' },
-      { src: 'https://images.unsplash.com/photo-1549144511-f099e773c147?w=1200&q=80', title: 'Versailles' },
-      { src: 'https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?w=1200&q=80', title: 'Seine River' },
-      { src: 'https://images.unsplash.com/photo-1478391679764-b2d8b3cd1e94?w=1200&q=80', title: 'Parisian Café' },
-      { src: 'https://images.unsplash.com/photo-1520939817895-060bdaf4fe1b?w=1200&q=80', title: 'Notre-Dame' },
-      { src: 'https://images.unsplash.com/photo-1550340499-a6c60fc8287c?w=1200&q=80', title: 'Sacré-Cœur' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'City Lights' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'French Countryside' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Loire Valley' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Forest Walk' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Provence Fields' },
-      { src: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&q=80', title: 'Village Lane' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'French Riviera' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Alpine Lake' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Mont Blanc' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Mountain View' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic Shot' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Sunset' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Sky Drama' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Lakeside' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Country Road' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Forest Canopy' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Normandy Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Harbor Sunset' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Street Scene' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Rooftop View' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'La Défense' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'French Cuisine' },
-      { src: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80', title: 'Patisserie' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Waterfall' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Bookshop' },
-    ],
-  },
-  {
-    id: 'swiss-alps',
-    name: 'Alpine Adventure',
-    countries: ['Switzerland'],
-    year: 2024,
-    description: 'Majestic peaks, pristine lakes, and chocolate dreams',
-    coverPhoto: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80', title: 'Matterhorn', description: 'Iconic Alpine peak' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Lake Lucerne' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Swiss Slopes' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Alpine Ridge' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Forest Path', description: 'Morning mist in the valley' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Mountain Lake' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic View', description: 'Overlooking the Bernese Oberland' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Golden Hour' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Green Valley' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Waterfall', description: 'Hidden cascade near Lauterbrunnen' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Dramatic Sky' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Mountain Pass' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Forest Canopy', description: 'Ancient pines along the trail' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Rocky Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Scenic Valley' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Alpine Forest' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Lakeside Beach' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Lake Sunset' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Zermatt Village' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Interlaken' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Zurich Skyline' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Historic Tower' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Evening Walk' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'City Bridge' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Mountain Hut' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Alpine Campfire' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Village Path' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Starry Alps', description: 'Milky Way over the mountains' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Swiss Cheese Fondue' },
-      { src: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80', title: 'Alpine Cuisine' },
-      { src: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80', title: 'Chalet Detail' },
-      { src: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80', title: 'Train Station' },
-      { src: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80', title: 'Wooden Door' },
-      { src: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80', title: 'Mountain Gate' },
-      { src: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80', title: 'Glacier View' },
-    ],
-  },
-  {
-    id: 'spain-fiesta',
-    name: 'Spanish Fiesta',
-    countries: ['Spain'],
-    year: 2022,
-    description: 'Flamenco rhythms, Gothic quarters, and Mediterranean sun',
-    coverPhoto: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=1200&q=80', title: 'Barcelona', description: 'Sagrada Familia at twilight' },
-      { src: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80', title: 'Seville' },
-      { src: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80', title: 'Costa del Sol' },
-      { src: 'https://images.unsplash.com/photo-1512187374372-3ecf4db53627?w=1200&q=80', title: 'Madrid' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Mediterranean Beach' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Mountain Valley' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Coastal Lagoon' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Sierra Nevada' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Mountain Peak' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Misty Forest' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Pine Forest' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Andalusian Countryside' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic Vista' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Golden Hour' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Storm Clouds' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Lake View' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Desert Landscape' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Green Hills' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Coastal Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Sunset Pier' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Gothic Quarter' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Old Town' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'Modern Barcelona' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Monument' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Evening Glow' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'Night Lights' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Waterfall' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Tapas Spread' },
-      { src: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80', title: 'Paella' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Plaza Scene' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Narrow Lane' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Beach Evening' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Starry Night' },
-    ],
-  },
-  {
-    id: 'australian-outback',
-    name: 'Australian Adventure',
-    countries: ['Australia'],
-    year: 2023,
-    description: 'Reef wonders, outback adventures, and coastal beauty',
-    coverPhoto: 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1200&q=80', title: 'Sydney Opera House' },
-      { src: 'https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?w=1200&q=80', title: 'Great Barrier Reef', description: 'Underwater paradise' },
-      { src: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&q=80', title: 'Bondi Beach' },
-      { src: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=1200&q=80', title: 'Uluru', description: 'Heart of the Outback' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Whitehaven Beach', description: 'Purest white sand in the world' },
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Blue Mountains' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Coastal Lagoon' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Mountain Peak' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Alpine View' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Daintree Rainforest' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Eucalyptus Forest' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Outback Landscape' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic View' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Outback Sunset' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Storm Over Desert' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Mountain Lake' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Red Desert' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Canopy Walk' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Twelve Apostles' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Harbour Sunset' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Melbourne Lanes' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Harbour Bridge' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'City Skyline' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Landmark View' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Night Scene' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'City at Night' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Tropical Falls' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Seafood Platter' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Beach Bar' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Beach Campfire' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Market Lane' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Outback Stars', description: 'Milky Way over the red center' },
-      { src: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80', title: 'Desert Road' },
-      { src: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80', title: 'Aboriginal Art' },
-      { src: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80', title: 'Ornate Arcade' },
-    ],
-  },
-  {
-    id: 'new-zealand',
-    name: 'New Zealand Quest',
-    countries: ['New Zealand'],
-    year: 2024,
-    description: 'Dramatic landscapes, Maori culture, and adventure sports',
-    coverPhoto: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-    photos: [
-      { src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80', title: 'Milford Sound', description: 'Fjordland National Park' },
-      { src: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1200&q=80', title: 'Queenstown' },
-      { src: 'https://images.unsplash.com/photo-1464690661257-1a4c590e5b6d?w=1200&q=80', title: 'Mount Cook' },
-      { src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80', title: 'Lake Tekapo', description: 'Turquoise glacial waters' },
-      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80', title: 'Southern Alps' },
-      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80', title: 'Mountain Range' },
-      { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80', title: 'Fiordland Forest' },
-      { src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', title: 'Native Bush' },
-      { src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80', title: 'Green Pastures' },
-      { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', title: 'Abel Tasman Beach' },
-      { src: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80', title: 'Panoramic Vista' },
-      { src: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80', title: 'Sunset over Lake' },
-      { src: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80', title: 'Dramatic Sky' },
-      { src: 'https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80', title: 'Mirror Lakes' },
-      { src: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80', title: 'Wanaka Tree' },
-      { src: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80', title: 'Kauri Forest' },
-      { src: 'https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80', title: 'Coastal Cliffs' },
-      { src: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80', title: 'Harbor Sunset' },
-      { src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80', title: 'Wellington Streets' },
-      { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80', title: 'Auckland Harbour' },
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80', title: 'City Skyline' },
-      { src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80', title: 'Sky Tower' },
-      { src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80', title: 'Huka Falls' },
-      { src: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80', title: 'Night Walk' },
-      { src: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80', title: 'Bridge at Night' },
-      { src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80', title: 'Cozy Lodge' },
-      { src: 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80', title: 'Campfire' },
-      { src: 'https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80', title: 'Village Street' },
-      { src: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80', title: 'Stargazing', description: 'Aoraki dark sky reserve' },
-      { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80', title: 'Fresh Catch' },
-      { src: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80', title: 'Volcanic Landscape' },
-      { src: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80', title: 'Maori Carving' },
-      { src: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80', title: 'Railway Station' },
-      { src: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80', title: 'Wooden Gate' },
-      { src: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80', title: 'Snowy Peak' },
-    ],
-  },
+	{
+		id: "japan-2023",
+		name: "Japan Adventures",
+		countries: ["Japan"],
+		year: 2023,
+		description: "Cherry blossoms, ancient temples, and neon-lit streets",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80",
+				title: "Fushimi Inari Shrine",
+				description: "Thousands of vermillion torii gates",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=80",
+				title: "Tokyo at Night",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80",
+				title: "Mount Fuji",
+				description: "Early morning view from Lake Kawaguchi",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504109586057-7a2ae83d1338?w=1200&q=80",
+				title: "Japanese Garden",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&q=80",
+				title: "Tokyo Skyline",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=1200&q=80",
+				title: "Shibuya Crossing",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=1200&q=80",
+				title: "Shinjuku Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=1200&q=80",
+				title: "Cherry Blossoms",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=1200&q=80",
+				title: "Tokyo Tower",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1552888968-e9a4302d3d4c?w=1200&q=80",
+				title: "Japanese Architecture",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=1200&q=80",
+				title: "Bamboo Forest",
+				description: "Arashiyama bamboo grove",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=1200&q=80",
+				title: "Osaka Castle",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=1200&q=80",
+				title: "Torii Gate",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1200&q=80",
+				title: "Tokyo Cityscape",
+				description: "Neon lights of Shinjuku",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=1200&q=80",
+				title: "Japanese Countryside",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1200&q=80",
+				title: "Kyoto Temple",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1528164344885-47b1492f7cf4?w=1200&q=80",
+				title: "Tokyo Alley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=1200&q=80",
+				title: "Floating Torii",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80",
+				title: "Japanese Cuisine",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80",
+				title: "Senso-ji Temple",
+				description: "Asakusa thunder gate",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=80",
+				title: "Night Market",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1551641506-ee5bf4cb45f1?w=1200&q=80",
+				title: "Tea Ceremony",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1570521462033-3015e76e7432?w=1200&q=80",
+				title: "Zen Garden",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1576675784201-0e142b423571?w=1200&q=80",
+				title: "Kinkaku-ji",
+				description: "Golden Pavilion in Kyoto",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1505069190533-40aea9ad55a4?w=1200&q=80",
+				title: "Nara Deer Park",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1573455494060-c5595004fb6c?w=1200&q=80",
+				title: "Himeji Castle",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=1200&q=80",
+				title: "Street Food Stall",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1547234856-2bfdd14e6e5a?w=1200&q=80",
+				title: "Rain in Tokyo",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=1200&q=80",
+				title: "Mountain Temple",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1558862107-d49ef2451048?w=1200&q=80",
+				title: "Osaka Night",
+				description: "Dotonbori district",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1524311842165-9e3e8d5e3435?w=1200&q=80",
+				title: "Japanese Bridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1585830300667-a7fde89f7449?w=1200&q=80",
+				title: "Spring in Kyoto",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1557409518-691ebcd96038?w=1200&q=80",
+				title: "Bullet Train",
+				description: "Shinkansen at the station",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1503640538573-148065ba6f84?w=1200&q=80",
+				title: "Japanese Lanterns",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Sushi Platter",
+			},
+		],
+	},
+	{
+		id: "morocco-markets",
+		name: "Colors of Morocco",
+		countries: ["Morocco"],
+		year: 2022,
+		description: "Vibrant souks, desert sunsets, and timeless medinas",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1200&q=80",
+				title: "Moroccan Market",
+				description: "Vibrant colors of the souk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+				title: "Sahara Desert",
+				description: "Golden dunes at sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80",
+				title: "Spice Market",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80",
+				title: "Moroccan Door",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Desert Campfire",
+				description: "Under the Saharan stars",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Moroccan Tiles",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1200&q=80",
+				title: "Atlas Mountains",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Desert Night Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Sand Dunes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Mountain Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Mountain Peak",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Foggy Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Cedar Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Essaouira Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Rural Landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Mountain Range",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Golden Hour",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Dramatic Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Coastal Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Mountain Oasis",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Palm Grove",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Harbor Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "City Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Rooftop View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Modern Marrakech",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Riad Interior",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Ouzoud Waterfalls",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "High Atlas",
+				description: "Snow-capped peaks above the desert",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Mountain Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Minaret Tower",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Night Lights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80",
+				title: "Ornate Gateway",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80",
+				title: "Coastal Paradise",
+			},
+		],
+	},
+	{
+		id: "nordic-winter",
+		name: "Nordic Winter",
+		countries: ["Norway", "Iceland"],
+		year: 2024,
+		description: "Northern lights, frozen waterfalls, and snowy fjords",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=1200&q=80",
+				title: "Aurora Borealis",
+				description: "Dancing lights over Tromsø",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Seljalandsfoss",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=1200&q=80",
+				title: "Norwegian Fjord",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=1200&q=80",
+				title: "Reykjavik",
+				description: "Colorful houses in the winter",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1200&q=80",
+				title: "Lofoten Islands",
+				description: "Dramatic peaks and fishing villages",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Snowy Mountains",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80",
+				title: "Snow-Covered Peak",
+				description: "Winter wonderland",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1200&q=80",
+				title: "Jökulsárlón",
+				description: "Glacier lagoon with ice diamonds",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1516850228053-8a97f7ff8a1a?w=1200&q=80",
+				title: "Blue Lagoon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=80",
+				title: "Northern Lights",
+				description: "Green aurora over snowy landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539717232966-433d38e36962?w=1200&q=80",
+				title: "Hallgrímskirkja",
+				description: "Iconic Reykjavik church",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1467816574367-9a652a7c1a4f?w=1200&q=80",
+				title: "Geirangerfjord",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1579033461380-adb47c3eb938?w=1200&q=80",
+				title: "Frozen Waterfall",
+				description: "Ice formations at Skógafoss",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Mountain Summit",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Misty Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Dramatic Arctic Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Glacial Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Snowy Plateau",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Fjord Vista",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Mountain Range",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Coastal Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Arctic Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Pine Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Tundra Landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Frozen Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Snow Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Black Sand Beach",
+				description: "Reynisfjara volcanic beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Harbor at Dusk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Bergen Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Coastal Village",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Modern Architecture",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Cozy Cabin",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Starry Night",
+				description: "Milky Way over the glacier",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Northern Camp",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Icy Path",
+			},
+		],
+	},
+	{
+		id: "italian-escape",
+		name: "Italian Escape",
+		countries: ["Italy"],
+		year: 2023,
+		description: "Renaissance art, rolling hills, and coastal beauty",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&q=80",
+				title: "Venice Canals",
+				description: "Gondolas on the Grand Canal",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80",
+				title: "Roman Colosseum",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1200&q=80",
+				title: "Tuscan Countryside",
+				description: "Rolling hills and vineyards",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1534445538923-ab38438550d8?w=1200&q=80",
+				title: "Florence Cathedral",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1529260830199-42c24126f198?w=1200&q=80",
+				title: "Amalfi Coast",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1515859005217-8a1f08870f59?w=1200&q=80",
+				title: "Cinque Terre",
+				description: "Colorful villages on the cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1543429776-2782f8f19a50?w=1200&q=80",
+				title: "Roman Forum",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1549988004-0d7e0a5a0a3b?w=1200&q=80",
+				title: "Positano",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1498307833015-e7b400441eb8?w=1200&q=80",
+				title: "Ponte Vecchio",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1543785734-4b6e564642f8?w=1200&q=80",
+				title: "Italian Piazza",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+				title: "Mediterranean Coast",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Cascading Falls",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Italian Alps",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Dolomites",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Misty Morning",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Olive Grove",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Sardinian Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Tuscan Landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Mountain Vista",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Lake Como",
+				description: "Crystal-clear alpine lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Sunset over Tuscany",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Dramatic Clouds",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Alpine Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Countryside Road",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Forest Canopy",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Coastal Rocks",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Harbor View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "City Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Rooftop Terrace",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Modern Milan",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Historic Monument",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Evening Stroll",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Italian Seafood",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "Bridge at Night",
+			},
+		],
+	},
+	{
+		id: "greek-islands",
+		name: "Greek Islands",
+		countries: ["Greece"],
+		year: 2022,
+		description: "White-washed villages, azure waters, and ancient history",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+				title: "Santorini Sunset",
+				description: "Iconic blue domes of Oia",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80",
+				title: "Mykonos Windmills",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1555993539-1732b0258235?w=1200&q=80",
+				title: "Athens Acropolis",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1200&q=80",
+				title: "Greek Coast",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Navagio Beach",
+				description: "Shipwreck Bay in Zakynthos",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Meteor Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Turquoise Bay",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Mount Olympus",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Island Mountains",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Olive Groves",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Forest Path",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Countryside",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Golden Hour",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Dramatic Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Crystal Waters",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Sandy Cove",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Hilltop View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Sea Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Fishing Harbor",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Athens Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Island Village",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Modern Athens",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Waterfall",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Ancient Temple",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Evening Promenade",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "City Lights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Fresh Seafood",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Taverna",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Beach Bonfire",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Narrow Street",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Starlit Night",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Mosaic Detail",
+			},
+		],
+	},
+	{
+		id: "thailand-adventure",
+		name: "Tropical Thailand",
+		countries: ["Thailand"],
+		year: 2024,
+		description: "Golden temples, jungle adventures, and island paradise",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=1200&q=80",
+				title: "Wat Arun",
+				description: "Temple of Dawn at sunrise",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1537458224466-780fe92b8338?w=1200&q=80",
+				title: "Phi Phi Islands",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80",
+				title: "Phuket Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&q=80",
+				title: "Chiang Mai",
+				description: "Mountain temples and night markets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Railay Beach",
+				description: "Limestone cliffs and turquoise water",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Jungle Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Island Lagoon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Tropical Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Jungle Trek",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Rice Paddies",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Mountain Peak",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Hilltop Temple",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic Vista",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Tropical Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Monsoon Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Emerald Pool",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Coastal View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Canopy Walk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Rocky Shore",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Sunset Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Bangkok Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Floating Market",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Erawan Falls",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Golden Stupa",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Night Scene",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Thai Street Food",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80",
+				title: "Pad Thai",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Beachside Bar",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Beach Campfire",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Alleyway",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Night Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Bangkok Skyline",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "City at Night",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Temple Mosaic",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80",
+				title: "Ornate Gateway",
+			},
+		],
+	},
+	{
+		id: "paris-romance",
+		name: "Parisian Dreams",
+		countries: ["France"],
+		year: 2023,
+		description: "Art, architecture, and timeless elegance",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Paris at Dusk",
+				description: "The City of Lights awakens",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Eiffel Tower",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=1200&q=80",
+				title: "Louvre Museum",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=1200&q=80",
+				title: "Montmartre",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1200&q=80",
+				title: "Arc de Triomphe",
+				description: "View down the Champs-Élysées",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1549144511-f099e773c147?w=1200&q=80",
+				title: "Versailles",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?w=1200&q=80",
+				title: "Seine River",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1478391679764-b2d8b3cd1e94?w=1200&q=80",
+				title: "Parisian Café",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1520939817895-060bdaf4fe1b?w=1200&q=80",
+				title: "Notre-Dame",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1550340499-a6c60fc8287c?w=1200&q=80",
+				title: "Sacré-Cœur",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "City Lights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "French Countryside",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Loire Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Forest Walk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Provence Fields",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&q=80",
+				title: "Village Lane",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "French Riviera",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Alpine Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Mont Blanc",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Mountain View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic Shot",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Sky Drama",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Lakeside",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Country Road",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Forest Canopy",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Normandy Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Harbor Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Street Scene",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Rooftop View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "La Défense",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "French Cuisine",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80",
+				title: "Patisserie",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Waterfall",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Bookshop",
+			},
+		],
+	},
+	{
+		id: "swiss-alps",
+		name: "Alpine Adventure",
+		countries: ["Switzerland"],
+		year: 2024,
+		description: "Majestic peaks, pristine lakes, and chocolate dreams",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80",
+				title: "Matterhorn",
+				description: "Iconic Alpine peak",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Lake Lucerne",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Swiss Slopes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Alpine Ridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Forest Path",
+				description: "Morning mist in the valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Mountain Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic View",
+				description: "Overlooking the Bernese Oberland",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Golden Hour",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Green Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Waterfall",
+				description: "Hidden cascade near Lauterbrunnen",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Dramatic Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Mountain Pass",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Forest Canopy",
+				description: "Ancient pines along the trail",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Rocky Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Scenic Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Alpine Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Lakeside Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Lake Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Zermatt Village",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Interlaken",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Zurich Skyline",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Historic Tower",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Evening Walk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "City Bridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Mountain Hut",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Alpine Campfire",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Village Path",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Starry Alps",
+				description: "Milky Way over the mountains",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Swiss Cheese Fondue",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80",
+				title: "Alpine Cuisine",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Chalet Detail",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80",
+				title: "Train Station",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80",
+				title: "Wooden Door",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80",
+				title: "Mountain Gate",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+				title: "Glacier View",
+			},
+		],
+	},
+	{
+		id: "spain-fiesta",
+		name: "Spanish Fiesta",
+		countries: ["Spain"],
+		year: 2022,
+		description: "Flamenco rhythms, Gothic quarters, and Mediterranean sun",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=1200&q=80",
+				title: "Barcelona",
+				description: "Sagrada Familia at twilight",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80",
+				title: "Seville",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80",
+				title: "Costa del Sol",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1512187374372-3ecf4db53627?w=1200&q=80",
+				title: "Madrid",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Mediterranean Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Mountain Valley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Coastal Lagoon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Sierra Nevada",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Mountain Peak",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Misty Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Pine Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Andalusian Countryside",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic Vista",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Golden Hour",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Storm Clouds",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Lake View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Desert Landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Green Hills",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Coastal Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Sunset Pier",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Gothic Quarter",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Old Town",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Modern Barcelona",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Monument",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Evening Glow",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "Night Lights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Waterfall",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Tapas Spread",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80",
+				title: "Paella",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Plaza Scene",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Narrow Lane",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Beach Evening",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Starry Night",
+			},
+		],
+	},
+	{
+		id: "australian-outback",
+		name: "Australian Adventure",
+		countries: ["Australia"],
+		year: 2023,
+		description: "Reef wonders, outback adventures, and coastal beauty",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1200&q=80",
+				title: "Sydney Opera House",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?w=1200&q=80",
+				title: "Great Barrier Reef",
+				description: "Underwater paradise",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&q=80",
+				title: "Bondi Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=1200&q=80",
+				title: "Uluru",
+				description: "Heart of the Outback",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Whitehaven Beach",
+				description: "Purest white sand in the world",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Blue Mountains",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Coastal Lagoon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Mountain Peak",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Alpine View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Daintree Rainforest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Eucalyptus Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Outback Landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Outback Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Storm Over Desert",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Mountain Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Red Desert",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Canopy Walk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Twelve Apostles",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Harbour Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Melbourne Lanes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Harbour Bridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "City Skyline",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Landmark View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Night Scene",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "City at Night",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Tropical Falls",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Seafood Platter",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Beach Bar",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Beach Campfire",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Market Lane",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Outback Stars",
+				description: "Milky Way over the red center",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+				title: "Desert Road",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Aboriginal Art",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80",
+				title: "Ornate Arcade",
+			},
+		],
+	},
+	{
+		id: "new-zealand",
+		name: "New Zealand Quest",
+		countries: ["New Zealand"],
+		year: 2024,
+		description: "Dramatic landscapes, Maori culture, and adventure sports",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Milford Sound",
+				description: "Fjordland National Park",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1200&q=80",
+				title: "Queenstown",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464690661257-1a4c590e5b6d?w=1200&q=80",
+				title: "Mount Cook",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Lake Tekapo",
+				description: "Turquoise glacial waters",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "Southern Alps",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Mountain Range",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Fiordland Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Native Bush",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Green Pastures",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Abel Tasman Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Panoramic Vista",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Sunset over Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Dramatic Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Mirror Lakes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Wanaka Tree",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Kauri Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Coastal Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Harbor Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Wellington Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Auckland Harbour",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "City Skyline",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Sky Tower",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Huka Falls",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Night Walk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "Bridge at Night",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Cozy Lodge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Campfire",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Village Street",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Stargazing",
+				description: "Aoraki dark sky reserve",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Fresh Catch",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+				title: "Volcanic Landscape",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Maori Carving",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80",
+				title: "Railway Station",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80",
+				title: "Wooden Gate",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80",
+				title: "Snowy Peak",
+			},
+		],
+	},
 ];

@@ -6,13 +6,13 @@
  */
 
 export enum RouteKey {
-  Home = 'home',
-  TripDetail = 'tripDetail',
+	Home = "home",
+	TripDetail = "tripDetail",
 }
 
 interface RouteConfig {
-  path: string;
-  params?: string[];
+	path: string;
+	params?: string[];
 }
 
 /**
@@ -24,19 +24,19 @@ interface RouteConfig {
  * - Multiple params: /trips/:country/:year
  */
 export const routes: Record<RouteKey, RouteConfig> = {
-  [RouteKey.Home]: {
-    path: '/',
-  },
-  [RouteKey.TripDetail]: {
-    path: '/trip/:id',
-    params: ['id'],
-  },
+	[RouteKey.Home]: {
+		path: "/",
+	},
+	[RouteKey.TripDetail]: {
+		path: "/trip/:id",
+		params: ["id"],
+	},
 };
 
 /**
  * Route parameter types for type-safe route building
  */
 export type RouteParams = {
-  [RouteKey.Home]: never;
-  [RouteKey.TripDetail]: { id: string };
+	[RouteKey.Home]: never;
+	[RouteKey.TripDetail]: { id: string };
 };

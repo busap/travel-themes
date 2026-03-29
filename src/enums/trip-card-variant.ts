@@ -1,4 +1,4 @@
 export enum TripCardVariant {
-  Polaroid = 'polaroid',
-  Immersive = 'immersive',
+	Polaroid = "polaroid",
+	Immersive = "immersive",
 }

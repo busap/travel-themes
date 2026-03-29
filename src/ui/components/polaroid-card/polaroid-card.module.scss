@@ -1,78 +1,78 @@
 @reference "../../../app/globals.scss";
 
 .frame {
-  @apply bg-white p-3 sm:p-4 rounded-sm shadow-2xl;
-  @apply hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-shadow duration-300;
+	@apply bg-white p-3 sm:p-4 rounded-sm shadow-2xl;
+	@apply hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-shadow duration-300;
 }
 
 .frameTrip {
-  @apply dark:bg-zinc-800;
+	@apply dark:bg-zinc-800;
 }
 
 .container {
-  @apply relative flex-shrink-0 transition-transform duration-300;
+	@apply relative flex-shrink-0 transition-transform duration-300;
 }
 
 .containerPhoto {
-  @apply hover:scale-105 hover:z-20;
+	@apply hover:scale-105 hover:z-20;
 }
 
 .tripLink {
-  @apply block transition-all duration-500;
-  @apply hover:rotate-0 hover:scale-105 hover:shadow-2xl;
+	@apply block transition-all duration-500;
+	@apply hover:rotate-0 hover:scale-105 hover:shadow-2xl;
 }
 
 /* Trip variant content */
 .tripImageContainer {
-  @apply relative aspect-square overflow-hidden;
-  @apply bg-zinc-100 dark:bg-zinc-900;
+	@apply relative aspect-square overflow-hidden;
+	@apply bg-zinc-100 dark:bg-zinc-900;
 }
 
 .tripImage {
-  @apply object-cover transition-all duration-500;
-  @apply group-hover:brightness-110;
+	@apply object-cover transition-all duration-500;
+	@apply group-hover:brightness-110;
 }
 
 .tripContent {
-  @apply mt-4 pb-2;
+	@apply mt-4 pb-2;
 }
 
 .tripTitle {
-  @apply text-xl font-semibold;
-  @apply text-zinc-900 dark:text-white;
+	@apply text-xl font-semibold;
+	@apply text-zinc-900 dark:text-white;
 }
 
 .tripSubtitle {
-  @apply mt-1 text-sm;
-  @apply text-zinc-600 dark:text-zinc-400;
+	@apply mt-1 text-sm;
+	@apply text-zinc-600 dark:text-zinc-400;
 }
 
 .tripDescription {
-  @apply mt-2 text-xs line-clamp-2 italic;
-  @apply text-zinc-500 dark:text-zinc-500;
+	@apply mt-2 text-xs line-clamp-2 italic;
+	@apply text-zinc-500 dark:text-zinc-500;
 }
 
 /* Photo variant content */
 .photoImageContainer {
-  @apply relative overflow-hidden;
+	@apply relative overflow-hidden;
 }
 
 .photoImageContainerSquare {
-  @apply aspect-square;
+	@apply aspect-square;
 }
 
 .photoImageContainerPortrait {
-  @apply w-60 h-[300px] sm:w-72 sm:h-[360px] md:w-80 md:h-[400px];
+	@apply w-60 h-[300px] sm:w-72 sm:h-[360px] md:w-80 md:h-[400px];
 }
 
 .photoImage {
-  @apply object-cover;
+	@apply object-cover;
 }
 
 .photoCaptionContainer {
-  @apply mt-3 sm:mt-4 text-center h-5 sm:h-6;
+	@apply mt-3 sm:mt-4 text-center h-5 sm:h-6;
 }
 
 .photoCaption {
-  @apply text-xs sm:text-sm text-zinc-700;
+	@apply text-xs sm:text-sm text-zinc-700;
 }

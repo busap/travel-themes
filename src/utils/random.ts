@@ -6,6 +6,6 @@
  * @returns A pseudo-random number between 0 and 1
  */
 export function seededRandom(seed: number): number {
-  const x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
+	const x = Math.sin(seed) * 10000;
+	return x - Math.floor(x);
 }
