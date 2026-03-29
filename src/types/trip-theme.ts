@@ -1,6 +1,6 @@
-import { Theme } from '@/enums/theme';
+import { Theme } from "@/enums/theme";
 
 export interface TripTheme {
-  tripId: string;
-  theme: Theme;
+	tripId: string;
+	theme: Theme;
 }

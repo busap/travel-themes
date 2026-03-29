@@ -1,4 +1,4 @@
 export enum PolaroidCardVariant {
-  Trip = 'trip',
-  Photo = 'photo',
+	Trip = "trip",
+	Photo = "photo",
 }

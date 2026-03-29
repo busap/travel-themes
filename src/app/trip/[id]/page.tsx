@@ -1,30 +1,30 @@
-import { getTripById, getAllTrips, getThemeForTrip } from '@/utils/trip';
-import { getThemeConfig } from '@/config/theme-config';
-import { TripDetail } from '@/ui/pages/trip-detail/trip-detail';
-import { notFound } from 'next/navigation';
+import { getTripById, getAllTrips, getThemeForTrip } from "@/utils/trip";
+import { getThemeConfig } from "@/config/theme-config";
+import { TripDetail } from "@/ui/pages/trip-detail/trip-detail";
+import { notFound } from "next/navigation";
 
 export default async function TripPage({
-  params
+	params,
 }: {
-  params: Promise<{ id: string }>
+	params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const trip = getTripById(id);
+	const { id } = await params;
+	const trip = getTripById(id);
 
-  if (!trip) {
-    notFound();
-  }
+	if (!trip) {
+		notFound();
+	}
 
-  const theme = getThemeForTrip(trip.id);
-  const config = getThemeConfig(theme);
+	const theme = getThemeForTrip(trip.id);
+	const config = getThemeConfig(theme);
 
-  return <TripDetail trip={trip} config={config} />;
+	return <TripDetail trip={trip} config={config} />;
 }
 
 // Generate static params for all trips
 export async function generateStaticParams() {
-  const trips = getAllTrips();
-  return trips.map((trip) => ({
-    id: trip.id,
-  }));
+	const trips = getAllTrips();
+	return trips.map((trip) => ({
+		id: trip.id,
+	}));
 }
