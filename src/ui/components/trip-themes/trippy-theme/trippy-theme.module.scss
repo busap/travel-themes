@@ -117,6 +117,9 @@
   overflow: hidden;
   will-change: transform;
 
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
   // Layered glow — purple bloom + cyan corona
   box-shadow:
     0 0   0 1px rgba(255, 255, 255, 0.07),
@@ -131,7 +134,12 @@
   width: 100%;
   height: 100%;
   transform-origin: center;
-  will-change: transform, filter;
+  // filter is no longer animated on the image — only scale is.
+  // backface-visibility + translateZ force a stable compositing layer
+  // from the start, eliminating the mid-animation flicker.
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 // Chromatic colour wash overlay — gradient faking lens aberration

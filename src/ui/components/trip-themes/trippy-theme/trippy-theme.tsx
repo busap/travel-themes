@@ -63,11 +63,20 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
       container.querySelectorAll<HTMLElement>('[data-photo-img]'),
     );
 
+    const HOLD_D = EXIT_START_RATIO - ENTRY_RATIO; // 0.30
+    const EXIT_D = 1 - EXIT_START_RATIO;           // 0.35
+
     const ctx = gsap.context(() => {
-      // Prevent flash: all layers start invisible.
-      // Only the entry fromTo at position 0 has immediateRender:true,
-      // so it re-applies autoAlpha:0 — consistent and conflict-free.
+      // Hide all layers. Photo 0 is immediately revealed below so the
+      // user sees content on load rather than a blank screen.
       gsap.set(layers, { autoAlpha: 0 });
+
+      // Photo 0: skip the entry animation — show it straight away in hold state.
+      if (layers[0] && frames[0] && imgs[0]) {
+        gsap.set(layers[0], { autoAlpha: 1 });
+        gsap.set(frames[0], { scale: 1, rotate: 0 });
+        gsap.set(imgs[0], { scale: 1.05 });
+      }
 
       // Background hue cycles through full 360° as user scrolls
       if (bgEl) {
@@ -92,60 +101,67 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
         const img = imgs[i];
         if (!frame || !img) return;
 
-        // Alternate rotation direction per photo
         const entryRotate = i % 2 === 0 ? 22 : -22;
         const exitRotate = -(entryRotate * 0.6);
-
         const sectionStart = i * PHOTO_SECTION_PX;
         const sectionEnd = (i + 1) * PHOTO_SECTION_PX;
 
-        // ── Single timeline per photo spanning the full section ────────────
-        // Using absolute positions so entry, hold, and exit are one coherent
-        // scrubbed sequence. This avoids the two-separate-timelines bug where
-        // the exit timeline's fromTo at time=0 would immediately render
-        // autoAlpha:1 on every layer (overriding the initial set).
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: container,
-              start: `top+=${sectionStart} top`,
-              end: `top+=${sectionEnd} top`,
-              scrub,
-            },
-          })
-          // Entry phase: 0 → ENTRY_RATIO
-          .fromTo(layer, { autoAlpha: 0 }, { autoAlpha: 1, duration: ENTRY_RATIO, ease: 'none' })
-          .fromTo(
-            frame,
-            { scale: 3, rotate: entryRotate },
-            { scale: 1, rotate: 0, ease: 'power2.out', duration: ENTRY_RATIO },
-            0,
-          )
-          .fromTo(
-            img,
-            { scale: 1.5, filter: 'saturate(2.5) hue-rotate(80deg)' },
-            { scale: 1.05, filter: 'saturate(1) hue-rotate(0deg)', ease: 'power2.out', duration: ENTRY_RATIO },
-            0,
-          )
-          // Exit phase: EXIT_START_RATIO → 1.0  (hold is the implicit gap between)
-          .fromTo(
-            layer,
-            { autoAlpha: 1 },
-            { autoAlpha: 0, ease: 'none', duration: 1 - EXIT_START_RATIO },
-            EXIT_START_RATIO,
-          )
-          .fromTo(
-            frame,
-            { scale: 1, rotate: 0 },
-            { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: 1 - EXIT_START_RATIO },
-            EXIT_START_RATIO,
-          )
-          .fromTo(
-            img,
-            { scale: 1.05, filter: 'saturate(1) hue-rotate(0deg)' },
-            { scale: 1.4, filter: 'saturate(2) hue-rotate(-60deg)', ease: 'power2.in', duration: 1 - EXIT_START_RATIO },
-            EXIT_START_RATIO,
-          );
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: container,
+            start: `top+=${sectionStart} top`,
+            end: `top+=${sectionEnd} top`,
+            scrub,
+          },
+        });
+
+        if (i === 0) {
+          // Photo 0 is already in hold state — only wire up the exit.
+          // The fromTo vars here are explicit so scrubbing backward
+          // correctly restores the visible hold state.
+          tl
+            .fromTo(layer,
+              { autoAlpha: 1 },
+              { autoAlpha: 0, ease: 'none', duration: EXIT_D },
+              EXIT_START_RATIO,
+            )
+            .fromTo(frame,
+              { scale: 1, rotate: 0 },
+              { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: EXIT_D },
+              EXIT_START_RATIO,
+            )
+            .fromTo(img,
+              { scale: 1.05 },
+              { scale: 1.4, ease: 'power2.in', duration: EXIT_D },
+              EXIT_START_RATIO,
+            );
+        } else {
+          // Photos 1+: entry → explicit hold → exit.
+          // The explicit hold tween (.to at the same value) fills the gap
+          // between entry and exit so GSAP never has an ambiguous state.
+          tl
+            // ── Entry: tunnel zoom-in (0 → ENTRY_RATIO) ─────────────────────
+            .fromTo(layer,
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: ENTRY_RATIO, ease: 'none' },
+            )
+            .fromTo(frame,
+              { scale: 3, rotate: entryRotate },
+              { scale: 1, rotate: 0, ease: 'power2.out', duration: ENTRY_RATIO },
+              0,
+            )
+            .fromTo(img,
+              { scale: 1.5 },
+              { scale: 1.05, ease: 'power2.out', duration: ENTRY_RATIO },
+              0,
+            )
+            // ── Hold: maintain visible state (ENTRY_RATIO → EXIT_START_RATIO) ─
+            .to(layer, { autoAlpha: 1, duration: HOLD_D, ease: 'none' })
+            // ── Exit: shrink to void + counter-rotate (EXIT_START_RATIO → 1) ──
+            .to(layer,  { autoAlpha: 0, ease: 'none', duration: EXIT_D })
+            .to(frame,  { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: EXIT_D }, '<')
+            .to(img,    { scale: 1.4, ease: 'power2.in', duration: EXIT_D }, '<');
+        }
       });
     }, container);
 

@@ -244,7 +244,7 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
     animation: {
       enabled: true,
       scrollTrigger: {
-        scrub: 2,
+        scrub: 1,
         start: 'top top',
         end: 'bottom bottom',
       },
