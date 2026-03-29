@@ -35,9 +35,6 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
     itemCount: photosToShow.length,
   });
 
-  const titleClass = `${styles.title} text-2xl font-bold`;
-  const subtitleClass = 'text-sm text-zinc-600';
-
   const cardsContainerClass = `${styles.cardsContainer} ${config.layout.spacing}`.trim();
 
   const getCardWrapperClass = (isVisible: boolean) => {
@@ -49,10 +46,10 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
 
   const renderHeader = () => (
     <div className={styles.header}>
-      <h1 className={titleClass}>
+      <h1 className={styles.title}>
         {trip.name}
       </h1>
-      <p className={subtitleClass}>
+      <p className={styles.subtitle}>
         {trip.countries.join(', ')} {trip.year && `• ${trip.year}`}
       </p>
     </div>
