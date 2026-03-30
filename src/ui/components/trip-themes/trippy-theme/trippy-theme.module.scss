@@ -47,6 +47,9 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  // Reserve space for the absolute-positioned header so the centered photo
+  // doesn't start immediately behind the title/subtitle text.
+  padding-top: 8rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +64,7 @@
   inset-inline: 0;
   padding-top: 2.25rem;
   text-align: center;
-  z-index: 10;
+  z-index: 20;
   pointer-events: none;
 }
 
@@ -157,8 +160,8 @@
 
 .photoCaption {
   position: absolute;
-  // Place just below the visible frame bottom
-  bottom: 5.5rem;
+  // Enough clearance above the scroll hint (~5rem tall from bottom: 1.75rem)
+  bottom: 8.5rem;
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.62rem;
