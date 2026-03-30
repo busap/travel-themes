@@ -36,6 +36,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  padding-top: 6rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,7 +94,7 @@
 .photoFrame {
   position: relative;
   width: min(88vw, 1100px);
-  height: min(75vh, 740px);
+  height: min(65vh, 680px);
   border-radius: 1.5rem;
   overflow: hidden;
   backface-visibility: hidden;
