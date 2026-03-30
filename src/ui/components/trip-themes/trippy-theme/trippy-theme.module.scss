@@ -159,7 +159,7 @@
 
 .photoCaption {
   position: absolute;
-  bottom: 6.5rem;
+  bottom: 3.25rem;
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.62rem;
@@ -175,16 +175,16 @@
 
 .scrollHint {
   position: absolute;
-  bottom: 1.75rem;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 1.75rem;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.55rem;
   z-index: 20;
   pointer-events: none;
-  animation: breathe 2.6s ease-in-out infinite;
+  animation: breatheRight 2.6s ease-in-out infinite;
 }
 
 .scrollLabel {
@@ -192,6 +192,7 @@
   letter-spacing: 0.48em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.26);
+  writing-mode: vertical-rl;
 }
 
 .scrollLine {
@@ -203,14 +204,14 @@
 
 // ── Animations ─────────────────────────────────────────────────────────────────
 
-@keyframes breathe {
+@keyframes breatheRight {
   0%, 100% {
     opacity: 0.5;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(calc(-50% + 0px));
   }
   50% {
     opacity: 1;
-    transform: translateX(-50%) translateY(-6px);
+    transform: translateY(calc(-50% - 6px));
   }
 }
 
