@@ -20,10 +20,7 @@ const bebas = Bebas_Neue({
   display: 'swap',
 });
 
-// Scroll distance allocated per photo
 const PHOTO_SECTION_PX = 1000;
-
-// Fraction of section for each phase
 const ENTRY_RATIO = 0.35;
 const EXIT_START_RATIO = 0.65;
 
@@ -62,21 +59,17 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
       container.querySelectorAll<HTMLElement>('[data-photo-img]'),
     );
 
-    const HOLD_D = EXIT_START_RATIO - ENTRY_RATIO; // 0.30
-    const EXIT_D = 1 - EXIT_START_RATIO;           // 0.35
+    const HOLD_D = EXIT_START_RATIO - ENTRY_RATIO;
+    const EXIT_D = 1 - EXIT_START_RATIO;
 
     const ctx = gsap.context(() => {
-      // Hide all layers. Photo 0 is immediately revealed below.
       gsap.set(layers, { autoAlpha: 0 });
 
-      // Photo 0: already in hold state on load — no entry animation.
       if (layers[0] && frames[0] && imgs[0]) {
         gsap.set(layers[0], { autoAlpha: 1 });
         gsap.set(frames[0], { scale: 1, rotate: 0 });
         gsap.set(imgs[0], { scale: 1.05 });
       }
-
-      // Background hue is now a pure CSS animation — no GSAP needed.
 
       layers.forEach((layer, i) => {
         const frame = frames[i];
@@ -98,7 +91,6 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
         });
 
         if (i === 0) {
-          // Photo 0: visible on load, only needs exit.
           tl
             .fromTo(layer,
               { autoAlpha: 1 },
@@ -116,17 +108,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
               EXIT_START_RATIO,
             );
         } else {
-          // Photos 1+: entry → hold → exit.
-          //
-          // immediateRender:false on frame and img entry tweens is critical:
-          // without it, GSAP would apply scale:2.5 to every frame at page load
-          // (immediateRender:true is default for fromTo at position 0).
-          // That pre-allocates GPU textures at 2.5× size for all hidden photos,
-          // causing the "pixelated square" artefacts and GPU memory pressure.
-          // With false, scale:2.5 is only set when that section's trigger fires,
-          // at which point the layer is still autoAlpha:0 so nothing is visible.
           tl
-            // ── Entry (0 → ENTRY_RATIO) ──────────────────────────────────────
             .fromTo(layer,
               { autoAlpha: 0 },
               { autoAlpha: 1, duration: ENTRY_RATIO, ease: 'none' },
@@ -141,9 +123,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
               { scale: 1.05, ease: 'power2.out', duration: ENTRY_RATIO },
               0,
             )
-            // ── Hold (ENTRY_RATIO → EXIT_START_RATIO) ────────────────────────
             .to(layer, { autoAlpha: 1, duration: HOLD_D, ease: 'none' })
-            // ── Exit (EXIT_START_RATIO → 1) ──────────────────────────────────
             .to(layer,  { autoAlpha: 0, ease: 'none', duration: EXIT_D })
             .to(frame,  { scale: 0.18, rotate: exitRotate, ease: 'power2.in', duration: EXIT_D }, '<')
             .to(img,    { scale: 1.4, ease: 'power2.in', duration: EXIT_D }, '<');
@@ -191,7 +171,6 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
                 loading={i < 2 ? undefined : 'eager'}
                 onError={() => handleImageError(photo.src)}
               />
-              {/* Chromatic colour wash */}
               <div className={styles.photoChroma} aria-hidden />
             </div>
 

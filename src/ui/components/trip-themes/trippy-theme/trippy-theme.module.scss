@@ -1,25 +1,17 @@
 @use "../../../../styles/breakpoints" as *;
 @reference "../../../../app/globals.scss";
 
-// ── Base ──────────────────────────────────────────────────────────────────────
-
 .theme {
   @apply relative w-full;
   background: #060009;
   min-height: 100vh;
 }
 
-// ── Psychedelic background ─────────────────────────────────────────────────────
-// A multi-layered radial gradient that GSAP hue-rotates as you scroll,
-// cycling through the full colour wheel.
-
 .bg {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  // Own compositing layer so hue-rotate runs on the GPU compositor thread
-  // without triggering layout/paint of the rest of the page.
   transform: translateZ(0);
   background:
     radial-gradient(ellipse 90% 70% at 50% 50%,
@@ -34,11 +26,8 @@
   animation: hueShift 12s linear infinite;
 }
 
-// ── Scroll / sticky layout ─────────────────────────────────────────────────────
-
 .scrollContainer {
   position: relative;
-  // total-scroll px for all photo sections + 1 full viewport of breathing room
   height: calc(var(--total-scroll, 5000px) + 100vh);
   z-index: 1;
 }
@@ -53,8 +42,6 @@
   overflow: hidden;
 }
 
-// ── Header ─────────────────────────────────────────────────────────────────────
-
 .header {
   position: absolute;
   top: 0;
@@ -66,16 +53,15 @@
 }
 
 .title {
-  // Bebas Neue makes it dramatic; chromatic text-shadow fakes RGB split
   font-size: clamp(2.5rem, 8vw, 5.5rem);
-  font-weight: 400; // Bebas Neue only has one weight
+  font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1;
   color: #fff;
   text-shadow:
-    -3px 0 3px rgba(255, 0, 110, 0.80),   // red-left
-     3px 0 3px rgba(0, 230, 255, 0.80),   // cyan-right
-     0   0 50px rgba(190, 60, 255, 0.55), // purple bloom
+    -3px 0 3px rgba(255, 0, 110, 0.80),
+     3px 0 3px rgba(0, 230, 255, 0.80),
+     0   0 50px rgba(190, 60, 255, 0.55),
      0   0 110px rgba(190, 60, 255, 0.20);
 }
 
@@ -87,8 +73,6 @@
   color: rgba(255, 255, 255, 0.36);
 }
 
-// ── Photo stack ────────────────────────────────────────────────────────────────
-
 .photoStack {
   position: relative;
   width: 100%;
@@ -98,7 +82,6 @@
   justify-content: center;
 }
 
-// Each layer fills the stage; only the active one is visible (GSAP autoAlpha)
 .photoLayer {
   position: absolute;
   inset: 0;
@@ -107,20 +90,14 @@
   justify-content: center;
 }
 
-// The visible photo card with glow
 .photoFrame {
   position: relative;
   width: min(88vw, 1100px);
-  // 58vh keeps the frame clear of both the header above and the caption +
-  // scroll-hint below — (100vh - 58vh) / 2 ≈ 21vh headroom on each side.
   height: min(58vh, 600px);
   border-radius: 1.5rem;
   overflow: hidden;
-
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-
-  // Two-layer glow — kept minimal to reduce GPU compositing cost
   box-shadow:
     0 0  60px rgba(160,  40, 255, 0.50),
     0 0 180px rgba(  0, 180, 255, 0.15);
@@ -131,14 +108,10 @@
   width: 100%;
   height: 100%;
   transform-origin: center;
-  // backface-visibility forces a stable compositing layer per image,
-  // eliminating mid-animation flicker without pre-allocating GPU textures
-  // for all photos up-front (no will-change: transform here).
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-// Chromatic colour wash overlay — gradient faking lens aberration
 .photoChroma {
   position: absolute;
   inset: 0;
@@ -149,13 +122,8 @@
     rgba(255,   0, 160, 0.00) 38%,
     rgba(  0, 220, 255, 0.08) 100%
   );
-  // mix-blend-mode removed — it forces a stacking context and compositing
-  // pass for every frame even when the layer is invisible.
   z-index: 2;
 }
-
-// ── Photo caption ──────────────────────────────────────────────────────────────
-// Sits above the scroll hint, anchored to the bottom of the sticky stage.
 
 .photoCaption {
   position: absolute;
@@ -170,8 +138,6 @@
   pointer-events: none;
   z-index: 20;
 }
-
-// ── Scroll hint ────────────────────────────────────────────────────────────────
 
 .scrollHint {
   position: absolute;
@@ -201,8 +167,6 @@
   height: 36px;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45), transparent);
 }
-
-// ── Animations ─────────────────────────────────────────────────────────────────
 
 @keyframes breatheRight {
   0%, 100% {
