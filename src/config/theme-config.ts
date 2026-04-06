@@ -202,7 +202,30 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 			revealPattern: "sequential",
 		},
 	},
-	[Theme.Feed]: {
+	[Theme.Trippy]: {
+        component: 'trippy-theme',
+        layout: {
+            type: 'vertical-parallax',
+            scrollDirection: 'vertical',
+            spacing: 'gap-0',
+        },
+        animation: {
+            scrollTrigger: {
+                scrub: 1,
+                start: 'top top',
+                end: 'bottom bottom',
+            },
+            timeline: {
+                duration: 1,
+                ease: 'power2.out',
+            },
+        },
+        photos: {
+            arrangement: 'stack',
+            revealPattern: 'scroll-based',
+        },
+  },
+  [Theme.Feed]: {
 		component: "feed-theme",
 		layout: {
 			type: "card-grid",

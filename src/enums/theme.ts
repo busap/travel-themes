@@ -9,4 +9,5 @@ export enum Theme {
 	DragShuffle = "drag-shuffle",
 	Showcase = "showcase",
 	PhotoCarousel = "photo-carousel",
+	Trippy = "trippy",
 }

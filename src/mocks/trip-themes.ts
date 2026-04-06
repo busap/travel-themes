@@ -42,4 +42,8 @@ export const tripThemes: TripTheme[] = [
 		tripId: "australian-outback",
 		theme: Theme.PhotoCarousel,
 	},
+    {
+        tripId: "bali-dreams",
+        theme: Theme.Trippy,
+    },
 ];
