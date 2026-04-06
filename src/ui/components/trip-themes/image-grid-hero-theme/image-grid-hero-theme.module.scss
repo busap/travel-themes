@@ -5,30 +5,31 @@
 
 .theme {
   @apply w-full;
-  background: #f5f5f5;
-  color: #1a1614;
+  background: #f4f4f4;
 }
 
-// ─── Hero (pinned while images assemble) ─────────────────────────────────────
+// ─── Hero (pinned while puzzle assembles) ─────────────────────────────────────
 
 .hero {
   @apply relative w-full;
   height: 100vh;
-  overflow: hidden;         // clips images that start outside the viewport
+  overflow: hidden;         // clips cells that are displaced outside viewport
   background: #ffffff;
 }
 
-// ─── Centered text block ─────────────────────────────────────────────────────
+// ─── Centered text (visible at start, fades as images converge) ───────────────
 
 .heroText {
+  // Dead-center in the viewport — both axes
   @apply absolute flex flex-col items-center text-center;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 20;
+  width: min(520px, 88vw);
   pointer-events: none;
-  width: min(460px, 90vw);
-  will-change: opacity, transform;
+  // No opacity transition — GSAP owns this element
+  will-change: opacity;
 }
 
 .eyebrow {
@@ -39,54 +40,55 @@
 }
 
 .title {
-  font-size: clamp(36px, 5.5vw, 82px);
+  font-size: clamp(36px, 5.5vw, 84px);
   font-weight: 900;
   line-height: 1.0;
   letter-spacing: -0.035em;
   color: #111;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .description {
   @apply text-sm leading-relaxed;
-  color: #777;
-  margin-bottom: 32px;
+  color: #888;
 }
 
-.scrollHint {
-  @apply flex flex-col items-center gap-2;
+// ─── Puzzle grid (covers 100% of the hero) ────────────────────────────────────
+
+.heroGrid {
+  @apply absolute inset-0;
+  display: grid;
+
+  // The assembled puzzle layout — 3 columns, 3 rows
+  //
+  //  ┌────────────────────┬──────────┐
+  //  │  img0  (wide)      │          │
+  //  ├──────────┬─────────┤   img3   │
+  //  │          │  img2   │  (tall)  │
+  //  │   img1   ├─────────┼──────────┤
+  //  │  (tall)  │  img4   │   img5   │
+  //  └──────────┴─────────┴──────────┘
+
+  grid-template-areas:
+    "img0 img0 img3"
+    "img1 img2 img3"
+    "img1 img4 img5";
+
+  grid-template-columns: 2fr 1.5fr 1.3fr;
+  grid-template-rows: 1fr 1.2fr 1fr;
 }
 
-.scrollLine {
-  width: 1px;
-  height: 36px;
-  background: linear-gradient(to bottom, #bbb 0%, transparent 100%);
-  animation: linePulse 2s ease-in-out infinite;
-}
+// ─── Individual grid cells ────────────────────────────────────────────────────
 
-@keyframes linePulse {
-  0%, 100% { opacity: 0.5; }
-  50%       { opacity: 1;   }
-}
+.gridCell {
+  @apply relative overflow-hidden;
+  will-change: transform;
 
-.scrollLabel {
-  @apply text-xs tracking-widest uppercase;
-  color: #aaa;
-  letter-spacing: 0.18em;
-}
-
-// ─── Shared image cell base ───────────────────────────────────────────────────
-
-.imgCell {
-  @apply absolute overflow-hidden;
-  will-change: transform, opacity;
-
-  // Hover effect
   &:hover img {
     transform: scale(1.05);
   }
 
-  &:hover .imgOverlay {
+  &:hover .cellOverlay {
     opacity: 1;
   }
 
@@ -96,122 +98,53 @@
   }
 }
 
-.imgOverlay {
+.cellImg0 { grid-area: img0; }
+.cellImg1 { grid-area: img1; }
+.cellImg2 { grid-area: img2; }
+.cellImg3 { grid-area: img3; }
+.cellImg4 { grid-area: img4; }
+.cellImg5 { grid-area: img5; }
+
+.cellOverlay {
   @apply absolute inset-0 flex items-end p-3;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.52) 0%, transparent 48%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.imgCaption {
+.cellCaption {
   @apply text-xs font-medium text-white;
   letter-spacing: 0.04em;
 }
 
-// ─── Individual image positions (match the reference screenshot layout) ───────
-//
-//  ┌──────────────────────────────────┬────────┐
-//  │  img0  (wide landscape)          │        │
-//  ├─────────┬────────────────────────│  img3  │
-//  │         │  img2  (med landscape) │  tall  │
-//  │  img1   │                        │        │
-//  │  large  │  [   trip  text   ]   ├────────┤
-//  │  portrait         │              │  img5  │
-//  │         ├────────────────────────│  small │
-//  │         │  img4  (med landscape) │        │
-//  └─────────┴────────────────────────┴────────┘
-
-// img0 – wide, short landscape – top-left region
-.img0 {
-  top: 0;
-  left: 0;
-  width: 64vw;
-  height: 22vh;
-}
-
-// img1 – large tall portrait – bottom-left
-.img1 {
-  bottom: 0;
-  left: 0;
-  width: 29vw;
-  height: 52vh;
-}
-
-// img2 – medium landscape – top-center-right (above text)
-.img2 {
-  top: 5vh;
-  left: 38vw;
-  width: 29vw;
-  height: 24vh;
-}
-
-// img3 – tall portrait – right edge, spans most of the height
-.img3 {
-  top: 0;
-  right: 0;
-  width: 21vw;
-  height: 52vh;
-}
-
-// img4 – medium landscape – bottom-center (below text)
-.img4 {
-  bottom: 5vh;
-  left: 34vw;
-  width: 33vw;
-  height: 24vh;
-}
-
-// img5 – small portrait – bottom-right
-.img5 {
-  bottom: 0;
-  right: 0;
-  width: 21vw;
-  height: 34vh;
-}
-
-// ─── Mobile: stack images behind text, reduce sizes ──────────────────────────
+// ─── Mobile fallback (reduce to 2×3 grid) ────────────────────────────────────
 
 @media (max-width: $breakpoint-md) {
-  .img0 { width: 60vw; height: 18vh; }
-  .img1 { width: 38vw; height: 40vh; }
-  .img2 { top: 4vh; left: 36vw; width: 36vw; height: 18vh; }
-  .img3 { width: 28vw; height: 42vh; }
-  .img4 { bottom: 4vh; left: 32vw; width: 36vw; height: 18vh; }
-  .img5 { width: 28vw; height: 26vh; }
-}
-
-@media (max-width: $breakpoint-sm) {
-  // On mobile, show only the 4 corner images to avoid clutter
-  .img2, .img4 { display: none; }
-
-  .img0 { width: 55vw; height: 16vh; }
-  .img1 { width: 42vw; height: 38vh; }
-  .img3 { width: 32vw; height: 38vh; }
-  .img5 { width: 32vw; height: 26vh; }
-
-  .heroText {
-    width: min(320px, 85vw);
+  .heroGrid {
+    grid-template-areas:
+      "img0 img3"
+      "img1 img3"
+      "img1 img5";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
   }
 
-  .title {
-    font-size: clamp(28px, 9vw, 44px);
-  }
+  // Hide the center images on small screens
+  .cellImg2,
+  .cellImg4 { display: none; }
+
+  .title { font-size: clamp(28px, 8vw, 48px); }
 }
 
-// ─── Gallery (scrolls normally below the pinned hero) ─────────────────────────
+// ─── Gallery section ──────────────────────────────────────────────────────────
 
 .gallery {
   @apply w-full;
   padding: 80px 72px;
-  background: #f5f5f5;
+  background: #f4f4f4;
 
-  @media (max-width: $breakpoint-lg) {
-    padding: 64px 48px;
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    padding: 48px 20px;
-  }
+  @media (max-width: $breakpoint-lg) { padding: 64px 48px; }
+  @media (max-width: $breakpoint-sm) { padding: 48px 20px; }
 }
 
 .galleryHeader {
@@ -234,33 +167,22 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 
-  @media (max-width: $breakpoint-lg) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: $breakpoint-lg) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: $breakpoint-sm) { grid-template-columns: 1fr; }
 }
 
 .galleryItem {
   @apply relative overflow-hidden;
   aspect-ratio: 4 / 3;
-  cursor: pointer;
   border-radius: 2px;
+  cursor: pointer;
 
-  &:hover .galleryItemInner img {
-    transform: scale(1.07);
-  }
-
-  &:hover .galleryOverlay {
-    opacity: 1;
-  }
+  &:hover .galleryItemInner img { transform: scale(1.07); }
+  &:hover .galleryOverlay        { opacity: 1; }
 }
 
 .galleryItemInner {
   @apply absolute inset-0;
-
   img {
     transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: transform;
@@ -269,7 +191,7 @@
 
 .galleryOverlay {
   @apply absolute inset-0 flex items-end p-4;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.52) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
