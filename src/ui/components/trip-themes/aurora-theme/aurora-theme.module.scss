@@ -2,130 +2,144 @@
 @reference "../../../../app/globals.scss";
 
 .layout {
-  @apply relative min-h-[400vh] overflow-hidden;
-  background: radial-gradient(ellipse at top, #1a0b2e 0%, #0d0523 40%, #000000 100%);
+	@apply relative min-h-[400vh] overflow-hidden;
+	background: radial-gradient(
+		ellipse at top,
+		#1a0b2e 0%,
+		#0d0523 40%,
+		#000000 100%
+	);
 }
 
 /* Vignette */
 .layout::after {
-  @apply fixed inset-0 pointer-events-none z-[99];
-  content: '';
-  background: radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(0,0,0,0.5) 100%);
+	@apply fixed inset-0 pointer-events-none z-[99];
+	content: "";
+	background: radial-gradient(
+		ellipse at center,
+		transparent 0%,
+		transparent 60%,
+		rgba(0, 0, 0, 0.5) 100%
+	);
 }
 
 .header {
-  @apply relative z-20 text-center py-20 px-4 min-h-screen flex flex-col items-center justify-center;
+	@apply relative z-20 text-center py-20 px-4 min-h-screen flex flex-col items-center justify-center;
 }
 
 .title {
-  @apply text-white mb-8 font-semibold leading-tight tracking-wide;
-  font-size: clamp(2.5rem, 8vw, 7rem);
-  background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #34d399 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.3));
+	@apply text-white mb-8 font-semibold leading-tight tracking-wide;
+	font-size: clamp(2.5rem, 8vw, 7rem);
+	background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #34d399 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.3));
 }
 
 .subtitle {
-  @apply text-white/90 font-light tracking-widest;
-  font-size: clamp(0.9rem, 2vw, 1.3rem);
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(52, 211, 153, 0.3);
+	@apply text-white/90 font-light tracking-widest;
+	font-size: clamp(0.9rem, 2vw, 1.3rem);
+	text-shadow:
+		0 2px 20px rgba(0, 0, 0, 0.8),
+		0 0 40px rgba(52, 211, 153, 0.3);
 }
 
 .photos {
-  @apply relative z-10 flex flex-col gap-0;
+	@apply relative z-10 flex flex-col gap-0;
 }
 
 .photoSection {
-  @apply relative flex items-center justify-center min-h-screen h-screen px-8 py-16 opacity-0 scale-95;
+	@apply relative flex items-center justify-center min-h-screen h-screen px-8 py-16 opacity-0 scale-95;
 }
 
 .photo {
-  @apply rounded-lg overflow-hidden relative backdrop-blur-[10px] ease-out;
-  background: rgba(15, 23, 42, 0.6);
-  max-height: min(85vh, 90vh / 1.05);
-  transition: transform 400ms ease-out, box-shadow 400ms ease-out;
+	@apply rounded-lg overflow-hidden relative backdrop-blur-[10px] ease-out;
+	background: rgba(15, 23, 42, 0.6);
+	max-height: min(85vh, 90vh / 1.05);
+	transition:
+		transform 400ms ease-out,
+		box-shadow 400ms ease-out;
 
-  /* Simple 3-layer shadow: depth + subtle aurora glow */
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(167, 139, 250, 0.15),
-    0 0 15px rgba(52, 211, 153, 0.1);
+	/* Simple 3-layer shadow: depth + subtle aurora glow */
+	box-shadow:
+		0 20px 50px rgba(0, 0, 0, 0.6),
+		0 0 30px rgba(167, 139, 250, 0.15),
+		0 0 15px rgba(52, 211, 153, 0.1);
 
-  &:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow:
-      0 25px 60px rgba(0, 0, 0, 0.7),
-      0 0 40px rgba(167, 139, 250, 0.25),
-      0 0 20px rgba(52, 211, 153, 0.15);
-  }
+	&:hover {
+		transform: translateY(-4px) scale(1.05);
+		box-shadow:
+			0 25px 60px rgba(0, 0, 0, 0.7),
+			0 0 40px rgba(167, 139, 250, 0.25),
+			0 0 20px rgba(52, 211, 153, 0.15);
+	}
 }
 
 .photoNarrow {
-  @apply w-full;
-  max-width: 500px;
+	@apply w-full;
+	max-width: 500px;
 
-  &:hover {
-    transform: translateY(-4px) scale(1.1);
-  }
+	&:hover {
+		transform: translateY(-4px) scale(1.1);
+	}
 }
 
 .photoMedium {
-  @apply w-full;
-  max-width: 650px;
+	@apply w-full;
+	max-width: 650px;
 
-  &:hover {
-    transform: translateY(-4px) scale(1.15);
-  }
+	&:hover {
+		transform: translateY(-4px) scale(1.15);
+	}
 }
 
 .photoWide {
-  @apply w-full;
-  max-width: 900px;
+	@apply w-full;
+	max-width: 900px;
 }
 
 .photoImage {
-  @apply w-full h-auto object-cover max-h-[75vh];
+	@apply w-full h-auto object-cover max-h-[75vh];
 }
 
 .photoCaption {
-  @apply px-6 py-4 text-white text-center text-lg font-normal h-[3.7rem] leading-normal overflow-hidden;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
+	@apply px-6 py-4 text-white text-center text-lg font-normal h-[3.7rem] leading-normal overflow-hidden;
+	text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
 }
 
 @media (max-width: $breakpoint-md) {
-  .header {
-    @apply py-12;
-  }
+	.header {
+		@apply py-12;
+	}
 
-  .photoSection {
-    @apply min-h-screen h-screen px-4 py-8;
-  }
+	.photoSection {
+		@apply min-h-screen h-screen px-4 py-8;
+	}
 
-  .photo {
-    @apply max-w-full;
-  }
+	.photo {
+		@apply max-w-full;
+	}
 
-  .photoImage {
-    @apply h-auto max-h-[70vh];
-  }
+	.photoImage {
+		@apply h-auto max-h-[70vh];
+	}
 
-  .title {
-    @apply text-3xl;
-  }
+	.title {
+		@apply text-3xl;
+	}
 
-  .subtitle {
-    @apply text-sm;
-  }
+	.subtitle {
+		@apply text-sm;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .photoSection {
-    @apply opacity-100 scale-100;
-    transform: none !important;
-  }
+	.photoSection {
+		@apply opacity-100 scale-100;
+		transform: none !important;
+	}
 }

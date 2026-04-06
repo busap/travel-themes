@@ -1,17 +1,16 @@
 @reference "../../../../app/globals.scss";
 
 .background {
-  @apply fixed inset-0 z-0 pointer-events-none;
+	@apply fixed inset-0 z-0 pointer-events-none;
 }
 
 .layer1,
 .layer2,
 .layer3,
 .layer4 {
-  @apply transition-opacity duration-1000 origin-center mix-blend-screen;
+	@apply transition-opacity duration-1000 origin-center mix-blend-screen;
 }
 
 .stars {
-  @apply opacity-80;
+	@apply opacity-80;
 }
-

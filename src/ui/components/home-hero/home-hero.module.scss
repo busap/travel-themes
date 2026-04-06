@@ -1,57 +1,57 @@
 @reference "../../../app/globals.scss";
 
 @keyframes heroReveal {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(1rem);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .hero {
-  @apply relative w-full overflow-hidden;
-  background-color: #e7f3ff;
+	@apply relative w-full overflow-hidden;
+	background-color: #e7f3ff;
 }
 
 .heroClipText {
-  @apply h-[60vh] md:h-[70vh];
+	@apply h-[60vh] md:h-[70vh];
 }
 
 .content {
-  @apply relative z-10 flex flex-col items-center justify-center;
-  @apply px-6 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16;
+	@apply relative z-10 flex flex-col items-center justify-center;
+	@apply px-6 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16;
 }
 
 .titleClipText {
-  font-family: var(--font-bebas-neue), sans-serif;
-  font-size: clamp(4.5rem, 14vw, 14rem);
-  line-height: 0.9;
-  letter-spacing: 0.02em;
-  @apply font-bold uppercase tracking-wider;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: cover;
-  background-position: center;
+	font-family: var(--font-bebas-neue), sans-serif;
+	font-size: clamp(4.5rem, 14vw, 14rem);
+	line-height: 0.9;
+	letter-spacing: 0.02em;
+	@apply font-bold uppercase tracking-wider;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-size: cover;
+	background-position: center;
 }
 
 .subtitleClipText {
-  @apply mt-6 text-lg md:text-xl lg:text-2xl;
-  @apply font-bold italic tracking-wider;
-  color: #846a50;
+	@apply mt-6 text-lg md:text-xl lg:text-2xl;
+	@apply font-bold italic tracking-wider;
+	color: #846a50;
 }
 
 .subtitleAnimated {
-  animation: heroReveal 0.8s ease-out 0.2s forwards;
-  opacity: 0;
+	animation: heroReveal 0.8s ease-out 0.2s forwards;
+	opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .subtitleAnimated {
-    animation: none;
-    opacity: 1;
-  }
+	.subtitleAnimated {
+		animation: none;
+		opacity: 1;
+	}
 }

@@ -1,14 +1,14 @@
 @reference "../../../app/globals.scss";
 
 .imagePlaceholder {
-  @apply w-full h-full flex items-center justify-center;
-  @apply bg-gradient-to-br from-zinc-200 to-zinc-300;
+	@apply w-full h-full flex items-center justify-center;
+	@apply bg-gradient-to-br from-zinc-200 to-zinc-300;
 }
 
 .content {
-  @apply text-center text-zinc-400;
+	@apply text-center text-zinc-400;
 }
 
 .icon {
-  @apply w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 opacity-50;
+	@apply w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 opacity-50;
 }
