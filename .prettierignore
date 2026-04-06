@@ -1,0 +1,5 @@
+.next/
+out/
+build/
+storybook-static/
+package-lock.json

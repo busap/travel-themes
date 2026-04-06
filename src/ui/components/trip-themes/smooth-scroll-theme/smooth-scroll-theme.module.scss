@@ -2,94 +2,94 @@
 @reference "../../../../app/globals.scss";
 
 .theme {
-  @apply min-h-screen w-full overflow-x-clip;
-  background: #020409;
+	@apply min-h-screen w-full overflow-x-clip;
+	background: #020409;
 }
 
 .layout {
-  position: relative;
-  height: calc(var(--layout-scroll-height, 1500px) + 100vh);
+	position: relative;
+	height: calc(var(--layout-scroll-height, 1500px) + 100vh);
 }
 
 .mainPhotoLayer {
-  @apply sticky top-0 h-screen flex items-center justify-center px-4 md:px-8;
+	@apply sticky top-0 h-screen flex items-center justify-center px-4 md:px-8;
 }
 
 .mainPhotoMask {
-  @apply relative overflow-hidden;
-  width: min(94vw, 1240px);
-  height: min(76vh, 760px);
-  will-change: clip-path, opacity;
+	@apply relative overflow-hidden;
+	width: min(94vw, 1240px);
+	height: min(76vh, 760px);
+	will-change: clip-path, opacity;
 }
 
 .mainPhoto {
-  @apply h-full w-full object-cover;
-  transform-origin: center;
-  will-change: transform;
+	@apply h-full w-full object-cover;
+	transform-origin: center;
+	will-change: transform;
 }
 
 .animatedPhotosLayer {
-  @apply pointer-events-none sticky top-0 h-screen;
+	@apply pointer-events-none sticky top-0 h-screen;
 }
 
 .animatedPhotoMask {
-  @apply absolute overflow-hidden;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 1rem;
-  will-change: clip-path, opacity;
+	@apply absolute overflow-hidden;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 1rem;
+	will-change: clip-path, opacity;
 }
 
 .animatedPhoto {
-  @apply h-full w-full object-cover;
-  transform-origin: center;
-  will-change: transform;
+	@apply h-full w-full object-cover;
+	transform-origin: center;
+	will-change: transform;
 }
 
 .animatedPhotoLayoutOne {
-  width: min(90vw, 1220px);
-  height: min(72vh, 720px);
+	width: min(90vw, 1220px);
+	height: min(72vh, 720px);
 }
 
 .animatedPhotoLayoutTwo {
-  width: min(84vw, 1080px);
-  height: min(66vh, 640px);
+	width: min(84vw, 1080px);
+	height: min(66vh, 640px);
 }
 
 .animatedPhotoLayoutThree {
-  width: min(92vw, 1180px);
-  height: min(62vh, 620px);
+	width: min(92vw, 1180px);
+	height: min(62vh, 620px);
 }
 
 .animatedPhotoLayoutFour {
-  width: min(80vw, 960px);
-  height: min(68vh, 670px);
+	width: min(80vw, 960px);
+	height: min(68vh, 670px);
 }
 
 .animatedPhotoLayoutFive {
-  width: min(88vw, 1140px);
-  height: min(64vh, 610px);
+	width: min(88vw, 1140px);
+	height: min(64vh, 610px);
 }
 
 .scrollIndicator {
-  @apply fixed right-3 top-1/2 flex -translate-y-1/2 flex-col items-center;
-  z-index: 80;
-  pointer-events: none;
+	@apply fixed right-3 top-1/2 flex -translate-y-1/2 flex-col items-center;
+	z-index: 80;
+	pointer-events: none;
 }
 
 .scrollTrack {
-  @apply relative overflow-hidden rounded-full;
-  width: 3px;
-  height: 130px;
-  background: rgba(255, 255, 255, 0.18);
+	@apply relative overflow-hidden rounded-full;
+	width: 3px;
+	height: 130px;
+	background: rgba(255, 255, 255, 0.18);
 }
 
 .scrollFill {
-  @apply absolute inset-x-0 top-0 h-full;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.92),
-    rgba(255, 255, 255, 0.35)
-  );
+	@apply absolute inset-x-0 top-0 h-full;
+	background: linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.92),
+		rgba(255, 255, 255, 0.35)
+	);
 }
