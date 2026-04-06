@@ -4,199 +4,164 @@
 // ─── Page wrapper ─────────────────────────────────────────────────────────────
 
 .theme {
-  @apply min-h-screen w-full;
-  background: #f7f5f2;
-  color: #1a1614;
+  @apply w-full;
+  background: #0d0d0d;
+  color: #f0ede8;
 }
 
-// ─── Hero section ─────────────────────────────────────────────────────────────
+// ─── Hero (pinned during scroll assembly) ────────────────────────────────────
 
 .hero {
-  display: grid;
-  grid-template-columns: 44fr 56fr;
-  min-height: 100vh;
+  @apply relative w-full flex flex-col items-center justify-center;
 
-  @media (max-width: $breakpoint-md) {
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
+  // Must be exactly 100vh so ScrollTrigger can pin it cleanly.
+  // The "extra" 180vh of scroll space is handled by ScrollTrigger's end offset.
+  height: 100vh;
+  overflow: hidden;           // clips images that start outside the viewport
+  background: #0d0d0d;
 }
 
-// ─── Left: text content ───────────────────────────────────────────────────────
+// ─── Text block ──────────────────────────────────────────────────────────────
 
 .heroText {
-  @apply flex flex-col justify-center;
-  padding: 80px 64px 80px 72px;
-  background: #f7f5f2;
-  position: relative;
-  z-index: 1;
-
-  @media (max-width: $breakpoint-lg) {
-    padding: 64px 48px;
-  }
-
-  @media (max-width: $breakpoint-md) {
-    padding: 56px 32px 40px;
-  }
+  @apply relative z-20 text-center pointer-events-none select-none;
+  padding: 0 24px 28px;
+  will-change: opacity, transform;
 }
 
 .eyebrow {
   @apply text-xs font-semibold tracking-widest uppercase;
-  color: #b5651d;
-  margin-bottom: 20px;
-  letter-spacing: 0.18em;
+  color: #b06a28;
+  letter-spacing: 0.2em;
+  margin-bottom: 14px;
 }
 
 .year {
   @apply font-normal;
-  color: #b5651d;
 }
 
 .title {
-  font-size: clamp(36px, 4.5vw, 72px);
+  font-size: clamp(36px, 5vw, 80px);
   font-weight: 800;
-  line-height: 1.02;
+  line-height: 1.0;
   letter-spacing: -0.03em;
-  color: #1a1614;
-  margin-bottom: 24px;
-
-  @media (max-width: $breakpoint-md) {
-    font-size: clamp(32px, 8vw, 56px);
-    margin-bottom: 20px;
-  }
+  color: #f0ede8;
+  margin-bottom: 14px;
 }
 
 .description {
-  @apply text-base leading-relaxed;
-  color: #6b6460;
-  max-width: 360px;
-  margin-bottom: 52px;
+  @apply text-sm leading-relaxed;
+  color: #908880;
+  max-width: 380px;
+  margin: 0 auto;
+}
 
-  @media (max-width: $breakpoint-md) {
-    margin-bottom: 36px;
+// ─── Grid wrapper (contains and clips the flying images) ─────────────────────
+
+.gridWrapper {
+  @apply relative z-10 w-full flex justify-center;
+  padding: 0 40px 0;
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 0 16px 0;
   }
 }
 
-// Scroll hint
-.scrollHint {
-  @apply flex items-center gap-3;
-  color: #9b928c;
-}
-
-.arrowIcon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  animation: bounceDown 2s ease-in-out infinite;
-}
-
-@keyframes bounceDown {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(5px); }
-}
-
-.scrollLabel {
-  @apply text-xs tracking-wider uppercase;
-  letter-spacing: 0.14em;
-}
-
-// ─── Right: photo grid ────────────────────────────────────────────────────────
+// ─── Hero image grid (3 cols × 2 rows) ───────────────────────────────────────
 
 .heroGrid {
   display: grid;
-  grid-template-columns: 3fr 2fr 2fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 3px;
-  background: #e8e0d8;
-  padding: 3px;
-  min-height: 100vh;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 5px;
+  width: 100%;
+  max-width: 960px;
+
+  // Two equal rows that fill the remaining viewport height after the text
+  // (approx. 100vh - 200px for text block)
+  height: calc(100vh - 220px);
 
   @media (max-width: $breakpoint-md) {
-    min-height: 60vw;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    padding: 2px;
-    gap: 2px;
+    height: calc(100vh - 180px);
+    gap: 3px;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: calc(100vh - 160px);
+    gap: 3px;
   }
 }
 
-// Cell base
+// ─── Individual grid cell ────────────────────────────────────────────────────
+
 .gridCell {
   @apply relative overflow-hidden;
+  will-change: transform, opacity;
   cursor: pointer;
+  border-radius: 3px;
 
-  &:hover .cellInner img {
+  // Hover: subtle zoom + reveal overlay
+  &:hover img {
     transform: scale(1.06);
   }
 
   &:hover .cellOverlay {
     opacity: 1;
   }
-}
-
-// Cell 1 – large left, spans 2 rows
-.cell1 {
-  grid-column: 1;
-  grid-row: 1 / 3;
-
-  @media (max-width: $breakpoint-md) {
-    grid-column: 1;
-    grid-row: 1 / 3;
-  }
-}
-
-// Cell 2 – top center
-.cell2 {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-// Cell 3 – top right
-.cell3 {
-  grid-column: 3;
-  grid-row: 1;
-}
-
-// Cell 4 – bottom center
-.cell4 {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-// Cell 5 – bottom right
-.cell5 {
-  grid-column: 3;
-  grid-row: 2;
-}
-
-.cellInner {
-  @apply absolute inset-0;
 
   img {
-    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: transform;
   }
 }
 
 .cellOverlay {
   @apply absolute inset-0 flex items-end p-3;
-  background: linear-gradient(to top, rgba(20, 14, 10, 0.62) 0%, transparent 55%);
+  background: linear-gradient(to top, rgba(10, 6, 4, 0.72) 0%, transparent 52%);
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.3s ease;
 }
 
 .cellTitle {
-  @apply text-xs font-medium text-white;
+  @apply text-xs font-medium;
+  color: rgba(255, 255, 255, 0.92);
   letter-spacing: 0.04em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-// ─── Gallery section ──────────────────────────────────────────────────────────
+// ─── Scroll hint ─────────────────────────────────────────────────────────────
+
+.scrollHint {
+  @apply absolute bottom-6 left-1/2 z-20 flex flex-col items-center gap-2;
+  transform: translateX(-50%);
+}
+
+.scrollLabel {
+  @apply text-xs tracking-widest uppercase;
+  color: #504844;
+  letter-spacing: 0.22em;
+}
+
+.scrollLine {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, #504844 0%, transparent 100%);
+  animation: scrollLineFade 2s ease-in-out infinite;
+}
+
+@keyframes scrollLineFade {
+  0%, 100% { opacity: 0.4; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(0.7); }
+}
+
+// ─── Gallery section (scrolls normally below the pinned hero) ─────────────────
 
 .gallery {
   @apply w-full;
   padding: 80px 72px;
-  background: #f7f5f2;
+  background: #111;
 
   @media (max-width: $breakpoint-lg) {
     padding: 64px 48px;
@@ -212,20 +177,20 @@
 }
 
 .galleryHeading {
-  @apply text-sm font-semibold tracking-widest uppercase flex-shrink-0;
-  color: #9b928c;
-  letter-spacing: 0.18em;
+  @apply text-xs font-semibold tracking-widest uppercase flex-shrink-0;
+  color: #504844;
+  letter-spacing: 0.2em;
 }
 
 .galleryDivider {
   @apply flex-1 h-px;
-  background: #e0d8d0;
+  background: #222;
 }
 
 .galleryGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 6px;
 
   @media (max-width: $breakpoint-lg) {
     grid-template-columns: repeat(2, 1fr);
@@ -240,7 +205,7 @@
   @apply relative overflow-hidden;
   aspect-ratio: 4 / 3;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 3px;
 
   &:hover .galleryItemInner img {
     transform: scale(1.07);
@@ -255,20 +220,21 @@
   @apply absolute inset-0;
 
   img {
-    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: transform;
   }
 }
 
 .galleryOverlay {
   @apply absolute inset-0 flex items-end p-4;
-  background: linear-gradient(to top, rgba(20, 14, 10, 0.58) 0%, transparent 52%);
+  background: linear-gradient(to top, rgba(10, 6, 4, 0.68) 0%, transparent 50%);
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.3s ease;
 }
 
 .galleryItemTitle {
-  @apply text-sm font-medium text-white;
+  @apply text-sm font-medium;
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: 0.03em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }

@@ -237,30 +237,33 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
   [Theme.ImageGridHero]: {
     component: 'image-grid-hero-theme',
     layout: {
-      type: 'card-grid',
+      type: 'masonry',
       scrollDirection: 'vertical',
-      spacing: 'gap-4',
+      spacing: 'gap-0',
     },
     animation: {
       enabled: true,
       scrollTrigger: {
-        start: 'top 88%',
+        start: 'top top',
+        end: '+=180%',
+        scrub: 1.2,
+        pin: true,
       },
       timeline: {
         duration: 0.8,
         ease: 'power3.out',
-        stagger: 0.1,
+        stagger: 0,
       },
     },
     photos: {
       arrangement: 'grid',
       revealPattern: 'scroll-based',
-      count: 5,
+      count: 6,
     },
     styling: {
       typography: {
         titleClasses: 'text-5xl md:text-7xl font-extrabold tracking-tight',
-        bodyClasses: 'text-base text-zinc-500',
+        bodyClasses: 'text-sm text-stone-500',
       },
     },
   },
