@@ -50,8 +50,8 @@ export const tripThemes: TripTheme[] = [
 		tripId: "new-zealand",
 		theme: Theme.ImageGridHero,
 	},
-    {
-        tripId: "portugal-coastline",
-        theme: Theme.GridHover,
-    },
+	{
+		tripId: "portugal-coastline",
+		theme: Theme.GridHover,
+	},
 ];

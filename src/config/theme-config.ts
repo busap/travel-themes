@@ -252,19 +252,19 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 		},
 	},
 	[Theme.GridHover]: {
-        component: 'grid-hover-theme',
-        layout: {
-            type: 'card-grid',
-            scrollDirection: 'vertical',
-            spacing: 'gap-0',
-        },
-        animation: {},
-        photos: {
-            arrangement: 'grid',
-            revealPattern: 'scroll-based',
-        },
-    },
-    [Theme.Feed]: {
+		component: "grid-hover-theme",
+		layout: {
+			type: "card-grid",
+			scrollDirection: "vertical",
+			spacing: "gap-0",
+		},
+		animation: {},
+		photos: {
+			arrangement: "grid",
+			revealPattern: "scroll-based",
+		},
+	},
+	[Theme.Feed]: {
 		component: "feed-theme",
 		layout: {
 			type: "card-grid",

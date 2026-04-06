@@ -11,5 +11,5 @@ export enum Theme {
 	PhotoCarousel = "photo-carousel",
 	Trippy = "trippy",
 	ImageGridHero = "image-grid-hero",
-    GridHover = "grid-hover",
+	GridHover = "grid-hover",
 }
