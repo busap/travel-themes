@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Bebas_Neue } from 'next/font/google';
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useValidatedImages } from '@/hooks/use-validated-images';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import styles from './trippy-theme.module.scss';
@@ -31,22 +30,15 @@ interface TrippyThemeProps {
 
 export function TrippyTheme({ trip, config }: TrippyThemeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { photos, failedSrcs, handleImageError } = useValidatedImages(trip.photos);
-
   const scrub = config.animation?.scrollTrigger?.scrub ?? 2;
 
-  const validPhotos = useMemo(
-    () => photos.filter((p) => !failedSrcs.has(p.src)),
-    [photos, failedSrcs],
-  );
-
   const totalScrollHeight = useMemo(
-    () => validPhotos.length * PHOTO_SECTION_PX,
-    [validPhotos.length],
+    () => trip.photos.length * PHOTO_SECTION_PX,
+    [trip.photos.length],
   );
 
   useEffect(() => {
-    if (!containerRef.current || validPhotos.length === 0) return;
+    if (!containerRef.current || trip.photos.length === 0) return;
     const container = containerRef.current;
 
     const layers = Array.from(
@@ -132,7 +124,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
     }, container);
 
     return () => ctx.revert();
-  }, [validPhotos, scrub]);
+  }, [trip.photos, scrub]);
 
   function renderBackground() {
     return <div data-bg className={styles.bg} aria-hidden />;
@@ -153,7 +145,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
   function renderPhotos() {
     return (
       <div className={styles.photoStack} aria-label="Trip photos">
-        {validPhotos.map((photo, i) => (
+        {trip.photos.map((photo, i) => (
           <div
             key={`${photo.src}-${i}`}
             className={styles.photoLayer}
@@ -169,7 +161,6 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
                 sizes="(max-width: 768px) 95vw, 88vw"
                 priority={i < 2}
                 loading={i < 2 ? undefined : 'eager'}
-                onError={() => handleImageError(photo.src)}
               />
               <div className={styles.photoChroma} aria-hidden />
             </div>
@@ -192,7 +183,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
     );
   }
 
-  if (validPhotos.length === 0) return null;
+  if (trip.photos.length === 0) return null;
 
   return (
     <div
@@ -201,7 +192,6 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
       style={{ '--total-scroll': `${totalScrollHeight}px` } as CSSProperties}
     >
       {renderBackground()}
-
       <div className={styles.scrollContainer}>
         <div className={styles.stickyStage}>
           {renderHeader()}
