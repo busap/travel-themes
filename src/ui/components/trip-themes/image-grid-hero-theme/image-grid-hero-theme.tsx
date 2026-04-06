@@ -18,25 +18,6 @@ interface ImageGridHeroThemeProps {
   config: ThemeConfig;
 }
 
-// ── Final assembled puzzle layout ────────────────────────────────────────────
-//
-//   grid-template-areas:
-//     "img0  img0  img3"   ← img0 spans cols 1+2 (wide top-left)
-//     "img1  img2  img3"   ← img3 spans rows 1+2 (tall right)
-//     "img1  img4  img5"   ← img1 spans rows 2+3 (tall left)
-//
-//   ┌──────────────────────┬───────────┐
-//   │  img0  (wide)        │           │
-//   ├───────────┬──────────┤   img3    │
-//   │           │  img2    │   (tall)  │
-//   │   img1    ├──────────┼───────────┤
-//   │  (tall)   │  img4    │   img5    │
-//   └───────────┴──────────┴───────────┘
-//
-// At START each cell is displaced outward so it peeks in from the viewport
-// edge. As the user scrolls the pinned section, cells converge to x:0 y:0
-// and the puzzle snaps together. Text stays in the center and fades out.
-
 const CELL_CLASSES = [
   styles.cellImg0,
   styles.cellImg1,
@@ -46,15 +27,13 @@ const CELL_CLASSES = [
   styles.cellImg5,
 ] as const;
 
-// How far (in vw/vh) each cell starts displaced from its grid position.
-// Direction = away from the grid center, so cells "peel off" outward.
 const DISPLACED: { x: string; y: string }[] = [
-  { x: '-30vw', y: '-28vh' }, // img0 wide top-left  → push top-left
-  { x: '-30vw', y: '28vh'  }, // img1 tall left      → push bottom-left
-  { x: '0vw',   y: '-28vh' }, // img2 center-middle  → push up
-  { x: '30vw',  y: '-28vh' }, // img3 tall right     → push top-right
-  { x: '0vw',   y: '28vh'  }, // img4 center-bottom  → push down
-  { x: '30vw',  y: '28vh'  }, // img5 bottom-right   → push bottom-right
+  { x: '-30vw', y: '-28vh' },
+  { x: '-30vw', y: '28vh'  },
+  { x: '0vw',   y: '-42vh' },
+  { x: '30vw',  y: '-28vh' },
+  { x: '0vw',   y: '28vh'  },
+  { x: '30vw',  y: '28vh'  },
 ];
 
 export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
@@ -79,13 +58,6 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
     const ctx = gsap.context(() => {
       const cells = cellRefs.current.filter(Boolean);
 
-      // ── Immediately place cells at displaced (but visible) start positions
-      cells.forEach((cell, i) => {
-        const d = DISPLACED[i];
-        if (cell && d) gsap.set(cell, { x: d.x, y: d.y });
-      });
-
-      // ── Pinned scroll timeline ────────────────────────────────────────
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: heroRef.current,
@@ -97,17 +69,18 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
         },
       });
 
-      // All cells converge to their grid slots simultaneously
       cells.forEach((cell, i) => {
         const d = DISPLACED[i];
         if (!cell || !d) return;
         tl.to(cell, { x: 0, y: 0, duration: 0.8, ease }, 0);
       });
 
-      // Text fades out in the second half as images fill in
-      tl.to(heroTextRef.current, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.45);
+      tl.to(
+        heroTextRef.current,
+        { autoAlpha: 0, scale: 0.78, duration: 0.32, ease: 'power2.out' },
+        0
+      );
 
-      // ── Gallery reveal on scroll ──────────────────────────────────────
       if (galleryRef.current) {
         galleryRef.current.querySelectorAll('[data-gallery-item]').forEach((item) => {
           gsap.fromTo(
@@ -129,8 +102,6 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
     return () => ctx.revert();
   }, [animationEnabled, validatedPhotos.length, ease]);
 
-  // ── Render helpers ──────────────────────────────────────────────────
-
   const renderHeroText = () => (
     <div className={styles.heroText} ref={heroTextRef}>
       <p className={styles.eyebrow}>
@@ -151,6 +122,11 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
           key={index}
           className={`${styles.gridCell} ${CELL_CLASSES[index]}`}
           ref={(el) => { cellRefs.current[index] = el; }}
+          style={
+            animationEnabled
+              ? { transform: `translate(${DISPLACED[index]?.x ?? '0vw'}, ${DISPLACED[index]?.y ?? '0vh'})` }
+              : undefined
+          }
         >
           <Image
             src={photo.src}
@@ -167,6 +143,15 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
           )}
         </div>
       ))}
+    </div>
+  );
+
+  const renderScrollIndicator = () => (
+    <div className={styles.scrollIndicator} aria-hidden="true">
+      <span className={styles.scrollIndicatorLabel}>Scroll</span>
+      <span className={styles.scrollIndicatorTrack}>
+        <span className={styles.scrollIndicatorDot} />
+      </span>
     </div>
   );
 
@@ -208,6 +193,7 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
       <section className={styles.hero} ref={heroRef}>
         {renderHeroText()}
         {renderGrid()}
+        {renderScrollIndicator()}
       </section>
       {renderGallery()}
     </div>
