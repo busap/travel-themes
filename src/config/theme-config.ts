@@ -226,32 +226,32 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 		},
 	},
 	[Theme.ImageGridHero]: {
-        component: 'image-grid-hero-theme',
-        layout: {
-              type: 'masonry',
-              scrollDirection: 'vertical',
-              spacing: 'gap-0',
-        },
-        animation: {
-            scrollTrigger: {
-                start: 'top top',
-                end: '+=180%',
-                scrub: 1.2,
-                pin: true,
-            },
-            timeline: {
-                duration: 0.8,
-                ease: 'power3.out',
-                stagger: 0,
-            },
-        },
-        photos: {
-            arrangement: 'grid',
-            revealPattern: 'scroll-based',
-            count: 6,
-        },
-    },
-    [Theme.Feed]: {
+		component: "image-grid-hero-theme",
+		layout: {
+			type: "masonry",
+			scrollDirection: "vertical",
+			spacing: "gap-0",
+		},
+		animation: {
+			scrollTrigger: {
+				start: "top top",
+				end: "+=180%",
+				scrub: 1.2,
+				pin: true,
+			},
+			timeline: {
+				duration: 0.8,
+				ease: "power3.out",
+				stagger: 0,
+			},
+		},
+		photos: {
+			arrangement: "grid",
+			revealPattern: "scroll-based",
+			count: 6,
+		},
+	},
+	[Theme.Feed]: {
 		component: "feed-theme",
 		layout: {
 			type: "card-grid",

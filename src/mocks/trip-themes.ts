@@ -46,8 +46,8 @@ export const tripThemes: TripTheme[] = [
 		tripId: "bali-dreams",
 		theme: Theme.Trippy,
 	},
-    {
-        tripId: "",
-        theme: Theme.ImageGridHero,
-    },
+	{
+		tripId: "new-zealand",
+		theme: Theme.ImageGridHero,
+	},
 ];

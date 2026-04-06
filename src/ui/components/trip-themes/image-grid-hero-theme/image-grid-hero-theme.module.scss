@@ -2,222 +2,258 @@
 @reference "../../../../app/globals.scss";
 
 .theme {
-  @apply w-full;
-  background: #f4f4f4;
+	@apply w-full;
+	background: #f4f4f4;
 }
 
 .hero {
-  @apply relative w-full;
-  height: 100vh;
-  overflow: hidden;
-  background: #ffffff;
+	@apply relative w-full;
+	height: 100vh;
+	overflow: hidden;
+	background: #ffffff;
 }
 
 .heroText {
-  @apply absolute flex flex-col items-center text-center;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 20;
-  width: min(520px, 88vw);
-  pointer-events: none;
-  will-change: opacity;
+	@apply absolute flex flex-col items-center text-center;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 20;
+	width: min(520px, 88vw);
+	pointer-events: none;
+	will-change: opacity;
 }
 
 .scrollIndicator {
-  @apply absolute left-1/2 flex flex-col items-center;
-  bottom: 50px;
-  transform: translateX(-50%);
-  z-index: 24;
-  pointer-events: none;
-  opacity: 0.9;
+	@apply absolute left-1/2 flex flex-col items-center;
+	bottom: 50px;
+	transform: translateX(-50%);
+	z-index: 24;
+	pointer-events: none;
+	opacity: 0.9;
 }
 
 .scrollIndicatorLabel {
-  @apply text-[10px] font-semibold uppercase;
-  color: rgba(17, 17, 17, 0.52);
-  letter-spacing: 0.2em;
-  margin-bottom: 8px;
+	@apply text-[10px] font-semibold uppercase;
+	color: rgba(17, 17, 17, 0.52);
+	letter-spacing: 0.2em;
+	margin-bottom: 8px;
 }
 
 .scrollIndicatorTrack {
-  @apply relative overflow-hidden rounded-full;
-  width: 2px;
-  height: 46px;
-  background: rgba(17, 17, 17, 0.22);
+	@apply relative overflow-hidden rounded-full;
+	width: 2px;
+	height: 46px;
+	background: rgba(17, 17, 17, 0.22);
 }
 
 .scrollIndicatorDot {
-  @apply absolute left-1/2 rounded-full;
-  top: 7px;
-  width: 6px;
-  height: 6px;
-  background: rgba(17, 17, 17, 0.75);
-  transform: translateX(-50%);
-  animation: scrollPulse 1.5s ease-in-out infinite;
+	@apply absolute left-1/2 rounded-full;
+	top: 7px;
+	width: 6px;
+	height: 6px;
+	background: rgba(17, 17, 17, 0.75);
+	transform: translateX(-50%);
+	animation: scrollPulse 1.5s ease-in-out infinite;
 }
 
 .eyebrow {
-  @apply text-xs font-semibold tracking-widest uppercase;
-  color: #b06a28;
-  letter-spacing: 0.2em;
-  margin-bottom: 14px;
+	@apply text-xs font-semibold tracking-widest uppercase;
+	color: #b06a28;
+	letter-spacing: 0.2em;
+	margin-bottom: 14px;
 }
 
 .title {
-  font-size: clamp(36px, 5.5vw, 84px);
-  font-weight: 900;
-  line-height: 1.0;
-  letter-spacing: -0.035em;
-  color: #111;
-  margin-bottom: 18px;
+	font-size: clamp(36px, 5.5vw, 84px);
+	font-weight: 900;
+	line-height: 1;
+	letter-spacing: -0.035em;
+	color: #111;
+	margin-bottom: 18px;
 }
 
 .description {
-  @apply text-sm leading-relaxed;
-  color: #888;
+	@apply text-sm leading-relaxed;
+	color: #888;
 }
 
 .heroGrid {
-  @apply absolute inset-0;
-  display: grid;
+	@apply absolute inset-0 gap-2;
+	display: grid;
 
-  grid-template-areas:
-    "img0 img0 img3"
-    "img1 img2 img3"
-    "img1 img4 img5";
+	grid-template-areas:
+		"img0 img0 img3"
+		"img1 img2 img3"
+		"img1 img4 img5";
 
-  grid-template-columns: 2fr 1.5fr 1.3fr;
-  grid-template-rows: 1fr 1.2fr 1fr;
+	grid-template-columns: 2fr 1.5fr 1.3fr;
+	grid-template-rows: 1fr 1.2fr 1fr;
 }
 
 .gridCell {
-  @apply relative overflow-hidden;
-  will-change: transform;
+	@apply relative overflow-hidden;
+	will-change: transform;
 
-  &:hover img {
-    transform: scale(1.05);
-  }
+	&:hover img {
+		transform: scale(1.05);
+	}
 
-  &:hover .cellOverlay {
-    opacity: 1;
-  }
+	&:hover .cellOverlay {
+		opacity: 1;
+	}
 
-  img {
-    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: transform;
-  }
+	img {
+		transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		will-change: transform;
+	}
 }
 
-.cellImg0 { grid-area: img0; }
-.cellImg1 { grid-area: img1; }
-.cellImg2 { grid-area: img2; }
-.cellImg3 { grid-area: img3; }
-.cellImg4 { grid-area: img4; }
-.cellImg5 { grid-area: img5; }
+.cellImg0 {
+	grid-area: img0;
+}
+.cellImg1 {
+	grid-area: img1;
+}
+.cellImg2 {
+	grid-area: img2;
+}
+.cellImg3 {
+	grid-area: img3;
+}
+.cellImg4 {
+	grid-area: img4;
+}
+.cellImg5 {
+	grid-area: img5;
+}
 
 .cellOverlay {
-  @apply absolute inset-0 flex items-end p-3;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.52) 0%, transparent 48%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+	@apply absolute inset-0 flex items-end p-3;
+	background: linear-gradient(
+		to top,
+		rgba(0, 0, 0, 0.52) 0%,
+		transparent 48%
+	);
+	opacity: 0;
+	transition: opacity 0.3s ease;
 }
 
 .cellCaption {
-  @apply text-xs font-medium text-white;
-  letter-spacing: 0.04em;
+	@apply text-xs font-medium text-white;
+	letter-spacing: 0.04em;
 }
 
 @keyframes scrollPulse {
-  0% {
-    top: 7px;
-    opacity: 0.25;
-  }
-  50% {
-    top: 24px;
-    opacity: 1;
-  }
-  100% {
-    top: 7px;
-    opacity: 0.25;
-  }
+	0% {
+		top: 7px;
+		opacity: 0.25;
+	}
+	50% {
+		top: 24px;
+		opacity: 1;
+	}
+	100% {
+		top: 7px;
+		opacity: 0.25;
+	}
 }
 
 @media (max-width: $breakpoint-md) {
-  .heroGrid {
-    grid-template-areas:
-      "img0 img3"
-      "img1 img3"
-      "img1 img5";
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-  }
+	.heroGrid {
+		grid-template-areas:
+			"img0 img3"
+			"img1 img3"
+			"img1 img5";
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: 1fr 1fr 1fr;
+	}
 
-  .cellImg2,
-  .cellImg4 { display: none; }
+	.cellImg2,
+	.cellImg4 {
+		display: none;
+	}
 
-  .title { font-size: clamp(28px, 8vw, 48px); }
+	.title {
+		font-size: clamp(28px, 8vw, 48px);
+	}
 }
 
 .gallery {
-  @apply w-full;
-  padding: 80px 72px;
-  background: #f4f4f4;
+	@apply w-full;
+	padding: 80px 72px;
+	background: #f4f4f4;
 
-  @media (max-width: $breakpoint-lg) { padding: 64px 48px; }
-  @media (max-width: $breakpoint-sm) { padding: 48px 20px; }
+	@media (max-width: $breakpoint-lg) {
+		padding: 64px 48px;
+	}
+	@media (max-width: $breakpoint-sm) {
+		padding: 48px 20px;
+	}
 }
 
 .galleryHeader {
-  @apply flex items-center gap-6 mb-10;
+	@apply flex items-center gap-6 mb-10;
 }
 
 .galleryHeading {
-  @apply text-xs font-semibold tracking-widest uppercase flex-shrink-0;
-  color: #aaa;
-  letter-spacing: 0.2em;
+	@apply text-xs font-semibold tracking-widest uppercase flex-shrink-0;
+	color: #aaa;
+	letter-spacing: 0.2em;
 }
 
 .galleryDivider {
-  @apply flex-1 h-px;
-  background: #ddd;
+	@apply flex-1 h-px;
+	background: #ddd;
 }
 
 .galleryGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 6px;
 
-  @media (max-width: $breakpoint-lg) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: $breakpoint-sm) { grid-template-columns: 1fr; }
+	@media (max-width: $breakpoint-lg) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@media (max-width: $breakpoint-sm) {
+		grid-template-columns: 1fr;
+	}
 }
 
 .galleryItem {
-  @apply relative overflow-hidden;
-  aspect-ratio: 4 / 3;
-  border-radius: 2px;
-  cursor: pointer;
+	@apply relative overflow-hidden;
+	aspect-ratio: 4 / 3;
+	border-radius: 2px;
+	cursor: pointer;
 
-  &:hover .galleryItemInner img { transform: scale(1.07); }
-  &:hover .galleryOverlay        { opacity: 1; }
+	&:hover .galleryItemInner img {
+		transform: scale(1.07);
+	}
+	&:hover .galleryOverlay {
+		opacity: 1;
+	}
 }
 
 .galleryItemInner {
-  @apply absolute inset-0;
-  img {
-    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: transform;
-  }
+	@apply absolute inset-0;
+	img {
+		transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		will-change: transform;
+	}
 }
 
 .galleryOverlay {
-  @apply absolute inset-0 flex items-end p-4;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.52) 0%, transparent 50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+	@apply absolute inset-0 flex items-end p-4;
+	background: linear-gradient(
+		to top,
+		rgba(0, 0, 0, 0.52) 0%,
+		transparent 50%
+	);
+	opacity: 0;
+	transition: opacity 0.3s ease;
 }
 
 .galleryItemTitle {
-  @apply text-sm font-medium text-white;
-  letter-spacing: 0.03em;
+	@apply text-sm font-medium text-white;
+	letter-spacing: 0.03em;
 }

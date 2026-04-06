@@ -12,7 +12,7 @@ import { DragShuffleTheme } from "@/ui/components/trip-themes/drag-shuffle-theme
 import { ShowcaseTheme } from "@/ui/components/trip-themes/showcase-theme/showcase-theme";
 import { PhotoCarouselTheme } from "@/ui/components/trip-themes/photo-carousel-theme/photo-carousel-theme";
 import { TrippyTheme } from "@/ui/components/trip-themes/trippy-theme/trippy-theme";
-import { ImageGridHeroTheme } from '@/ui/components/trip-themes/image-grid-hero-theme/image-grid-hero-theme';
+import { ImageGridHeroTheme } from "@/ui/components/trip-themes/image-grid-hero-theme/image-grid-hero-theme";
 
 interface ThemeRendererProps {
 	trip: Trip;
@@ -56,10 +56,10 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 		case "trippy-theme":
 			return <TrippyTheme trip={trip} config={config} />;
 
-        case "image-grid-hero-theme":
-            return <ImageGridHeroTheme trip={trip} config={config} />;
+		case "image-grid-hero-theme":
+			return <ImageGridHeroTheme trip={trip} config={config} />;
 
-        default:
+		default:
 			// Default fallback
 			return (
 				<div className={styles.fallback}>
