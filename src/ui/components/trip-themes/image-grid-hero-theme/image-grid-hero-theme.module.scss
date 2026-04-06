@@ -7,17 +7,11 @@
 }
 
 .hero {
-	@apply relative w-full;
-	height: 100vh;
-	overflow: hidden;
-	background: #ffffff;
+	@apply relative w-full h-screen overflow-hidden bg-white;
 }
 
 .heroText {
-	@apply absolute flex flex-col items-center text-center;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center;
 	z-index: 20;
 	width: min(520px, 88vw);
 	pointer-events: none;

@@ -39,6 +39,7 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const heroRef = useRef<HTMLDivElement>(null);
 	const heroTextRef = useRef<HTMLDivElement>(null);
+	const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 	const gridRef = useRef<HTMLDivElement>(null);
 	const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
 	const galleryRef = useRef<HTMLDivElement>(null);
@@ -73,11 +74,15 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 			cells.forEach((cell, i) => {
 				const d = DISPLACED[i];
 				if (!cell || !d) return;
-				tl.to(cell, { x: 0, y: 0, duration: cellDuration, ease: cellEase }, 0);
+				tl.to(
+					cell,
+					{ x: 0, y: 0, duration: cellDuration, ease: cellEase },
+					0
+				);
 			});
 
 			tl.to(
-				heroTextRef.current,
+				[heroTextRef.current, scrollIndicatorRef.current],
 				{
 					autoAlpha: 0,
 					scale: 0.78,
@@ -145,8 +150,8 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 						cellRefs.current[index] = el;
 					}}
 					style={{
-                        transform: `translate(${DISPLACED[index]?.x ?? "0vw"}, ${DISPLACED[index]?.y ?? "0vh"})`,
-                    }}
+						transform: `translate(${DISPLACED[index]?.x ?? "0vw"}, ${DISPLACED[index]?.y ?? "0vh"})`,
+					}}
 				>
 					<Image
 						src={photo.src}
@@ -168,7 +173,11 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	);
 
 	const renderScrollIndicator = () => (
-		<div className={styles.scrollIndicator} aria-hidden="true">
+		<div
+			className={styles.scrollIndicator}
+			ref={scrollIndicatorRef}
+			aria-hidden="true"
+		>
 			<span className={styles.scrollIndicatorLabel}>Scroll</span>
 			<span className={styles.scrollIndicatorTrack}>
 				<span className={styles.scrollIndicatorDot} />
