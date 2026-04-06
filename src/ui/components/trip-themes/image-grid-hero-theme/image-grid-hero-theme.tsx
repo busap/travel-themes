@@ -93,25 +93,100 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 			);
 
 			if (galleryRef.current) {
-				galleryRef.current
-					.querySelectorAll("[data-gallery-item]")
-					.forEach((item) => {
-						gsap.fromTo(
-							item,
-							{ opacity: 0, y: 36 },
-							{
-								opacity: 1,
-								y: 0,
-								duration: 0.7,
-								ease: "power2.out",
-								scrollTrigger: {
-									trigger: item,
-									start: "top 88%",
-									toggleActions: "play none none none",
-								},
-							}
-						);
+				const grid = galleryRef.current.querySelector<HTMLElement>("[data-gallery-grid]");
+				const allItems = Array.from(
+					galleryRef.current.querySelectorAll<HTMLElement>("[data-gallery-item]")
+				);
+				if (allItems.length === 0) return;
+
+				const computedColumns = grid
+					? window.getComputedStyle(grid).gridTemplateColumns.split(" ").length
+					: 3;
+				const columns = Math.max(1, computedColumns);
+				const rowCount = Math.ceil(allItems.length / columns);
+
+				for (let row = 0; row < rowCount; row += 1) {
+					const rowItems = allItems.slice(row * columns, row * columns + columns);
+					if (rowItems.length === 0) continue;
+
+					const rowTl = gsap.timeline({
+						scrollTrigger: {
+							trigger: rowItems[0],
+							start:
+								row === 0 ? "top 88%" : row === 1 ? "top 84%" : "top 80%",
+							end:
+								row === 0 ? "top 34%" : row === 1 ? "top 28%" : "top 22%",
+							scrub: row === 1 ? 1.1 : row === 2 ? 0.7 : 0.45,
+						},
 					});
+
+					rowItems.forEach((item, col) => {
+						const inner = item.querySelector<HTMLElement>("[data-gallery-item-inner]");
+						const image = item.querySelector<HTMLElement>("img");
+						const title = item.querySelector<HTMLElement>("[data-gallery-title]");
+						const colDelay = col * 0.09;
+
+						const fromX =
+							row === 0
+								? col === 0
+									? -42
+									: 20
+								: row === 1
+								? col === rowItems.length - 1
+									? 36
+									: -24
+								: col % 2 === 0
+								? -20
+								: 28;
+						const fromY = row === 0 ? 62 : row === 1 ? 52 : 44;
+						const fromRotate =
+							row === 0 ? (col === 1 ? -3 : 4) : row === 1 ? (col === 0 ? -5 : 3) : col === 2 ? -4 : 2;
+
+						rowTl.fromTo(
+							item,
+							{ autoAlpha: 0, y: fromY, x: fromX },
+							{ autoAlpha: 1, y: 0, x: 0, duration: 0.9, ease: "power3.out" },
+							colDelay
+						);
+
+						if (inner) {
+							rowTl.fromTo(
+								inner,
+								{
+									scale: row === 1 ? 0.9 : 0.94,
+									rotate: fromRotate,
+									clipPath: "inset(16% 14% 20% 14% round 18px)",
+								},
+								{
+									scale: 1,
+									rotate: 0,
+									clipPath: "inset(0% 0% 0% 0% round 2px)",
+									duration: 1.0,
+									ease: "power4.out",
+								},
+								colDelay + 0.03
+							);
+						}
+
+						if (image) {
+							rowTl.fromTo(
+								image,
+								{ scale: row === 2 ? 1.12 : 1.18 },
+								{ scale: 1, duration: 1.06, ease: "power3.out" },
+								colDelay
+							);
+						}
+
+						if (title) {
+							rowTl.fromTo(
+								title,
+								{ autoAlpha: 0, y: 12 },
+								{ autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
+								colDelay + 0.44
+							);
+						}
+					});
+				}
 			}
 		}, containerRef);
 
@@ -193,14 +268,14 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 					<h2 className={styles.galleryHeading}>All Photos</h2>
 					<div className={styles.galleryDivider} />
 				</div>
-				<div className={styles.galleryGrid}>
+				<div className={styles.galleryGrid} data-gallery-grid>
 					{galleryPhotos.map((photo, index) => (
 						<div
 							key={index}
 							className={styles.galleryItem}
 							data-gallery-item
 						>
-							<div className={styles.galleryItemInner}>
+							<div className={styles.galleryItemInner} data-gallery-item-inner>
 								<Image
 									src={photo.src}
 									alt={
@@ -215,6 +290,7 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 									<div className={styles.galleryOverlay}>
 										<span
 											className={styles.galleryItemTitle}
+											data-gallery-title
 										>
 											{photo.title}
 										</span>
