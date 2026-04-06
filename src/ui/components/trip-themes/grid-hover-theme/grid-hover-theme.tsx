@@ -2,7 +2,7 @@
 
 import { Trip } from '@/types/trip';
 import { ThemeConfig } from '@/config/theme-config';
-import { useRef, useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { Syne, Space_Grotesk } from 'next/font/google';
 import { useValidatedImages } from '@/hooks/use-validated-images';
@@ -26,39 +26,26 @@ interface GridHoverThemeProps {
 }
 
 const GRID_COLS = 6;
-const GRID_ROWS = 5;
-const TOTAL_CELLS = GRID_COLS * GRID_ROWS;
-
-function buildPhotoMap(photoCount: number): Map<number, number> {
-  const map = new Map<number, number>();
-  if (photoCount === 0) return map;
-
-  const count = Math.min(photoCount, TOTAL_CELLS);
-  const stride = Math.max(1, Math.floor(TOTAL_CELLS / count));
-
-  for (let i = 0; i < count; i++) {
-    map.set((i * stride) % TOTAL_CELLS, i);
-  }
-  return map;
-}
+const MIN_ROWS_WHEN_EMPTY = 5;
+const MIN_CELLS_WHEN_EMPTY = GRID_COLS * MIN_ROWS_WHEN_EMPTY;
 
 export function GridHoverTheme({ trip, config }: GridHoverThemeProps) {
-  const heroRef = useRef<HTMLDivElement>(null);
   const [hoveredCell, setHoveredCell] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const [isHovering, setIsHovering] = useState(false);
 
   const animationEnabled = config.animation?.enabled ?? true;
   const { photos: validatedPhotos, failedSrcs, handleImageError } = useValidatedImages(trip.photos);
-
-  const photoMap = useMemo(() => buildPhotoMap(validatedPhotos.length), [validatedPhotos.length]);
+  const visiblePhotos = validatedPhotos.filter((photo) => !failedSrcs.has(photo.src));
+  const cellCount =
+    visiblePhotos.length > 0 ? visiblePhotos.length : MIN_CELLS_WHEN_EMPTY;
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current) return;
-    const rect = heroRef.current.getBoundingClientRect();
+    const w = typeof window !== 'undefined' ? window.innerWidth : 1;
+    const h = typeof window !== 'undefined' ? window.innerHeight : 1;
     setMousePos({
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top) / rect.height,
+      x: e.clientX / w,
+      y: e.clientY / h,
     });
   }, []);
 
@@ -67,7 +54,6 @@ export function GridHoverTheme({ trip, config }: GridHoverThemeProps) {
 
   const renderHero = () => (
     <section
-      ref={heroRef}
       className={styles.hero}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovering(true)}
@@ -91,11 +77,9 @@ export function GridHoverTheme({ trip, config }: GridHoverThemeProps) {
         } : undefined}
       >
         <div className={styles.grid}>
-          {Array.from({ length: TOTAL_CELLS }, (_, cellIndex) => {
-            const photoIndex = photoMap.get(cellIndex);
-            const hasPhoto = photoIndex !== undefined;
-            const photo = hasPhoto ? validatedPhotos[photoIndex] : undefined;
-            const showPhoto = !!photo && !failedSrcs.has(photo.src);
+          {Array.from({ length: cellCount }, (_, cellIndex) => {
+            const photo = visiblePhotos[cellIndex];
+            const showPhoto = !!photo;
             const isActive = hoveredCell === cellIndex;
 
             return (
@@ -113,7 +97,7 @@ export function GridHoverTheme({ trip, config }: GridHoverThemeProps) {
                   <div className={styles.photoReveal}>
                     <Image
                       src={photo!.src}
-                      alt={photo!.title || `Photo ${photoIndex! + 1}`}
+                      alt={photo!.title || `Photo ${cellIndex + 1}`}
                       fill
                       sizes="(max-width: 768px) 25vw, 17vw"
                       style={{ objectFit: 'cover' }}
@@ -135,45 +119,12 @@ export function GridHoverTheme({ trip, config }: GridHoverThemeProps) {
         <h1 className={`${styles.title} ${syne.className}`}>{trip.name}</h1>
         <p className={`${styles.hint} ${spaceGrotesk.className}`}>move to explore</p>
       </div>
-
-      <div className={styles.bottomFade} />
     </section>
   );
-
-  const renderGallery = () => {
-    const visiblePhotos = validatedPhotos.filter(p => !failedSrcs.has(p.src));
-    if (visiblePhotos.length === 0) return null;
-
-    return (
-      <section className={styles.gallery}>
-        <div className={styles.galleryGrid}>
-          {visiblePhotos.map((photo, i) => (
-            <div key={i} className={styles.galleryItem}>
-              <Image
-                src={photo.src}
-                alt={photo.title || `Photo ${i + 1}`}
-                fill
-                sizes="(max-width: 768px) 50vw, 33vw"
-                style={{ objectFit: 'cover' }}
-                onError={() => handleImageError(photo.src)}
-                className={styles.galleryImage}
-              />
-              {photo.title && (
-                <div className={styles.caption}>
-                  <span className={spaceGrotesk.className}>{photo.title}</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  };
 
   return (
     <div className={styles.theme}>
       {renderHero()}
-      {renderGallery()}
     </div>
   );
 }

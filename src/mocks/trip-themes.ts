@@ -34,4 +34,8 @@ export const tripThemes: TripTheme[] = [
     tripId: 'swiss-alps',
     theme: Theme.DragShuffle,
   },
+  {
+    tripId: 'portugal-coastline',
+    theme: Theme.GridHover,
+  },
 ];
