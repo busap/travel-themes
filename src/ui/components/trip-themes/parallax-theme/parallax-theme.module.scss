@@ -11,7 +11,7 @@
 
 .scrollContainer {
 	position: relative;
-	height: calc(var(--scroll-height, 2400px) + 100vh);
+	height: calc(var(--total-scroll, 0px) + 100vh);
 }
 
 .stickyStage {
@@ -21,74 +21,62 @@
 	overflow: hidden;
 }
 
-// ─── Strips ──────────────────────────────────────────────────────────────────
+// ─── Photos + strips ─────────────────────────────────────────────────────────
 
-.stripsContainer {
+.photosWrapper {
 	position: absolute;
 	inset: 0;
-	display: flex;
-	flex-direction: column;
 }
 
-.strip {
-	position: relative;
-	flex: 1;
+/** One full-viewport layer per photo; stacked by z-index. */
+.photoLayer {
+	position: absolute;
+	inset: 0;
+}
+
+/**
+ * A single horizontal strip — clipped to its row of the viewport.
+ * top + height set via inline style.
+ */
+.stripSlide {
+	position: absolute;
+	left: 0;
+	right: 0;
 	overflow: hidden;
 	will-change: transform;
-	transform: translateZ(0);
-
-	// 1 px rule between strips
-	&:not(:last-child)::after {
-		content: "";
-		position: absolute;
-		bottom: 0;
-		inset-inline: 0;
-		height: 1px;
-		background: rgba(255, 255, 255, 0.1);
-		z-index: 2;
-		pointer-events: none;
-	}
 }
 
-// Extra coverage prevents empty gaps as strips diverge
-.imageWrapper {
-	position: absolute;
-	top: -130px;
-	right: -9%;
-	bottom: -130px;
-	left: -9%;
+/**
+ * Full-viewport-height image container.
+ * Negative `top` (set inline) aligns the correct band of the photo
+ * within the strip's clip window.
+ */
+.imagePos {
+	position: relative;
+	height: 100vh;
+	width: 100%;
 }
 
 .image {
 	object-fit: cover;
 }
 
-// Edge-darkening tint keeps the centre bright
-.stripTint {
+// ─── Strip separators ────────────────────────────────────────────────────────
+
+.separators {
 	position: absolute;
 	inset: 0;
-	z-index: 1;
 	pointer-events: none;
-	background: linear-gradient(
-		to right,
-		rgba(0, 0, 0, 0.38) 0%,
-		transparent 22%,
-		transparent 78%,
-		rgba(0, 0, 0, 0.38) 100%
-	);
+	z-index: 100;
 }
 
-.caption {
+.separator {
 	position: absolute;
-	bottom: 0.65rem;
-	left: 1.4rem;
-	z-index: 3;
-	font-size: 0.54rem;
-	letter-spacing: 0.32em;
-	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.38);
-	pointer-events: none;
-	white-space: nowrap;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background: rgba(255, 255, 255, 0.08);
+	mix-blend-mode: overlay;
 }
 
 // ─── Header overlay ──────────────────────────────────────────────────────────
@@ -100,12 +88,12 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	z-index: 10;
+	z-index: 200;
 	pointer-events: none;
 	text-align: center;
 	padding: 0 2rem;
 
-	// Subtle radial bloom behind the text
+	// Radial bloom improves text legibility over any photo
 	&::before {
 		content: "";
 		position: absolute;
@@ -113,10 +101,10 @@
 		left: 50%;
 		translate: -50% -50%;
 		width: 80%;
-		height: 60%;
+		height: 55%;
 		background: radial-gradient(
 			ellipse at center,
-			rgba(0, 0, 0, 0.6) 0%,
+			rgba(0, 0, 0, 0.65) 0%,
 			transparent 68%
 		);
 		pointer-events: none;
@@ -126,44 +114,77 @@
 .subtitle {
 	position: relative;
 	z-index: 1;
-	font-size: 0.65rem;
+	font-size: 0.62rem;
 	letter-spacing: 0.42em;
 	text-transform: uppercase;
 	color: rgba(255, 255, 255, 0.5);
-	margin-bottom: 1.1rem;
+	margin-bottom: 1rem;
 }
 
 .title {
 	position: relative;
 	z-index: 1;
-	font-size: clamp(3.2rem, 8.5vw, 7rem);
+	font-size: clamp(3rem, 8.5vw, 7rem);
 	font-style: italic;
 	color: #fff;
 	line-height: 1;
 	letter-spacing: -0.02em;
 	text-shadow:
-		0 2px 48px rgba(0, 0, 0, 0.85),
-		0 0 100px rgba(0, 0, 0, 0.4);
+		0 2px 48px rgba(0, 0, 0, 0.9),
+		0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+// ─── Photo counter ───────────────────────────────────────────────────────────
+
+.counter {
+	position: absolute;
+	bottom: 2rem;
+	right: 2rem;
+	z-index: 200;
+	display: flex;
+	align-items: baseline;
+	gap: 0.35rem;
+	pointer-events: none;
+}
+
+.counterCurrent {
+	font-size: 1.15rem;
+	font-variant-numeric: tabular-nums;
+	color: rgba(255, 255, 255, 0.85);
+	letter-spacing: 0.04em;
+	font-weight: 300;
+}
+
+.counterSep {
+	font-size: 0.7rem;
+	color: rgba(255, 255, 255, 0.28);
+}
+
+.counterTotal {
+	font-size: 0.7rem;
+	font-variant-numeric: tabular-nums;
+	color: rgba(255, 255, 255, 0.28);
+	letter-spacing: 0.04em;
 }
 
 // ─── Scroll hint ─────────────────────────────────────────────────────────────
 
 .scrollHint {
 	position: absolute;
-	bottom: 1.75rem;
+	bottom: 2rem;
 	left: 50%;
 	translate: -50% 0;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 0.5rem;
-	z-index: 10;
+	z-index: 200;
 	pointer-events: none;
 	animation: breathe 2.4s ease-in-out infinite;
 }
 
 .scrollLabel {
-	font-size: 0.55rem;
+	font-size: 0.52rem;
 	letter-spacing: 0.46em;
 	text-transform: uppercase;
 	color: rgba(255, 255, 255, 0.28);
@@ -172,10 +193,10 @@
 .scrollLine {
 	display: block;
 	width: 1px;
-	height: 30px;
+	height: 28px;
 	background: linear-gradient(
 		to bottom,
-		rgba(255, 255, 255, 0.42),
+		rgba(255, 255, 255, 0.4),
 		transparent
 	);
 }

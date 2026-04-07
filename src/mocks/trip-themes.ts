@@ -54,4 +54,8 @@ export const tripThemes: TripTheme[] = [
 		tripId: "portugal-coastline",
 		theme: Theme.GridHover,
 	},
+	{
+		tripId: "world-in-frames",
+		theme: Theme.Parallax,
+	},
 ];

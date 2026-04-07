@@ -2132,4 +2132,108 @@ export const trips: Trip[] = [
 			},
 		],
 	},
+	{
+		id: "world-in-frames",
+		name: "World in Frames",
+		countries: ["France", "Japan", "Iceland", "Morocco", "Peru"],
+		year: 2024,
+		description:
+			"Five continents, twenty moments — a journey told in strips of light",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Eiffel at Dusk",
+				description: "Golden hour over the Seine",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80",
+				title: "Fushimi Inari",
+				description: "Thousand vermillion gates",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504103982616-97bd2cfbafc5?w=1200&q=80",
+				title: "Northern Lights",
+				description: "Aurora over Vatnajökull",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1200&q=80",
+				title: "Marrakech Souk",
+				description: "Colors of the medina",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=1200&q=80",
+				title: "Shinjuku Nights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+				title: "Sahara at Sunrise",
+				description: "First light over the dunes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80",
+				title: "Alpine Ridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=1200&q=80",
+				title: "Bamboo Grove",
+				description: "Arashiyama in the mist",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Paris Rooftops",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80",
+				title: "Fuji at Dawn",
+				description: "Lake Kawaguchi reflection",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Alpine Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1548017871-f3f70db8b4c3?w=1200&q=80",
+				title: "Blue City",
+				description: "Chefchaouen at midday",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+				title: "Turquoise Shore",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1200&q=80",
+				title: "Kyoto Temple",
+				description: "Morning incense smoke",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Snow Peaks",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80",
+				title: "Spice Bazaar",
+				description: "Saffron and sumac",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=1200&q=80",
+				title: "Aurora Reflection",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=1200&q=80",
+				title: "Osaka Castle",
+				description: "Cherry blossoms in bloom",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "London Bridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&q=80",
+				title: "Rolling Hills",
+				description: "The countryside at dusk",
+			},
+		],
+	},
 ];
