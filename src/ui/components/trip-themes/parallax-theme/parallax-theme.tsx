@@ -24,7 +24,8 @@ const dmSerif = DM_Serif_Display({
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const STRIP_COUNT = 7;
-const SECTION_PX = 1200; // scroll distance per photo transition
+const SECTION_PX = 1200; // scroll distance per photo (transition + hold)
+const TRANSITION_FRAC = 0.65; // strips arrive in first 65%; last 35% = hold
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -45,9 +46,11 @@ interface ParallaxThemeProps {
 interface StripAnim {
 	/** xPercent to start from (±108 = off-screen left/right) */
 	entryDir: number;
-	/** Fraction of the section when this strip starts moving (0–0.45) */
+	/** y offset in px at entry — adds vertical jump/drop to the slide-in */
+	entryY: number;
+	/** Fraction of the section when this strip starts moving (within TRANSITION_FRAC) */
 	startRatio: number;
-	/** Fraction of the section when this strip finishes (0.55–1.0) */
+	/** Fraction of the section when this strip finishes (within TRANSITION_FRAC) */
 	endRatio: number;
 	/** GSAP ease string, unique per strip */
 	ease: string;
@@ -57,10 +60,21 @@ interface StripAnim {
 
 function buildStripAnim(photoIdx: number, stripIdx: number): StripAnim {
 	const base = photoIdx * 97 + stripIdx * 13;
+
+	// Ratios are scaled so all strips finish within TRANSITION_FRAC of the section
+	const startRatio = seededRandom(base + 2) * 0.42 * TRANSITION_FRAC;
+	const endRatio = (0.56 + seededRandom(base + 3) * 0.44) * TRANSITION_FRAC;
+
+	// ~60% of strips get a vertical offset (±30–80 px); the rest slide in flat
+	const hasY = seededRandom(base + 5) > 0.4;
+	const yMag = 30 + seededRandom(base + 6) * 50;
+	const ySign = seededRandom(base + 7) > 0.5 ? 1 : -1;
+
 	return {
 		entryDir: seededRandom(base + 1) > 0.5 ? 108 : -108,
-		startRatio: seededRandom(base + 2) * 0.42,
-		endRatio: 0.56 + seededRandom(base + 3) * 0.44,
+		entryY: hasY ? yMag * ySign : 0,
+		startRatio,
+		endRatio,
 		ease: EASES[Math.floor(seededRandom(base + 4) * EASES.length)],
 	};
 }
@@ -141,12 +155,16 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 				strips.forEach((strip, s) => {
 					const anim = allStripAnims[p][s];
 
-					// Start off-screen
-					gsap.set(strip, { xPercent: anim.entryDir });
+					// Start off-screen with optional y offset
+					gsap.set(strip, {
+						xPercent: anim.entryDir,
+						y: anim.entryY,
+					});
 
-					// Slide in with this strip's unique timing + ease
+					// Slide in — x and y both return to 0
 					gsap.to(strip, {
 						xPercent: 0,
+						y: 0,
 						ease: anim.ease,
 						immediateRender: false,
 						scrollTrigger: {
