@@ -38,7 +38,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 		null
 	);
 
-	const spacing = config.layout?.spacing ?? "gap-4";
+	const spacing = "gap-4";
 	const titleClasses = "text-4xl font-bold";
 	const bodyClasses = "text-base text-zinc-600";
 	const stagger = config.animation?.timeline?.stagger ?? 0.1;

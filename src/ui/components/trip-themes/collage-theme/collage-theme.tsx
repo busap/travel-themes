@@ -1,7 +1,6 @@
 "use client";
 
 import { Trip } from "@/types/trip";
-import { ThemeConfig } from "@/config/theme-config";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PolaroidCard } from "@/ui/components/polaroid-card/polaroid-card";
@@ -14,34 +13,25 @@ import styles from "./collage-theme.module.scss";
 
 interface CollageThemeProps {
 	trip: Trip;
-	config: ThemeConfig;
 }
 
-export function CollageTheme({ trip, config }: CollageThemeProps) {
+export function CollageTheme({ trip }: CollageThemeProps) {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
-	const isHorizontalScroll = config.layout.scrollDirection === "horizontal";
-	const revealPattern = config.photos.revealPattern;
-	const isScrollBasedReveal = revealPattern === "scroll-based";
-	const photosWithSrc = trip.photos;
-	const photosToShow = config.photos?.count
-		? photosWithSrc.slice(0, config.photos.count)
-		: photosWithSrc;
 
-	useHorizontalScroll(scrollContainerRef, isHorizontalScroll);
+	useHorizontalScroll(scrollContainerRef, true);
 
 	const visiblePhotos = useScrollBasedReveal({
 		containerRef: scrollContainerRef,
-		enabled: isScrollBasedReveal ?? false,
-		totalItems: photosToShow.length,
-		itemCount: photosToShow.length,
+		enabled: true,
+		totalItems: trip.photos.length,
+		itemCount: trip.photos.length,
 	});
 
-	const cardsContainerClass =
-		`${styles.cardsContainer} ${config.layout.spacing}`.trim();
+	const spacing = "gap-16";
+	const cardsContainerClass = `${styles.cardsContainer} ${spacing}`.trim();
 
 	const getCardWrapperClass = (isVisible: boolean) => {
-		if (!isScrollBasedReveal) return "";
 		return isVisible
 			? `${styles.cardWrapper} ${styles.cardWrapperVisible}`
 			: `${styles.cardWrapper} ${styles.cardWrapperHidden}`;
@@ -82,7 +72,7 @@ export function CollageTheme({ trip, config }: CollageThemeProps) {
 	const renderPolaroidCards = () => {
 		return (
 			<div className={cardsContainerClass}>
-				{photosToShow.map((photo, index) => {
+				{trip.photos.map((photo, index) => {
 					const { rotation, offset } = getPolaroidTransform(index);
 					const isVisible = visiblePhotos.has(index);
 
