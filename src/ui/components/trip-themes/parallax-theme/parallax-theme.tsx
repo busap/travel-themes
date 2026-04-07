@@ -23,6 +23,7 @@ const dmSerif = DM_Serif_Display({
 const MAX_Y_PX = 110;
 const MAX_X_PC = 7;
 const SCROLL_HEIGHT_BASE = 2400;
+const MIN_STRIPS = 6;
 const MAX_STRIPS = 8;
 
 interface ParallaxThemeProps {
@@ -45,10 +46,15 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const scrub = config.animation?.scrollTrigger?.scrub ?? 1.5;
 
-	const photos = useMemo(
-		() => trip.photos.slice(0, MAX_STRIPS),
-		[trip.photos]
-	);
+	const photos = useMemo(() => {
+		const raw = trip.photos.slice(0, MAX_STRIPS);
+		if (raw.length === 0) return [];
+		// Always fill at least MIN_STRIPS strips by cycling available photos.
+		// With few photos this creates a dramatic multi-depth parallax; with
+		// many photos each strip shows a unique image.
+		const target = Math.max(raw.length, MIN_STRIPS);
+		return Array.from({ length: target }, (_, i) => raw[i % raw.length]);
+	}, [trip.photos]);
 	const count = photos.length;
 
 	const scrollHeight = useMemo(
