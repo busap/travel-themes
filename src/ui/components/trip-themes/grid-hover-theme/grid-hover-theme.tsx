@@ -28,7 +28,7 @@ const GRID_COLS = 6;
 const MIN_ROWS_WHEN_EMPTY = 5;
 const MIN_CELLS_WHEN_EMPTY = GRID_COLS * MIN_ROWS_WHEN_EMPTY;
 
-export function GridHoverTheme({ trip, config }: GridHoverThemeProps) {
+export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 	const [hoveredCell, setHoveredCell] = useState<number | null>(null);
 	const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
 	const [isHovering, setIsHovering] = useState(false);
