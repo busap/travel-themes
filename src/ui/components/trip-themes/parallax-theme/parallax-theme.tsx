@@ -21,11 +21,9 @@ const dmSerif = DM_Serif_Display({
 	display: "swap",
 });
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
 const STRIP_COUNT = 7;
-const SECTION_PX = 1200; // scroll distance per photo (transition + hold)
-const TRANSITION_FRAC = 0.65; // strips arrive in first 65%; last 35% = hold
+const SECTION_PX = 1200;
+const TRANSITION_FRAC = 0.65;
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -36,36 +34,25 @@ const EASES = [
 	"sine.inOut",
 ];
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface ParallaxThemeProps {
 	trip: Trip;
 	config: ThemeConfig;
 }
 
 interface StripAnim {
-	/** xPercent to start from (±108 = off-screen left/right) */
 	entryDir: number;
-	/** y offset in px at entry — adds vertical jump/drop to the slide-in */
 	entryY: number;
-	/** Fraction of the section when this strip starts moving (within TRANSITION_FRAC) */
 	startRatio: number;
-	/** Fraction of the section when this strip finishes (within TRANSITION_FRAC) */
 	endRatio: number;
-	/** GSAP ease string, unique per strip */
 	ease: string;
 }
-
-// ─── Seeded animation data ───────────────────────────────────────────────────
 
 function buildStripAnim(photoIdx: number, stripIdx: number): StripAnim {
 	const base = photoIdx * 97 + stripIdx * 13;
 
-	// Ratios are scaled so all strips finish within TRANSITION_FRAC of the section
 	const startRatio = seededRandom(base + 2) * 0.42 * TRANSITION_FRAC;
 	const endRatio = (0.56 + seededRandom(base + 3) * 0.44) * TRANSITION_FRAC;
 
-	// ~60% of strips get a vertical offset (±30–80 px); the rest slide in flat
 	const hasY = seededRandom(base + 5) > 0.4;
 	const yMag = 30 + seededRandom(base + 6) * 50;
 	const ySign = seededRandom(base + 7) > 0.5 ? 1 : -1;
@@ -79,8 +66,6 @@ function buildStripAnim(photoIdx: number, stripIdx: number): StripAnim {
 	};
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
-
 export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const counterRef = useRef<HTMLSpanElement>(null);
@@ -89,7 +74,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	const photos = trip.photos;
 	const count = photos.length;
 
-	// Pre-compute all strip animation data at render time (stable across renders)
 	const allStripAnims = useMemo<StripAnim[][]>(
 		() =>
 			photos.map((_, p) =>
@@ -97,8 +81,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 					buildStripAnim(p, s)
 				)
 			),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[count]
+		[photos]
 	);
 
 	const totalScrollHeight = useMemo(() => (count - 1) * SECTION_PX, [count]);
@@ -116,7 +99,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 				container.querySelectorAll<HTMLElement>("[data-photo-layer]")
 			);
 
-			// ── Reduced motion: skip animation, show first photo ──────────────
 			if (prefersReduced) {
 				photoLayers.forEach((layer, p) => {
 					gsap.set(layer, { autoAlpha: p === 0 ? 1 : 0 });
@@ -124,14 +106,12 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 				return;
 			}
 
-			// ── Per-photo strip setup ─────────────────────────────────────────
 			photoLayers.forEach((layer, p) => {
 				const strips = Array.from(
 					layer.querySelectorAll<HTMLElement>("[data-strip]")
 				);
 
 				if (p === 0) {
-					// First photo: entrance only — strips fly in from alternating sides
 					gsap.fromTo(
 						strips,
 						{
@@ -149,19 +129,16 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 					return;
 				}
 
-				// Photos 1+: each strip slides in during its scroll section
 				const sectionStart = (p - 1) * SECTION_PX;
 
 				strips.forEach((strip, s) => {
 					const anim = allStripAnims[p][s];
 
-					// Start off-screen with optional y offset
 					gsap.set(strip, {
 						xPercent: anim.entryDir,
 						y: anim.entryY,
 					});
 
-					// Slide in — x and y both return to 0
 					gsap.to(strip, {
 						xPercent: 0,
 						y: 0,
@@ -176,7 +153,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 					});
 				});
 
-				// Photo counter: update when halfway through each transition
 				if (counterRef.current) {
 					const midpoint = sectionStart + SECTION_PX * 0.55;
 					ScrollTrigger.create({
@@ -198,7 +174,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 				}
 			});
 
-			// ── Title / subtitle fade out on first scroll ────────────────────
 			const titleEl =
 				container.querySelector<HTMLElement>("[data-title]");
 			const subtitleEl =
@@ -272,7 +247,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 		>
 			<div className={styles.scrollContainer}>
 				<div className={styles.stickyStage}>
-					{/* Photo layers — stacked by z-index, strips slide in on scroll */}
 					<div
 						className={styles.photosWrapper}
 						aria-label="Trip photo gallery"
@@ -296,11 +270,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 											} as CSSProperties
 										}
 									>
-										{/*
-										 * imagePos extends the full viewport height,
-										 * offset upward so the correct band of the
-										 * photo shows through the strip's clip.
-										 */}
 										<div
 											className={styles.imagePos}
 											style={
@@ -330,7 +299,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						))}
 					</div>
 
-					{/* Strip separator lines */}
 					<div className={styles.separators} aria-hidden>
 						{Array.from({ length: STRIP_COUNT - 1 }, (_, i) => (
 							<div
@@ -345,7 +313,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						))}
 					</div>
 
-					{/* Trip title — visible at start, fades on scroll */}
 					<div className={styles.headerOverlay}>
 						<p
 							className={styles.subtitle}
@@ -363,7 +330,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						</h1>
 					</div>
 
-					{/* Photo counter — bottom-right */}
 					<div className={styles.counter} aria-hidden>
 						<span
 							ref={counterRef}
@@ -377,7 +343,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						</span>
 					</div>
 
-					{/* Scroll hint */}
 					<div className={styles.scrollHint} aria-hidden>
 						<span className={styles.scrollLabel}>scroll</span>
 						<span className={styles.scrollLine} />

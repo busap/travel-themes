@@ -1,8 +1,6 @@
 @use "../../../../styles/breakpoints" as *;
 @reference "../../../../app/globals.scss";
 
-// ─── Layout ──────────────────────────────────────────────────────────────────
-
 .theme {
 	@apply relative;
 	background: #0c0c0c;
@@ -21,23 +19,16 @@
 	overflow: hidden;
 }
 
-// ─── Photos + strips ─────────────────────────────────────────────────────────
-
 .photosWrapper {
 	position: absolute;
 	inset: 0;
 }
 
-/** One full-viewport layer per photo; stacked by z-index. */
 .photoLayer {
 	position: absolute;
 	inset: 0;
 }
 
-/**
- * A single horizontal strip — clipped to its row of the viewport.
- * top + height set via inline style.
- */
 .stripSlide {
 	position: absolute;
 	left: 0;
@@ -46,11 +37,6 @@
 	will-change: transform;
 }
 
-/**
- * Full-viewport-height image container.
- * Negative `top` (set inline) aligns the correct band of the photo
- * within the strip's clip window.
- */
 .imagePos {
 	position: relative;
 	height: 100vh;
@@ -60,8 +46,6 @@
 .image {
 	object-fit: cover;
 }
-
-// ─── Strip separators ────────────────────────────────────────────────────────
 
 .separators {
 	position: absolute;
@@ -79,8 +63,6 @@
 	mix-blend-mode: overlay;
 }
 
-// ─── Header overlay ──────────────────────────────────────────────────────────
-
 .headerOverlay {
 	position: absolute;
 	inset: 0;
@@ -93,7 +75,6 @@
 	text-align: center;
 	padding: 0 2rem;
 
-	// Radial bloom improves text legibility over any photo
 	&::before {
 		content: "";
 		position: absolute;
@@ -134,8 +115,6 @@
 		0 0 100px rgba(0, 0, 0, 0.5);
 }
 
-// ─── Photo counter ───────────────────────────────────────────────────────────
-
 .counter {
 	position: absolute;
 	bottom: 2rem;
@@ -166,8 +145,6 @@
 	color: rgba(255, 255, 255, 0.28);
 	letter-spacing: 0.04em;
 }
-
-// ─── Scroll hint ─────────────────────────────────────────────────────────────
 
 .scrollHint {
 	position: absolute;
