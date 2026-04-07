@@ -264,6 +264,31 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 			revealPattern: "scroll-based",
 		},
 	},
+	[Theme.Parallax]: {
+		component: "parallax-theme",
+		layout: {
+			type: "vertical-parallax",
+			scrollDirection: "vertical",
+			spacing: "gap-0",
+		},
+		animation: {
+			scrollTrigger: {
+				scrub: 1.5,
+				start: "top top",
+				end: "bottom bottom",
+			},
+			timeline: {
+				duration: 0.75,
+				ease: "power3.out",
+				stagger: 0.09,
+			},
+		},
+		photos: {
+			arrangement: "flow",
+			revealPattern: "scroll-based",
+			count: 8,
+		},
+	},
 	[Theme.Feed]: {
 		component: "feed-theme",
 		layout: {

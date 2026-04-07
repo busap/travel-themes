@@ -12,4 +12,5 @@ export enum Theme {
 	Trippy = "trippy",
 	ImageGridHero = "image-grid-hero",
 	GridHover = "grid-hover",
+	Parallax = "parallax",
 }

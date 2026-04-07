@@ -14,6 +14,7 @@ import { PhotoCarouselTheme } from "@/ui/components/trip-themes/photo-carousel-t
 import { TrippyTheme } from "@/ui/components/trip-themes/trippy-theme/trippy-theme";
 import { ImageGridHeroTheme } from "@/ui/components/trip-themes/image-grid-hero-theme/image-grid-hero-theme";
 import { GridHoverTheme } from "@/ui/components/trip-themes/grid-hover-theme/grid-hover-theme";
+import { ParallaxTheme } from "@/ui/components/trip-themes/parallax-theme/parallax-theme";
 
 interface ThemeRendererProps {
 	trip: Trip;
@@ -62,6 +63,9 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
 		case "grid-hover-theme":
 			return <GridHoverTheme trip={trip} config={config} />;
+
+		case "parallax-theme":
+			return <ParallaxTheme trip={trip} config={config} />;
 
 		default:
 			// Default fallback
