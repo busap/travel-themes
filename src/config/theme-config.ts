@@ -19,7 +19,6 @@ export interface ThemeConfig {
 			stagger?: number;
 		};
 	};
-
 }
 
 // Configuration map - initially empty/minimal

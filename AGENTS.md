@@ -72,6 +72,7 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 - Themes are implemented incrementally, one at a time
 
 **Adding a theme**:
+
 - Add enum value in `src/enums/theme.ts`
 - Create component in `src/ui/components/trip-themes/{name}/`
 - Update `src/config/theme-config.ts` with config for the new enum key
