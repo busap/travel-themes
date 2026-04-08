@@ -27,8 +27,6 @@ export function HomeHero() {
 			<div className={styles.globeContainer}>
 				<GlobeVisualization trips={trips} />
 			</div>
-
-			<div className={styles.fadeBottom} />
 		</section>
 	);
 }

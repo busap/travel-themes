@@ -220,11 +220,13 @@ export function GlobeVisualization({ trips }: GlobeVisualizationProps) {
 					}
 				});
 
-			// Auto-rotate
+			// Auto-rotate and zoom
 			const controls = globe.controls();
 			controls.autoRotate = true;
 			controls.autoRotateSpeed = 0.6;
-			controls.enableZoom = false;
+			controls.enableZoom = true;
+			controls.minDistance = 120;
+			controls.maxDistance = 500;
 
 			// Set initial camera angle
 			globe.pointOfView({ lat: 20, lng: 15, altitude: 2.2 });
@@ -277,6 +279,18 @@ export function GlobeVisualization({ trips }: GlobeVisualizationProps) {
 		setTooltipPos({ x: e.clientX, y: e.clientY });
 	}, []);
 
+	// Pause auto-rotation when hovering over the globe
+	const handleMouseEnter = useCallback(() => {
+		const controls = globeInstanceRef.current?.controls();
+		if (controls) controls.autoRotate = false;
+	}, []);
+
+	const handleMouseLeave = useCallback(() => {
+		const controls = globeInstanceRef.current?.controls();
+		if (controls) controls.autoRotate = true;
+		setHoveredCountry(null);
+	}, []);
+
 	// Handle resize
 	useEffect(() => {
 		const handleResize = () => {
@@ -292,7 +306,12 @@ export function GlobeVisualization({ trips }: GlobeVisualizationProps) {
 	}, []);
 
 	return (
-		<div className={styles.wrapper} onMouseMove={handleMouseMove}>
+		<div
+			className={styles.wrapper}
+			onMouseMove={handleMouseMove}
+			onMouseEnter={handleMouseEnter}
+			onMouseLeave={handleMouseLeave}
+		>
 			<div
 				ref={containerRef}
 				className={`${styles.globe} ${isLoaded ? styles.loaded : ""}`}
