@@ -1,0 +1,85 @@
+@reference "../../../app/globals.scss";
+
+.wrapper {
+	@apply relative w-full;
+	height: 70vh;
+	min-height: 480px;
+	max-height: 800px;
+	overflow: hidden;
+}
+
+.globe {
+	@apply absolute inset-0;
+	opacity: 0;
+	transition: opacity 1.2s ease-out;
+
+	canvas {
+		display: block;
+	}
+}
+
+.loaded {
+	opacity: 1;
+}
+
+.tooltip {
+	position: fixed;
+	z-index: 50;
+	pointer-events: none;
+	display: flex;
+	overflow: hidden;
+	width: 240px;
+	border-radius: 12px;
+	background: rgba(15, 23, 42, 0.85);
+	backdrop-filter: blur(16px);
+	border: 1px solid rgba(251, 191, 36, 0.3);
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.4),
+		0 0 20px rgba(245, 158, 11, 0.15);
+	animation: tooltipIn 0.2s ease-out forwards;
+	flex-direction: column;
+}
+
+@keyframes tooltipIn {
+	from {
+		opacity: 0;
+		transform: translateY(4px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.tooltipImageWrapper {
+	@apply relative w-full;
+	height: 120px;
+	overflow: hidden;
+}
+
+.tooltipImage {
+	@apply h-full w-full object-cover;
+}
+
+.tooltipImageOverlay {
+	@apply absolute inset-0;
+	background: linear-gradient(
+		to bottom,
+		transparent 40%,
+		rgba(15, 23, 42, 0.9) 100%
+	);
+}
+
+.tooltipContent {
+	@apply flex flex-col gap-0.5 px-3 py-2.5;
+}
+
+.tooltipName {
+	@apply text-sm font-semibold leading-tight;
+	color: #fbbf24;
+}
+
+.tooltipCountry {
+	@apply text-xs;
+	color: rgba(203, 213, 225, 0.8);
+}

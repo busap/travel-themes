@@ -1,26 +1,34 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { getAllTrips } from "@/utils/trip";
 import styles from "./home-hero.module.scss";
 
-const CLIP_TEXT_IMAGE_URL =
-	"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&auto=format&fit=crop";
+const GlobeVisualization = dynamic(
+	() =>
+		import("@/ui/components/globe/globe").then(
+			(mod) => mod.GlobeVisualization
+		),
+	{ ssr: false }
+);
 
 export function HomeHero() {
+	const trips = getAllTrips();
+
 	return (
-		<section className={`${styles.hero} ${styles.heroClipText}`}>
+		<section className={styles.hero}>
+			<div className={styles.background} />
+
 			<div className={styles.content}>
-				<h1
-					className={styles.titleClipText}
-					style={{
-						backgroundImage: `url(${CLIP_TEXT_IMAGE_URL})`,
-					}}
-				>
-					TravelThemes
-				</h1>
-				<p
-					className={`${styles.subtitleClipText} ${styles.subtitleAnimated}`}
-				>
-					Adventures through the lens
-				</p>
+				<h1 className={styles.title}>TravelThemes</h1>
+				<p className={styles.subtitle}>Adventures through the lens</p>
 			</div>
+
+			<div className={styles.globeContainer}>
+				<GlobeVisualization trips={trips} />
+			</div>
+
+			<div className={styles.fadeBottom} />
 		</section>
 	);
 }
