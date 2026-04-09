@@ -26,7 +26,7 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
 	switch (config.component) {
 		case "collage-theme":
-			return <CollageTheme trip={trip} config={config} />;
+			return <CollageTheme trip={trip} />;
 
 		case "aurora-theme":
 			return <AuroraTheme trip={trip} config={config} />;
