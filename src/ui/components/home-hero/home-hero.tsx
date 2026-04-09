@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { getAllTrips } from "@/utils/trip";
+import { TripStrip } from "@/ui/components/trip-strip/trip-strip";
 import styles from "./home-hero.module.scss";
 
 const GlobeVisualization = dynamic(
@@ -14,19 +16,24 @@ const GlobeVisualization = dynamic(
 
 export function HomeHero() {
 	const trips = getAllTrips();
+	const [focusTripId, setFocusTripId] = useState<string | null>(null);
 
 	return (
 		<section className={styles.hero}>
 			<div className={styles.background} />
 
 			<div className={styles.content}>
-				<h1 className={styles.title}>TravelThemes</h1>
+				<div className={styles.titleStamp}>
+					<h1 className={styles.title}>TravelThemes</h1>
+				</div>
 				<p className={styles.subtitle}>Adventures through the lens</p>
 			</div>
 
 			<div className={styles.globeContainer}>
-				<GlobeVisualization trips={trips} />
+				<GlobeVisualization trips={trips} focusTripId={focusTripId} />
 			</div>
+
+			<TripStrip trips={trips} onTripHover={setFocusTripId} />
 		</section>
 	);
 }
