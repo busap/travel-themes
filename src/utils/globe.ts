@@ -50,7 +50,9 @@ export function computeCentroid(feature: GeoFeature): {
 		);
 	}
 
-	const lng = ring.reduce((s: number, c: number[]) => s + c[0], 0) / ring.length;
-	const lat = ring.reduce((s: number, c: number[]) => s + c[1], 0) / ring.length;
+	const lng =
+		ring.reduce((s: number, c: number[]) => s + c[0], 0) / ring.length;
+	const lat =
+		ring.reduce((s: number, c: number[]) => s + c[1], 0) / ring.length;
 	return { lat, lng };
 }

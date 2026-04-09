@@ -11,7 +11,13 @@ const meta: Meta<typeof TripStrip> = {
 	},
 	decorators: [
 		(Story) => (
-			<div style={{ position: "relative", height: "100vh", background: "#050a14" }}>
+			<div
+				style={{
+					position: "relative",
+					height: "100vh",
+					background: "#050a14",
+				}}
+			>
 				<Story />
 			</div>
 		),

@@ -2,7 +2,13 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import * as topojson from "topojson-client";
 import type { Topology } from "topojson-specification";
-import { TextureLoader, MeshPhongMaterial, Vector2, Vector3, type Material } from "three";
+import {
+	TextureLoader,
+	MeshPhongMaterial,
+	Vector2,
+	Vector3,
+	type Material,
+} from "three";
 import type { GlobeInstance } from "globe.gl";
 
 import { Trip } from "@/types/trip";
@@ -31,12 +37,17 @@ interface UseGlobeReturn {
 	handleMouseMove: (e: React.MouseEvent) => void;
 }
 
-export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn {
+export function useGlobe({
+	trips,
+	focusTripId,
+}: UseGlobeProps): UseGlobeReturn {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
 	const materialCacheRef = useRef<Map<string, MeshPhongMaterial>>(new Map());
 	const [countries, setCountries] = useState<GeoFeature[]>([]);
-	const [hoveredCountry, setHoveredCountry] = useState<CountryTrip | null>(null);
+	const [hoveredCountry, setHoveredCountry] = useState<CountryTrip | null>(
+		null
+	);
 	const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 	const [isLoaded, setIsLoaded] = useState(false);
 	const router = useRouter();
@@ -90,7 +101,10 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 		fetch(TOPO_JSON_URL)
 			.then((res) => res.json())
 			.then((topoData: Topology) => {
-				const geoData = topojson.feature(topoData, topoData.objects.countries);
+				const geoData = topojson.feature(
+					topoData,
+					topoData.objects.countries
+				);
 				if ("features" in geoData) {
 					setCountries(geoData.features as unknown as GeoFeature[]);
 				}
@@ -105,36 +119,42 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 		[visitedIds]
 	);
 
-	const updateHoverState = useCallback((hId: string | null) => {
-		if (!globeInstanceRef.current) return;
+	const updateHoverState = useCallback(
+		(hId: string | null) => {
+			if (!globeInstanceRef.current) return;
 
-		for (const [id, mat] of materialCacheRef.current.entries()) {
-			mat.opacity = id === hId ? 0.85 : 0.45;
-			mat.needsUpdate = true;
-		}
+			for (const [id, mat] of materialCacheRef.current.entries()) {
+				mat.opacity = id === hId ? 0.85 : 0.45;
+				mat.needsUpdate = true;
+			}
 
-		globeInstanceRef.current
-			.polygonAltitude((d: object) => {
-				const feat = d as GeoFeature;
-				const isVisited = visitedIds.has(feat.id);
-				const isHovered = feat.id === hId;
-				if (isHovered && isVisited) return 0.02;
-				if (isVisited) return 0.012;
-				return 0.001;
-			})
-			.polygonStrokeColor((d: object) => {
-				const feat = d as GeoFeature;
-				const isVisited = visitedIds.has(feat.id);
-				const isHovered = feat.id === hId;
-				if (isHovered && isVisited) return "rgba(255, 235, 80, 1.0)";
-				if (isVisited) return "rgba(200, 140, 30, 0.6)";
-				return "rgba(148, 163, 184, 0.35)";
-			});
-	}, [visitedIds]);
+			globeInstanceRef.current
+				.polygonAltitude((d: object) => {
+					const feat = d as GeoFeature;
+					const isVisited = visitedIds.has(feat.id);
+					const isHovered = feat.id === hId;
+					if (isHovered && isVisited) return 0.02;
+					if (isVisited) return 0.012;
+					return 0.001;
+				})
+				.polygonStrokeColor((d: object) => {
+					const feat = d as GeoFeature;
+					const isVisited = visitedIds.has(feat.id);
+					const isHovered = feat.id === hId;
+					if (isHovered && isVisited)
+						return "rgba(255, 235, 80, 1.0)";
+					if (isVisited) return "rgba(200, 140, 30, 0.6)";
+					return "rgba(148, 163, 184, 0.35)";
+				});
+		},
+		[visitedIds]
+	);
 
 	// Keep a ref so onPolygonHover (registered once during init) always calls the latest version
 	const updateHoverStateRef = useRef(updateHoverState);
-	useEffect(() => { updateHoverStateRef.current = updateHoverState; }, [updateHoverState]);
+	useEffect(() => {
+		updateHoverStateRef.current = updateHoverState;
+	}, [updateHoverState]);
 
 	// Initialize globe
 	useEffect(() => {
@@ -158,7 +178,9 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 				.width(containerRef.current.clientWidth)
 				.height(containerRef.current.clientHeight)
 				.backgroundColor("rgba(0,0,0,0)")
-				.globeImageUrl("//unpkg.com/three-globe/example/img/earth-night.jpg")
+				.globeImageUrl(
+					"//unpkg.com/three-globe/example/img/earth-night.jpg"
+				)
 				.showAtmosphere(true)
 				.atmosphereColor("rgba(78, 167, 243, 0.25)")
 				.atmosphereAltitude(0.18)
@@ -185,7 +207,8 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 					if (!polygon) {
 						hoveredIdRef.current = null;
 						setHoveredCountry(null);
-						if (containerRef.current) containerRef.current.style.cursor = "default";
+						if (containerRef.current)
+							containerRef.current.style.cursor = "default";
 						updateHoverStateRef.current(null);
 						return;
 					}
@@ -195,12 +218,21 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 					hoveredIdRef.current = feat.id;
 
 					if (trip) {
-						const name = idToName.get(feat.id) ?? idToCountryName[feat.id] ?? "";
-						setHoveredCountry({ feature: feat, trip, countryName: name });
-						if (containerRef.current) containerRef.current.style.cursor = "pointer";
+						const name =
+							idToName.get(feat.id) ??
+							idToCountryName[feat.id] ??
+							"";
+						setHoveredCountry({
+							feature: feat,
+							trip,
+							countryName: name,
+						});
+						if (containerRef.current)
+							containerRef.current.style.cursor = "pointer";
 					} else {
 						setHoveredCountry(null);
-						if (containerRef.current) containerRef.current.style.cursor = "default";
+						if (containerRef.current)
+							containerRef.current.style.cursor = "default";
 					}
 
 					updateHoverStateRef.current(feat.id);
@@ -272,8 +304,12 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 		const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
 		const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-		raycaster.setFromCamera(new Vector2(x, y), globeInstanceRef.current.camera());
-		const isOverGlobe = raycaster.ray.intersectSphere(globeSphere, new Vector3()) !== null;
+		raycaster.setFromCamera(
+			new Vector2(x, y),
+			globeInstanceRef.current.camera()
+		);
+		const isOverGlobe =
+			raycaster.ray.intersectSphere(globeSphere, new Vector3()) !== null;
 
 		const controls = globeInstanceRef.current.controls();
 		if (controls) controls.autoRotate = !isOverGlobe;
@@ -293,5 +329,11 @@ export function useGlobe({ trips, focusTripId }: UseGlobeProps): UseGlobeReturn 
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
-	return { containerRef, isLoaded, hoveredCountry, tooltipPos, handleMouseMove };
+	return {
+		containerRef,
+		isLoaded,
+		hoveredCountry,
+		tooltipPos,
+		handleMouseMove,
+	};
 }

@@ -12,7 +12,8 @@ const meta = {
 	argTypes: {
 		priority: {
 			control: "boolean",
-			description: "Enable priority image loading for above-the-fold cards",
+			description:
+				"Enable priority image loading for above-the-fold cards",
 		},
 	},
 	decorators: [

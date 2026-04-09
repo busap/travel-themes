@@ -10,9 +10,17 @@ interface GlobeVisualizationProps {
 	focusTripId?: string | null;
 }
 
-export function GlobeVisualization({ trips, focusTripId }: GlobeVisualizationProps) {
-	const { containerRef, isLoaded, hoveredCountry, tooltipPos, handleMouseMove } =
-		useGlobe({ trips, focusTripId });
+export function GlobeVisualization({
+	trips,
+	focusTripId,
+}: GlobeVisualizationProps) {
+	const {
+		containerRef,
+		isLoaded,
+		hoveredCountry,
+		tooltipPos,
+		handleMouseMove,
+	} = useGlobe({ trips, focusTripId });
 
 	return (
 		<div className={styles.wrapper} onMouseMove={handleMouseMove}>

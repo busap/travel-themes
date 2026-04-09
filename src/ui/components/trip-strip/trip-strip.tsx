@@ -18,7 +18,11 @@ export function TripStrip({ trips, onTripHover }: TripStripProps) {
 							priority={i < 3}
 							compact
 							onTripHover={onTripHover}
-							onTripHoverEnd={onTripHover ? () => onTripHover(null) : undefined}
+							onTripHoverEnd={
+								onTripHover
+									? () => onTripHover(null)
+									: undefined
+							}
 						/>
 					</div>
 				))}

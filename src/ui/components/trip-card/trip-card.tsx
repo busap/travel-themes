@@ -12,7 +12,13 @@ interface TripCardProps {
 	onTripHoverEnd?: () => void;
 }
 
-export function TripCard({ trip, priority = false, compact = false, onTripHover, onTripHoverEnd }: TripCardProps) {
+export function TripCard({
+	trip,
+	priority = false,
+	compact = false,
+	onTripHover,
+	onTripHoverEnd,
+}: TripCardProps) {
 	return (
 		<Link
 			href={getTripRoute(trip.id)}
@@ -46,7 +52,9 @@ export function TripCard({ trip, priority = false, compact = false, onTripHover,
 						<p className={styles.description}>{trip.description}</p>
 					)}
 					<div className={styles.explore}>
-						<span className={styles.exploreText}>Explore journey</span>
+						<span className={styles.exploreText}>
+							Explore journey
+						</span>
 						<svg
 							className={styles.exploreIcon}
 							fill="none"

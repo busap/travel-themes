@@ -12,7 +12,12 @@
 
 .primaryGradient {
 	@apply absolute inset-0;
-	background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 30%, transparent 65%);
+	background: linear-gradient(
+		to top,
+		rgba(0, 0, 0, 0.9) 0%,
+		rgba(0, 0, 0, 0.5) 30%,
+		transparent 65%
+	);
 }
 
 .hoverGradient {
@@ -59,7 +64,9 @@
 	@apply mt-3 text-sm text-white/80 line-clamp-2;
 	opacity: 0;
 	transform: translateY(1rem);
-	transition: opacity 700ms 100ms, transform 700ms 100ms;
+	transition:
+		opacity 700ms 100ms,
+		transform 700ms 100ms;
 }
 
 .explore {
@@ -104,7 +111,10 @@
 		overflow: hidden;
 		opacity: 0;
 		margin-top: 0;
-		transition: opacity 500ms ease, max-height 450ms ease 500ms, margin-top 450ms ease 500ms;
+		transition:
+			opacity 500ms ease,
+			max-height 450ms ease 500ms,
+			margin-top 450ms ease 500ms;
 	}
 
 	.description {
@@ -144,7 +154,10 @@
 	max-height: 6rem;
 	opacity: 1;
 	margin-top: 0.375rem;
-	transition: opacity 500ms ease, max-height 500ms ease, margin-top 500ms ease;
+	transition:
+		opacity 500ms ease,
+		max-height 500ms ease,
+		margin-top 500ms ease;
 }
 
 .card:hover .image {

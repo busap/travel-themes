@@ -9,7 +9,12 @@ interface GlobeTooltipCardProps {
 	y: number;
 }
 
-export function GlobeTooltipCard({ trip, countryName, x, y }: GlobeTooltipCardProps) {
+export function GlobeTooltipCard({
+	trip,
+	countryName,
+	x,
+	y,
+}: GlobeTooltipCardProps) {
 	return (
 		<div className={styles.tooltip} style={{ left: x + 16, top: y - 16 }}>
 			<div className={styles.imageWrapper}>
