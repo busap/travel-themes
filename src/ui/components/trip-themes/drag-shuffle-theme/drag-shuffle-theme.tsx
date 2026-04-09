@@ -45,7 +45,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const titleClasses = "text-3xl md:text-4xl font-black";
 	const bodyClasses = "text-sm md:text-base text-white/70";
 
-	const deckPhotos = useMemo(() => trip.photos.slice(0, 24), [trip.photos]);
+	const deckPhotos = useMemo(() => trip.photos, [trip.photos]);
 
 	const hasCards = deckPhotos.length > 0;
 	const isFirstItem = activeIndex === 0;
