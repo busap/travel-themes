@@ -116,3 +116,12 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - Added `ImageGridHero` theme - pinned grid assembly hero sequence.
 - Added `GridHover` theme - interactive hover-reactive image grid.
 - Added `Parallax` theme - strip-based parallax/morph transition style.
+
+### Iteration 12
+
+- Replaced home page trip card grid with fullscreen interactive 3D globe (`globe.gl` + Three.js).
+- Visited countries rendered as textured/highlighted polygons on the globe; hover rotates and zooms in.
+- Added `TripStrip` component — fixed side panel with compact `TripCard` items that drive globe focus via hover.
+- `TripCard` gained a `compact` variant (collapses expandable content until hover) for strip use.
+- Removed `TripCardVariant` enum and `variants/` sub-components (ImmersiveCard, PolaroidCard variant) — no longer needed.
+- Pattern: home page globe focus is controlled by `focusTripId` state passed down from `HomeHero`.
