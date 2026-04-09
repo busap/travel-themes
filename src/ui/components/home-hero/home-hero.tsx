@@ -17,6 +17,7 @@ const GlobeVisualization = dynamic(
 export function HomeHero() {
 	const trips = getAllTrips();
 	const [focusTripId, setFocusTripId] = useState<string | null>(null);
+	const [isStripOpen, setIsStripOpen] = useState(false);
 
 	return (
 		<section className={styles.hero}>
@@ -29,11 +30,17 @@ export function HomeHero() {
 				<p className={styles.subtitle}>Adventures through the lens</p>
 			</div>
 
-			<div className={styles.globeContainer}>
+			<div
+				className={`${styles.globeContainer} ${isStripOpen ? styles.globeContainerOpen : ""}`}
+			>
 				<GlobeVisualization trips={trips} focusTripId={focusTripId} />
 			</div>
 
-			<TripStrip trips={trips} onTripHover={setFocusTripId} />
+			<TripStrip
+				trips={trips}
+				onTripHover={setFocusTripId}
+				onIsOpenChange={setIsStripOpen}
+			/>
 		</section>
 	);
 }

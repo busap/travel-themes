@@ -94,6 +94,11 @@
 
 .globeContainer {
 	@apply absolute inset-0 z-10;
+	right: 0;
+	transition: right 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.globeContainerOpen {
 	right: 300px;
 }
 
