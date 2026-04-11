@@ -25,17 +25,17 @@
 
 @keyframes flyBack {
 	0% {
-		transform: translate(-140px, 155px) scale(1.8, 0.2) rotate(-180deg);
+		transform: translate(-140px, 155px) scale(1.8, 0.2) rotate(180deg);
 		opacity: 0;
 		filter: blur(3.5px);
 	}
 	40% {
-		transform: translate(-65px, 70px) scale(1.4, 0.65) rotate(-90deg);
+		transform: translate(-65px, 70px) scale(1.4, 0.65) rotate(90deg);
 		opacity: 0.55;
 		filter: blur(1.5px);
 	}
 	80% {
-		transform: translate(-10px, 10px) scale(1.08, 0.92) rotate(-20deg);
+		transform: translate(-10px, 10px) scale(1.08, 0.92) rotate(20deg);
 		opacity: 1;
 		filter: blur(0px);
 	}
