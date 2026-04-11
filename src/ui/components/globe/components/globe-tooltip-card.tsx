@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,8 +23,11 @@ export function GlobeTooltipCard({
 	y,
 	mobile = false,
 }: GlobeTooltipCardProps) {
-	const [mounted, setMounted] = useState(false);
-	useEffect(() => setMounted(true), []);
+	const mounted = useSyncExternalStore(
+		() => () => {},
+		() => true,
+		() => false
+	);
 
 	const inner = (
 		<>

@@ -47,6 +47,10 @@ export function useGlobe({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
 	const materialCacheRef = useRef<Map<string, MeshPhongMaterial>>(new Map());
+	const isMobileRef = useRef(isMobile);
+	useEffect(() => {
+		isMobileRef.current = isMobile;
+	}, [isMobile]);
 	const [countries, setCountries] = useState<GeoFeature[]>([]);
 	const [activeCountry, setActiveCountry] = useState<CountryTrip | null>(
 		null
@@ -211,7 +215,7 @@ export function useGlobe({
 				})
 				.polygonsTransitionDuration(300)
 				.onPolygonHover((polygon: object | null) => {
-					if (isMobile) return;
+					if (isMobileRef.current) return;
 
 					if (!polygon) {
 						hoveredIdRef.current = null;
@@ -250,7 +254,7 @@ export function useGlobe({
 					const feat = polygon as GeoFeature;
 					const trip = idToTrip.get(feat.id);
 
-					if (!isMobile) {
+					if (!isMobileRef.current) {
 						if (trip) router.push(getTripRoute(trip.id));
 						return;
 					}
@@ -290,7 +294,7 @@ export function useGlobe({
 			globe.pointOfView({
 				lat: 20,
 				lng: 15,
-				altitude: isMobile ? 4 : 2.2,
+				altitude: isMobileRef.current ? 4 : 2.2,
 			});
 			setIsLoaded(true);
 		};
@@ -311,7 +315,7 @@ export function useGlobe({
 			const controls = globeInstanceRef.current.controls();
 			if (controls) controls.autoRotate = true;
 			globeInstanceRef.current.pointOfView(
-				{ altitude: isMobile ? 1.6 : 2.2 },
+				{ altitude: isMobileRef.current ? 1.6 : 2.2 },
 				800
 			);
 			return;
@@ -336,7 +340,7 @@ export function useGlobe({
 
 		globeInstanceRef.current.pointOfView({ lat, lng, altitude: 1.4 }, 1000);
 		updateHoverState(targetCountryId);
-	}, [focusTripId, countries, idToTrip, updateHoverState]);
+	}, [focusTripId, countries, idToTrip, updateHoverState, isMobile]);
 
 	const clearActiveCountry = useCallback(() => {
 		setActiveCountry(null);

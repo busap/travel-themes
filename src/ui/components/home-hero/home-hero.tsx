@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { getAllTrips } from "@/utils/trip";
 import { TripStrip } from "@/ui/components/trip-strip/trip-strip";
@@ -14,19 +14,21 @@ const GlobeVisualization = dynamic(
 	{ ssr: false }
 );
 
+function subscribe(cb: () => void) {
+	const mq = window.matchMedia("(max-width: 1024px)");
+	mq.addEventListener("change", cb);
+	return () => mq.removeEventListener("change", cb);
+}
+
+function getSnapshot() {
+	return window.matchMedia("(max-width: 1024px)").matches;
+}
+
 export function HomeHero() {
 	const trips = getAllTrips();
 	const [focusTripId, setFocusTripId] = useState<string | null>(null);
 	const [isStripOpen, setIsStripOpen] = useState(false);
-	const [isMobile, setIsMobile] = useState(false);
-
-	useEffect(() => {
-		const mq = window.matchMedia("(max-width: 1024px)");
-		setIsMobile(mq.matches);
-		const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-		mq.addEventListener("change", handler);
-		return () => mq.removeEventListener("change", handler);
-	}, []);
+	const isMobile = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
 	return (
 		<section className={styles.hero}>
