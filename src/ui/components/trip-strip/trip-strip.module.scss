@@ -117,7 +117,10 @@
 	&::before {
 		content: '';
 		position: absolute;
-		inset: 0;
+		top: 0;
+		right: 0;
+		width: 325px;
+		height: 325px;
 		background: linear-gradient(160deg, #f5f0e8 0%, #ede8de 50%, #e8e2d6 100%);
 		clip-path: circle(162px at 100% 0%);
 		z-index: -1;
