@@ -23,28 +23,6 @@
 	}
 }
 
-@keyframes flyBack {
-	0% {
-		transform: translate(-140px, 155px) scale(1.8, 0.2) rotate(180deg);
-		opacity: 0;
-		filter: blur(3.5px);
-	}
-	40% {
-		transform: translate(-65px, 70px) scale(1.4, 0.65) rotate(90deg);
-		opacity: 0.55;
-		filter: blur(1.5px);
-	}
-	80% {
-		transform: translate(-10px, 10px) scale(1.08, 0.92) rotate(20deg);
-		opacity: 1;
-		filter: blur(0px);
-	}
-	100% {
-		transform: translate(0, 0) scale(1, 1) rotate(0deg);
-		opacity: 1;
-		filter: blur(0px);
-	}
-}
 
 @keyframes slideIn {
 	from {
@@ -150,9 +128,6 @@
 	animation: flyAway 0.52s cubic-bezier(0.4, 0, 1, 1) 0.18s both;
 }
 
-.planeFlyBack {
-	animation: flyBack 0.48s cubic-bezier(0, 0, 0.6, 1) 0.35s both;
-}
 
 .planeHidden {
 	opacity: 0;
