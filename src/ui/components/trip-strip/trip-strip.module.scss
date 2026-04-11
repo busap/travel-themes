@@ -91,7 +91,16 @@
 	}
 }
 
+.arcFill {
+	fill: #f5f0e8;
+	transition: opacity 0.4s linear;
+}
+
 .arcHidden {
+	.arcFill {
+		opacity: 0;
+	}
+
 	path {
 		stroke-dashoffset: 252;
 	}
