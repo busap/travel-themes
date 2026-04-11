@@ -2,7 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
-import { getAllTrips } from "@/utils/trip";
+import { Trip } from "@/types/trip";
 import { TripStrip } from "@/ui/components/trip-strip/trip-strip";
 import styles from "./home-hero.module.scss";
 
@@ -24,8 +24,7 @@ function getSnapshot() {
 	return window.matchMedia("(max-width: 1024px)").matches;
 }
 
-export function HomeHero() {
-	const trips = getAllTrips();
+export function HomeHero({ trips }: { trips: Trip[] }) {
 	const [focusTripId, setFocusTripId] = useState<string | null>(null);
 	const [isStripOpen, setIsStripOpen] = useState(false);
 	const isMobile = useSyncExternalStore(subscribe, getSnapshot, () => false);
