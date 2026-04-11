@@ -1,0 +1,201 @@
+@use "../../../../styles/breakpoints" as *;
+@reference "../../../../app/globals.scss";
+
+.theme {
+	@apply relative w-full;
+	background: #060009;
+	min-height: 100vh;
+}
+
+.bg {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	transform: translateZ(0);
+	background:
+		radial-gradient(
+			ellipse 90% 70% at 50% 50%,
+			rgba(140, 20, 255, 0.35) 0%,
+			transparent 60%
+		),
+		radial-gradient(
+			ellipse 55% 45% at 15% 85%,
+			rgba(255, 20, 110, 0.22) 0%,
+			transparent 55%
+		),
+		radial-gradient(
+			ellipse 50% 55% at 85% 15%,
+			rgba(0, 200, 255, 0.2) 0%,
+			transparent 55%
+		);
+	animation: hueShift 12s linear infinite;
+}
+
+.scrollContainer {
+	position: relative;
+	height: calc(var(--total-scroll, 5000px) + 100vh);
+	z-index: 1;
+}
+
+.stickyStage {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	padding-top: 6rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.header {
+	position: absolute;
+	top: 0;
+	inset-inline: 0;
+	padding-top: 2.25rem;
+	text-align: center;
+	z-index: 20;
+	pointer-events: none;
+}
+
+.title {
+	font-size: clamp(2.5rem, 8vw, 5.5rem);
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	line-height: 1;
+	color: #fff;
+	text-shadow:
+		-3px 0 3px rgba(255, 0, 110, 0.8),
+		3px 0 3px rgba(0, 230, 255, 0.8),
+		0 0 50px rgba(190, 60, 255, 0.55),
+		0 0 110px rgba(190, 60, 255, 0.2);
+}
+
+.subtitle {
+	margin-top: 0.6rem;
+	font-size: 0.68rem;
+	letter-spacing: 0.42em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.36);
+}
+
+.photoStack {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.photoLayer {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.photoFrame {
+	position: relative;
+	width: min(88vw, 1100px);
+	height: min(65vh, 680px);
+	border-radius: 1.5rem;
+	overflow: hidden;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	box-shadow:
+		0 0 60px rgba(160, 40, 255, 0.5),
+		0 0 180px rgba(0, 180, 255, 0.15);
+}
+
+.photoImg {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	transform-origin: center;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
+.photoChroma {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background: linear-gradient(
+		135deg,
+		rgba(255, 0, 160, 0.12) 0%,
+		rgba(255, 0, 160, 0) 38%,
+		rgba(0, 220, 255, 0.08) 100%
+	);
+	z-index: 2;
+}
+
+.photoCaption {
+	position: absolute;
+	bottom: 3.25rem;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 0.62rem;
+	letter-spacing: 0.38em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.52);
+	white-space: nowrap;
+	pointer-events: none;
+	z-index: 20;
+}
+
+.scrollHint {
+	position: absolute;
+	right: 1.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.55rem;
+	z-index: 20;
+	pointer-events: none;
+	animation: breatheRight 2.6s ease-in-out infinite;
+}
+
+.scrollLabel {
+	font-size: 0.58rem;
+	letter-spacing: 0.48em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.26);
+	writing-mode: vertical-rl;
+}
+
+.scrollLine {
+	display: block;
+	width: 1px;
+	height: 36px;
+	background: linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.45),
+		transparent
+	);
+}
+
+@keyframes breatheRight {
+	0%,
+	100% {
+		opacity: 0.5;
+		transform: translateY(calc(-50% + 0px));
+	}
+	50% {
+		opacity: 1;
+		transform: translateY(calc(-50% - 6px));
+	}
+}
+
+@keyframes hueShift {
+	from {
+		filter: hue-rotate(0deg);
+	}
+	to {
+		filter: hue-rotate(360deg);
+	}
+}

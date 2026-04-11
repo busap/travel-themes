@@ -11,6 +11,10 @@ import { SmoothScrollTheme } from "@/ui/components/trip-themes/smooth-scroll-the
 import { DragShuffleTheme } from "@/ui/components/trip-themes/drag-shuffle-theme/drag-shuffle-theme";
 import { ShowcaseTheme } from "@/ui/components/trip-themes/showcase-theme/showcase-theme";
 import { PhotoCarouselTheme } from "@/ui/components/trip-themes/photo-carousel-theme/photo-carousel-theme";
+import { TrippyTheme } from "@/ui/components/trip-themes/trippy-theme/trippy-theme";
+import { ImageGridHeroTheme } from "@/ui/components/trip-themes/image-grid-hero-theme/image-grid-hero-theme";
+import { GridHoverTheme } from "@/ui/components/trip-themes/grid-hover-theme/grid-hover-theme";
+import { ParallaxTheme } from "@/ui/components/trip-themes/parallax-theme/parallax-theme";
 
 interface ThemeRendererProps {
 	trip: Trip;
@@ -22,7 +26,7 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
 	switch (config.component) {
 		case "collage-theme":
-			return <CollageTheme trip={trip} config={config} />;
+			return <CollageTheme trip={trip} />;
 
 		case "aurora-theme":
 			return <AuroraTheme trip={trip} config={config} />;
@@ -50,6 +54,18 @@ export function ThemeRenderer({ trip, config }: ThemeRendererProps) {
 
 		case "photo-carousel-theme":
 			return <PhotoCarouselTheme trip={trip} config={config} />;
+
+		case "trippy-theme":
+			return <TrippyTheme trip={trip} config={config} />;
+
+		case "image-grid-hero-theme":
+			return <ImageGridHeroTheme trip={trip} config={config} />;
+
+		case "grid-hover-theme":
+			return <GridHoverTheme trip={trip} config={config} />;
+
+		case "parallax-theme":
+			return <ParallaxTheme trip={trip} config={config} />;
 
 		default:
 			// Default fallback

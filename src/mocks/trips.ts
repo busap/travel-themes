@@ -1812,4 +1812,428 @@ export const trips: Trip[] = [
 			},
 		],
 	},
+	{
+		id: "bali-dreams",
+		name: "Bali Dreams",
+		countries: ["Indonesia"],
+		year: 2024,
+		description: "Rice terraces, sacred temples, and neon-drenched nights",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80",
+				title: "Tegallalang Terraces",
+				description: "Cascading emerald rice paddies",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1552751753-0fc84ae5b6c8?w=1200&q=80",
+				title: "Tanah Lot",
+				description: "Temple at the edge of the sea",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1573790387438-4da905039392?w=1200&q=80",
+				title: "Ubud Jungle",
+				description: "Mist through the canopy",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=1200&q=80",
+				title: "Seminyak Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=1200&q=80",
+				title: "Uluwatu Cliffs",
+				description: "Kecak fire dance at sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?w=1200&q=80",
+				title: "Sacred Monkey Forest",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1484959014842-cd1d967a39cf?w=1200&q=80",
+				title: "Tirta Empul",
+				description: "Holy spring purification ritual",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80",
+				title: "Mount Agung",
+				description: "Volcano at dawn",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1562016600-ece13e8ba570?w=1200&q=80",
+				title: "Pura Besakih",
+				description: "Mother temple of Bali",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1538681105587-85640961bf8b?w=1200&q=80",
+				title: "Nusa Penida",
+				description: "Kelingking Secret Point",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Dreamland Beach",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&q=80",
+				title: "Jimbaran Bay",
+				description: "Seafood by the shore",
+			},
+		],
+	},
+	{
+		id: "portugal-coastline",
+		name: "Portuguese Coastline",
+		countries: ["Portugal"],
+		year: 2024,
+		description: "Clifftop villages, golden beaches, and Atlantic sunsets",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1200&q=80",
+				title: "Algarve Coast",
+				description: "Golden cliffs and turquoise water",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1455587734955-081b22074882?w=1200&q=80",
+				title: "Porto Riverside",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1200&q=80",
+				title: "Hidden Cove",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+				title: "Atlantic Cliffs",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+				title: "Praia da Marinha",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+				title: "Lisbon Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "Bridge at Dusk",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1200&q=80",
+				title: "Atlantic Sunset",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+				title: "Coastal Dunes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80",
+				title: "Seafood Evening",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=80",
+				title: "Cascais Harbor",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506102383123-c8ef1e872756?w=1200&q=80",
+				title: "Rugged Coastline",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Blue Lagoon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1439853949127-fa647821eba0?w=1200&q=80",
+				title: "Sea Arch",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Belém Tower",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Old Town Evening",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+				title: "Alfama Rooftops",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80",
+				title: "Modern Lisbon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+				title: "Ocean Panorama",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1200&q=80",
+				title: "Pastel de Nata",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&q=80",
+				title: "Sintra Hills",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=1200&q=80",
+				title: "Azulejo Facade",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=1200&q=80",
+				title: "Mosaic Details",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1200&q=80",
+				title: "Atlantic Night Sky",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=1200&q=80",
+				title: "Beach Bonfire",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1200&q=80",
+				title: "Coastal Waterfall",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80",
+				title: "Cliff Vista",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=1200&q=80",
+				title: "Dusk over the Atlantic",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80",
+				title: "Misty Morning Coast",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+				title: "Pine Grove Path",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+				title: "Rolling Green Hills",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&q=80",
+				title: "Storm Light",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=1200&q=80",
+				title: "Sandy Path",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1200&q=80",
+				title: "Forest Edge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+				title: "High Viewpoint",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Mountain Silhouette",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1200&q=80",
+				title: "Distant Peaks",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80",
+				title: "Painted Doorway",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1553522991-71439aa4bf14?w=1200&q=80",
+				title: "Cobblestone Alley",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+				title: "Café Corner",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=80",
+				title: "Harbor Reflections",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80",
+				title: "Lantern Glow",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504109586057-7a2ae83d1338?w=1200&q=80",
+				title: "Garden Courtyard",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80",
+				title: "Distant Summit",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1548017871-f3f70db8b4c3?w=1200&q=80",
+				title: "Blue Hour Streets",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=1200&q=80",
+				title: "Coastal Shrine",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=1200&q=80",
+				title: "Historic Fortress",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1570521462033-3015e76e7432?w=1200&q=80",
+				title: "Quiet Garden",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1576675784201-0e142b423571?w=1200&q=80",
+				title: "Golden Pavilion Light",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1505069190533-40aea9ad55a4?w=1200&q=80",
+				title: "Park Stroll",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1573455494060-c5595004fb6c?w=1200&q=80",
+				title: "Castle on the Hill",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=1200&q=80",
+				title: "Market Stalls",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1547234856-2bfdd14e6e5a?w=1200&q=80",
+				title: "Rainy Boulevard",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=1200&q=80",
+				title: "Hilltop View",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1558862107-d49ef2451048?w=1200&q=80",
+				title: "Harbor Neon",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1524311842165-9e3e8d5e3435?w=1200&q=80",
+				title: "Arched Bridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1585830300667-a7fde89f7449?w=1200&q=80",
+				title: "Spring Bloom",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1557409518-691ebcd96038?w=1200&q=80",
+				title: "Coastal Train",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1503640538573-148065ba6f84?w=1200&q=80",
+				title: "Festival Lights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=1200&q=80",
+				title: "Crossing at Night",
+			},
+		],
+	},
+	{
+		id: "world-in-frames",
+		name: "World in Frames",
+		countries: ["France", "Japan", "Iceland", "Morocco", "Peru"],
+		year: 2024,
+		description:
+			"Five continents, twenty moments — a journey told in strips of light",
+		coverPhoto:
+			"https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&q=80",
+		photos: [
+			{
+				src: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+				title: "Eiffel at Dusk",
+				description: "Golden hour over the Seine",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=80",
+				title: "Fushimi Inari",
+				description: "Thousand vermillion gates",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1504103982616-97bd2cfbafc5?w=1200&q=80",
+				title: "Northern Lights",
+				description: "Aurora over Vatnajökull",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1200&q=80",
+				title: "Marrakech Souk",
+				description: "Colors of the medina",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=1200&q=80",
+				title: "Shinjuku Nights",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+				title: "Sahara at Sunrise",
+				description: "First light over the dunes",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80",
+				title: "Alpine Ridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=1200&q=80",
+				title: "Bamboo Grove",
+				description: "Arashiyama in the mist",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+				title: "Paris Rooftops",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&q=80",
+				title: "Fuji at Dawn",
+				description: "Lake Kawaguchi reflection",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+				title: "Alpine Lake",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1548017871-f3f70db8b4c3?w=1200&q=80",
+				title: "Blue City",
+				description: "Chefchaouen at midday",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+				title: "Turquoise Shore",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1200&q=80",
+				title: "Kyoto Temple",
+				description: "Morning incense smoke",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+				title: "Snow Peaks",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80",
+				title: "Spice Bazaar",
+				description: "Saffron and sumac",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=1200&q=80",
+				title: "Aurora Reflection",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=1200&q=80",
+				title: "Osaka Castle",
+				description: "Cherry blossoms in bloom",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
+				title: "London Bridge",
+			},
+			{
+				src: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&q=80",
+				title: "Rolling Hills",
+				description: "The countryside at dusk",
+			},
+		],
+	},
 ];

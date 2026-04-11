@@ -66,11 +66,10 @@ Photo-centric travel website where trips are displayed through themed visual pre
 
 ### Iteration 5
 
-- Implemented Collage theme with horizontal scrolling
-- Created `src/ui/` with `components/` and `pages/` subdirectories
-- Pages tested via E2E only (no Storybook stories)
-- Components have Storybook stories
-- Fixed Next.js build conflicts
+- Added `Collage` theme - horizontal scrolling collage layout.
+- Created `src/ui/` structure with clear split between reusable components and route-level pages.
+- Locked testing convention: pages use E2E, components use Storybook.
+- Resolved Next.js build conflicts introduced during the structure split.
 
 ### Iteration 6
 
@@ -85,13 +84,13 @@ Photo-centric travel website where trips are displayed through themed visual pre
 
 ### Iteration 8
 
-- Implemented config-driven theme system
-- Made Collage theme fully driven by ThemeConfig options (scrollDirection, animation, revealPattern)
+- Added config-driven theme system across trip detail pages.
+- Updated `Collage` theme - fully driven by `ThemeConfig`.
 - Created custom hooks pattern in `src/hooks/`:
     - `useHorizontalScroll` - reusable horizontal scroll conversion
     - `useScrollBasedReveal` - reusable scroll-based reveal animations
-- Made ThemeConfig interface fully optional to support different theme needs
-- Established pattern: extract config values as constants at component top
+- Made `ThemeConfig` fully optional to support different theme needs without forcing unused fields.
+- Added convention: extract config values as constants at the top of each theme component.
 
 ### Iteration 9
 
@@ -101,19 +100,28 @@ Photo-centric travel website where trips are displayed through themed visual pre
 
 ### Iteration 10
 
-- Implemented Aurora theme with animated gradient background and scroll-based photo reveals
+- Added `Aurora` theme - animated gradient + scroll reveal style.
+- Added `Mosaic` theme - fullscreen masonry grid with expand interactions.
+- Added `Drift` theme - editorial wave/magazine style composition.
 
 ### Iteration 11
 
-- Implemented Mosaic theme with fullscreen masonry grid layout
-- Created `src/utils/mosaic-layout.ts` utility for aspect ratio-based grid cell sizing
-- Created `src/hooks/use-mouse-position.ts` hook for cursor-tracking effects
-- Implemented expand-in-place photo interaction with GSAP animations
+- Added `Feed` theme - social-feed inspired vertical card flow.
+- Added `Trail` theme - cursor photo-trail presentation.
+- Added `SmoothScroll` theme - smooth vertical parallax motion style.
+- Added `DragShuffle` theme - draggable stacked photo-card style.
+- Added `Showcase` theme - focused sequential spotlight presentation.
+- Added `PhotoCarousel` theme - cinematic carousel browsing style.
+- Added `Trippy` theme - psychedelic layered scroll-reactive visuals.
+- Added `ImageGridHero` theme - pinned grid assembly hero sequence.
+- Added `GridHover` theme - interactive hover-reactive image grid.
+- Added `Parallax` theme - strip-based parallax/morph transition style.
 
 ### Iteration 12
 
-- Rebuilt Drift theme as wave-based magazine editorial layout
-
-### Iteration 13
-
-- 2026-03-01: HomeHero refinement – editorial + cinematic design, ClipText variant (image through letters), Playfair Display, entrance animation
+- Replaced home page trip card grid with fullscreen interactive 3D globe (`globe.gl` + Three.js).
+- Visited countries rendered as textured/highlighted polygons on the globe; hover rotates and zooms in.
+- Added `TripStrip` component — fixed side panel with compact `TripCard` items that drive globe focus via hover.
+- `TripCard` gained a `compact` variant (collapses expandable content until hover) for strip use.
+- Removed `TripCardVariant` enum and `variants/` sub-components (ImmersiveCard, PolaroidCard variant) — no longer needed.
+- Pattern: home page globe focus is controlled by `focusTripId` state passed down from `HomeHero`.

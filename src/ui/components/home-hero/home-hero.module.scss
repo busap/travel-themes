@@ -1,9 +1,18 @@
 @reference "../../../app/globals.scss";
 
-@keyframes heroReveal {
+@keyframes imagePan {
+	0% {
+		background-position: 0% center;
+	}
+	100% {
+		background-position: 100% center;
+	}
+}
+
+@keyframes contentReveal {
 	from {
 		opacity: 0;
-		transform: translateY(1rem);
+		transform: translateY(0.5rem);
 	}
 	to {
 		opacity: 1;
@@ -13,45 +22,98 @@
 
 .hero {
 	@apply relative w-full overflow-hidden;
-	background-color: #e7f3ff;
+	height: 100vh;
+	background: linear-gradient(
+		160deg,
+		#f5f0e8 0%,
+		#ede8de 30%,
+		#e8e2d6 60%,
+		#ede6d8 100%
+	);
 }
 
-.heroClipText {
-	@apply h-[60vh] md:h-[70vh];
+.background {
+	@apply absolute inset-0;
+	background-image:
+		radial-gradient(
+			ellipse 80% 60% at 20% 10%,
+			rgba(210, 195, 168, 0.35) 0%,
+			transparent 60%
+		),
+		radial-gradient(
+			ellipse 60% 50% at 80% 80%,
+			rgba(196, 182, 155, 0.25) 0%,
+			transparent 60%
+		),
+		radial-gradient(
+			ellipse 40% 40% at 55% 45%,
+			rgba(230, 220, 200, 0.2) 0%,
+			transparent 70%
+		);
 }
 
 .content {
-	@apply relative z-10 flex flex-col items-center justify-center;
-	@apply px-6 py-8 md:px-8 md:py-12 lg:px-12 lg:py-16;
+	@apply absolute z-20 flex flex-col items-start;
+	bottom: 2rem;
+	left: 2rem;
+	pointer-events: none;
+	animation: contentReveal 0.9s ease-out 0.4s both;
 }
 
-.titleClipText {
+.titleStamp {
+	display: inline-block;
+	border: 1.5px solid rgba(180, 140, 60, 0.5);
+	padding: 5px 10px 4px;
+	border-radius: 2px;
+	margin-bottom: 6px;
+}
+
+.title {
 	font-family: var(--font-bebas-neue), sans-serif;
-	font-size: clamp(4.5rem, 14vw, 14rem);
-	line-height: 0.9;
-	letter-spacing: 0.02em;
-	@apply font-bold uppercase tracking-wider;
+	font-size: clamp(1.4rem, 3.25vw, 3.5rem);
+	line-height: 1;
+	letter-spacing: 0.14em;
+	@apply font-bold uppercase;
+	display: block;
+	background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80");
+	background-size: 300% auto;
+	background-position: 0% center;
 	-webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
-	background-size: cover;
-	background-position: center;
+	animation: imagePan 25s linear infinite alternate;
 }
 
-.subtitleClipText {
-	@apply mt-6 text-lg md:text-xl lg:text-2xl;
-	@apply font-bold italic tracking-wider;
-	color: #846a50;
+.subtitle {
+	font-size: 0.8rem;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: rgba(100, 85, 60, 0.6);
+	padding-left: 1px;
 }
 
-.subtitleAnimated {
-	animation: heroReveal 0.8s ease-out 0.2s forwards;
-	opacity: 0;
+.globeContainer {
+	@apply absolute inset-0 z-10;
+	right: 0;
+	transition: right 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.globeContainerOpen {
+	right: 300px;
+
+	@media (max-width: 1024px) {
+		right: 0;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.subtitleAnimated {
+	.content {
 		animation: none;
 		opacity: 1;
+	}
+
+	.title {
+		animation: none;
+		background-position: 50% center;
 	}
 }

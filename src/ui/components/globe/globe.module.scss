@@ -1,0 +1,20 @@
+@reference "../../../app/globals.scss";
+
+.wrapper {
+	@apply relative h-full w-full;
+	overflow: hidden;
+}
+
+.globe {
+	@apply absolute inset-0;
+	opacity: 0;
+	transition: opacity 1.2s ease-out;
+
+	canvas {
+		display: block;
+	}
+}
+
+.loaded {
+	opacity: 1;
+}

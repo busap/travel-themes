@@ -42,4 +42,20 @@ export const tripThemes: TripTheme[] = [
 		tripId: "australian-outback",
 		theme: Theme.PhotoCarousel,
 	},
+	{
+		tripId: "bali-dreams",
+		theme: Theme.Trippy,
+	},
+	{
+		tripId: "new-zealand",
+		theme: Theme.ImageGridHero,
+	},
+	{
+		tripId: "portugal-coastline",
+		theme: Theme.GridHover,
+	},
+	{
+		tripId: "world-in-frames",
+		theme: Theme.Parallax,
+	},
 ];

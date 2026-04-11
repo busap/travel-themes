@@ -1,0 +1,325 @@
+@reference "../../../app/globals.scss";
+
+@keyframes flyAway {
+	0% {
+		transform: translate(0, 0) scale(1, 1);
+		opacity: 1;
+		filter: blur(0px);
+	}
+	20% {
+		transform: translate(-10px, 10px) scale(1.08, 0.92);
+		opacity: 1;
+		filter: blur(0px);
+	}
+	60% {
+		transform: translate(-65px, 70px) scale(1.4, 0.65);
+		opacity: 0.55;
+		filter: blur(1.5px);
+	}
+	100% {
+		transform: translate(-140px, 155px) scale(1.8, 0.2);
+		opacity: 0;
+		filter: blur(3.5px);
+	}
+}
+
+@keyframes flyBack {
+	0% {
+		transform: translate(-140px, 155px) scale(1.8, 0.2);
+		opacity: 0;
+		filter: blur(3.5px);
+	}
+	40% {
+		transform: translate(-65px, 70px) scale(1.4, 0.65);
+		opacity: 0.55;
+		filter: blur(1.5px);
+	}
+	80% {
+		transform: translate(-10px, 10px) scale(1.08, 0.92);
+		opacity: 1;
+		filter: blur(0px);
+	}
+	100% {
+		transform: translate(0, 0) scale(1, 1);
+		opacity: 1;
+		filter: blur(0px);
+	}
+}
+
+@keyframes slideIn {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideOut {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}
+
+.container {
+	@apply absolute top-0 right-0 bottom-0 z-20;
+	width: 300px;
+	pointer-events: none;
+}
+
+.arcBorder {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 325px;
+	height: 325px;
+	transform: translate(50%, -50%);
+	pointer-events: none;
+	overflow: visible;
+
+	path {
+		fill: none;
+		stroke: rgba(60, 44, 16, 0.72);
+		stroke-width: 1.5;
+		stroke-dasharray: 252;
+		stroke-dashoffset: 0;
+		transition: stroke-dashoffset 0.4s linear;
+	}
+}
+
+.arcHidden {
+	path {
+		stroke-dashoffset: 252;
+	}
+}
+
+.opener {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding-top: 1.25rem;
+	padding-right: 1.25rem;
+	pointer-events: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 5px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: rgba(60, 44, 16, 0.78);
+	isolation: isolate;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 325px;
+		height: 325px;
+		background: linear-gradient(
+			160deg,
+			#f5f0e8 0%,
+			#ede8de 50%,
+			#e8e2d6 100%
+		);
+		clip-path: circle(162px at 100% 0%);
+		z-index: -1;
+		transition: opacity 0.3s ease;
+	}
+
+	&:disabled {
+		cursor: default;
+
+		&::before {
+			opacity: 0;
+		}
+	}
+}
+
+.openerLabel {
+	font-family: var(--font-bebas-neue), sans-serif;
+	font-size: 1.25rem;
+	font-weight: 400;
+	letter-spacing: 0.14em;
+	white-space: nowrap;
+	opacity: 1;
+	transition: opacity 0.22s ease;
+	text-shadow:
+		0 1px 6px rgba(255, 255, 255, 0.7),
+		0 2px 12px rgba(255, 255, 255, 0.4);
+}
+
+.labelHidden {
+	opacity: 0;
+}
+
+.planeWrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.planeIcon {
+	width: 56px;
+	height: 56px;
+	transform: rotate(225deg);
+	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
+}
+
+.planeFlyAway {
+	animation: flyAway 0.52s cubic-bezier(0.4, 0, 1, 1) 0.18s both;
+}
+
+.planeFlyBack {
+	animation: flyBack 0.48s cubic-bezier(0, 0, 0.6, 1) 0.35s both;
+}
+
+.planeHidden {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.strip {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 300px;
+	transform: translateX(100%);
+	pointer-events: none;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	backdrop-filter: blur(14px);
+	box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+}
+
+.stripSlideIn {
+	animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s both;
+	pointer-events: auto;
+}
+
+.stripOpen {
+	transform: translateX(0);
+	pointer-events: auto;
+}
+
+.stripSlideOut {
+	animation: slideOut 0.4s ease-in forwards;
+	pointer-events: none;
+}
+
+.closeBtn {
+	position: absolute;
+	top: 0.5rem;
+	right: 1rem;
+	background: rgba(255, 255, 255, 0.82);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(180, 140, 60, 0.28);
+	border-radius: 50%;
+	padding: 8px;
+	cursor: pointer;
+	color: rgba(60, 44, 16, 0.7);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	transition:
+		background 0.15s ease,
+		color 0.15s ease,
+		transform 0.15s ease,
+		box-shadow 0.15s ease;
+	z-index: 1;
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.97);
+		color: rgba(60, 44, 16, 1);
+		transform: scale(1.1);
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+	}
+}
+
+.closeIcon {
+	width: 24px;
+	height: 24px;
+	display: block;
+}
+
+.list {
+	@apply flex-1 overflow-y-auto;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 62px 8px 8px;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.cardWrapper {
+	@apply relative flex-shrink-0;
+	height: 180px;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+	.container {
+		left: 0;
+		width: 100%;
+	}
+
+	.opener {
+		padding-top: 0.5rem;
+		padding-right: 0.5rem;
+		&::before {
+			width: 200px;
+			height: 200px;
+			clip-path: circle(100px at 100% 0%);
+		}
+	}
+
+	.arcBorder {
+		width: 200px;
+		height: 200px;
+	}
+
+	.openerLabel {
+		font-size: 0.9rem;
+	}
+
+	.planeIcon {
+		width: 36px;
+		height: 36px;
+	}
+
+	.strip {
+		width: 100%;
+		background: #f5f0e8;
+		backdrop-filter: none;
+	}
+
+	.list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px;
+		padding: 62px 12px 12px;
+	}
+
+	.cardWrapper {
+		height: 200px;
+	}
+
+	@media (max-width: 480px) {
+		.list {
+			grid-template-columns: 1fr;
+		}
+
+		.cardWrapper {
+			height: 180px;
+		}
+	}
+}

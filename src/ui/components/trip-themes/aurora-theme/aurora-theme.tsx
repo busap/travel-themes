@@ -35,7 +35,7 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 	const timelineDuration = config.animation?.timeline?.duration ?? 20;
 	const scrollTriggerConfig = config.animation?.scrollTrigger;
 	const pinDuration = scrollTriggerConfig?.end ?? "+=80%";
-	const spacing = config.layout?.spacing ?? "gap-8";
+	const spacing = "gap-8";
 	const titleClasses = "text-4xl md:text-6xl font-light tracking-wide";
 	const bodyClasses = "text-base md:text-lg text-white/80";
 

@@ -73,7 +73,14 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 - Only specify config options that the theme actually uses (all ThemeConfig fields are optional)
 - Themes are implemented incrementally, one at a time
 
-**Adding a theme**: Create component in `src/ui/components/trip-themes/{name}/`, update `theme-config.ts`, add case to ThemeRenderer, create story, extract reusable hooks if applicable.
+**Adding a theme**:
+
+- Add enum value in `src/enums/theme.ts`
+- Create component in `src/ui/components/trip-themes/{name}/`
+- Update `src/config/theme-config.ts` with config for the new enum key
+- Add case to `src/ui/components/trip-themes/theme-renderer.tsx`
+- Wire demo data in `src/mocks/trip-themes.ts` and, when needed, add/update trip content in `src/mocks/trips.ts`
+- Create story and extract reusable hooks if applicable
 
 ## Don't
 

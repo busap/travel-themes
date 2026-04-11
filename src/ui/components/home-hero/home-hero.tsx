@@ -1,26 +1,62 @@
+"use client";
+
+import { useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
+import { getAllTrips } from "@/utils/trip";
+import { TripStrip } from "@/ui/components/trip-strip/trip-strip";
 import styles from "./home-hero.module.scss";
 
-const CLIP_TEXT_IMAGE_URL =
-	"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&auto=format&fit=crop";
+const GlobeVisualization = dynamic(
+	() =>
+		import("@/ui/components/globe/globe").then(
+			(mod) => mod.GlobeVisualization
+		),
+	{ ssr: false }
+);
+
+function subscribe(cb: () => void) {
+	const mq = window.matchMedia("(max-width: 1024px)");
+	mq.addEventListener("change", cb);
+	return () => mq.removeEventListener("change", cb);
+}
+
+function getSnapshot() {
+	return window.matchMedia("(max-width: 1024px)").matches;
+}
 
 export function HomeHero() {
+	const trips = getAllTrips();
+	const [focusTripId, setFocusTripId] = useState<string | null>(null);
+	const [isStripOpen, setIsStripOpen] = useState(false);
+	const isMobile = useSyncExternalStore(subscribe, getSnapshot, () => false);
+
 	return (
-		<section className={`${styles.hero} ${styles.heroClipText}`}>
+		<section className={styles.hero}>
+			<div className={styles.background} />
+
 			<div className={styles.content}>
-				<h1
-					className={styles.titleClipText}
-					style={{
-						backgroundImage: `url(${CLIP_TEXT_IMAGE_URL})`,
-					}}
-				>
-					TravelThemes
-				</h1>
-				<p
-					className={`${styles.subtitleClipText} ${styles.subtitleAnimated}`}
-				>
-					Adventures through the lens
-				</p>
+				<div className={styles.titleStamp}>
+					<h1 className={styles.title}>TravelThemes</h1>
+				</div>
+				<p className={styles.subtitle}>Adventures through the lens</p>
 			</div>
+
+			<div
+				className={`${styles.globeContainer} ${isStripOpen ? styles.globeContainerOpen : ""}`}
+			>
+				<GlobeVisualization
+					trips={trips}
+					focusTripId={focusTripId}
+					isMobile={isMobile}
+					isStripOpen={isStripOpen}
+				/>
+			</div>
+
+			<TripStrip
+				trips={trips}
+				onTripHover={isMobile ? undefined : setFocusTripId}
+				onIsOpenChange={setIsStripOpen}
+			/>
 		</section>
 	);
 }

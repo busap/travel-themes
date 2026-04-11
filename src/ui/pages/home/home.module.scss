@@ -1,31 +1,5 @@
 @reference "../../../app/globals.scss";
 
 .home {
-	@apply min-h-screen;
-	@apply bg-white dark:bg-zinc-950;
-}
-
-.header {
-	@apply px-6 py-12 md:px-12 md:py-16;
-}
-
-.title {
-	@apply text-4xl font-bold tracking-tight md:text-5xl;
-	@apply text-zinc-900 dark:text-white;
-}
-
-.subtitle {
-	@apply mt-2 text-lg;
-	@apply text-zinc-600 dark:text-zinc-400;
-}
-
-.main {
-	@apply relative z-10 px-6 pb-16 md:px-12 md:pb-24;
-	margin-top: -20vh;
-}
-
-.grid {
-	@apply grid gap-12 sm:gap-16 md:gap-20;
-	@apply sm:grid-cols-2 lg:grid-cols-3;
-	@apply auto-rows-auto;
+	@apply h-screen w-screen overflow-hidden;
 }

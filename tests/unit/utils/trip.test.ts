@@ -121,42 +121,33 @@ describe("trip utilities", () => {
 			const config = getTripThemeConfig("japan-2023");
 			expect(config).toBeDefined();
 			expect(config).toHaveProperty("component");
-			expect(config).toHaveProperty("layout");
 			expect(config).toHaveProperty("animation");
-			expect(config).toHaveProperty("photos");
 		});
 
 		it("should return theme config for Morocco trip", () => {
 			const config = getTripThemeConfig("morocco-markets");
 			expect(config).toBeDefined();
-			expect(config).toHaveProperty("layout");
+			expect(config).toHaveProperty("animation");
 		});
 
 		it("should return theme config for Nordic trip", () => {
 			const config = getTripThemeConfig("nordic-winter");
 			expect(config).toBeDefined();
-			expect(config).toHaveProperty("layout");
+			expect(config).toHaveProperty("animation");
 		});
 
 		it("should return fallback theme config for unknown trip", () => {
 			const config = getTripThemeConfig("unknown-trip");
 			expect(config).toBeDefined();
-			// Should get Minimal theme config as fallback
-			expect(config).toHaveProperty("layout");
+			expect(config).toHaveProperty("component");
 		});
 
-		it("should return config with all required properties", () => {
+		it("should return config with required properties", () => {
 			const config = getTripThemeConfig("japan-2023");
 
 			// Component
 			expect(typeof config.component).toBe("string");
-
-			// Layout properties
-			expect(config.layout).toHaveProperty("scrollDirection");
-			expect(config.layout).toHaveProperty("spacing");
-
-			// Photos properties
-			expect(config.photos).toHaveProperty("revealPattern");
+			expect(config.animation).toBeDefined();
 		});
 
 		it("should return different configs for different trips", () => {
