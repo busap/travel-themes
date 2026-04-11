@@ -132,6 +132,10 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 
 	return (
 		<div className={styles.container}>
+			<div
+				className={`${styles.arcBorder} ${phase !== "closed" ? styles.arcHidden : ""}`}
+				aria-hidden="true"
+			/>
 			{renderOpener()}
 			{renderStrip()}
 		</div>

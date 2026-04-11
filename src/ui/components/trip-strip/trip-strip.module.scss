@@ -70,6 +70,23 @@
 	pointer-events: none;
 }
 
+.arcBorder {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 320px;
+	height: 320px;
+	border: 1.5px solid rgba(60, 44, 16, 0.72);
+	border-radius: 50%;
+	transform: translate(50%, -50%);
+	pointer-events: none;
+	transition: opacity 0.15s linear;
+}
+
+.arcHidden {
+	opacity: 0;
+}
+
 .opener {
 	position: absolute;
 	top: 0;
