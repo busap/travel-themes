@@ -270,16 +270,18 @@
 	}
 
 	.opener {
+		padding-top: 0.5rem;
+		padding-right: 0.5rem;
 		&::before {
-			width: 210px;
-			height: 210px;
-			clip-path: circle(104px at 100% 0%);
+			width: 200px;
+			height: 200px;
+			clip-path: circle(100px at 100% 0%);
 		}
 	}
 
 	.arcBorder {
-		width: 210px;
-		height: 210px;
+		width: 200px;
+		height: 200px;
 	}
 
 	.openerLabel {
