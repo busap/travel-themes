@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { Trip } from "@/types/trip";
@@ -19,6 +23,9 @@ export function GlobeTooltipCard({
 	y,
 	mobile = false,
 }: GlobeTooltipCardProps) {
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => setMounted(true), []);
+
 	const inner = (
 		<>
 			<div className={styles.imageWrapper}>
@@ -42,11 +49,12 @@ export function GlobeTooltipCard({
 	);
 
 	if (mobile) {
-		return (
+		const card = (
 			<Link href={getTripRoute(trip.id)} className={styles.tooltipMobile}>
 				{inner}
 			</Link>
 		);
+		return mounted ? createPortal(card, document.body) : null;
 	}
 
 	return (
