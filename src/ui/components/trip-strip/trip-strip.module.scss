@@ -2,7 +2,7 @@
 
 /* ── Keyframes ─────────────────────────────────────────── */
 
-/* Plane accelerates upper-right with stretch + blur trail */
+/* Plane accelerates upper-left with stretch + blur trail */
 @keyframes flyAway {
 	0% {
 		transform: translate(0, 0) scale(1, 1);
@@ -10,36 +10,36 @@
 		filter: blur(0px);
 	}
 	20% {
-		transform: translate(10px, -8px) scale(1.12, 0.88);
+		transform: translate(-10px, -8px) scale(1.12, 0.88);
 		opacity: 1;
 		filter: blur(0px);
 	}
 	60% {
-		transform: translate(68px, -52px) scale(1.65, 0.48);
+		transform: translate(-68px, -52px) scale(1.65, 0.48);
 		opacity: 0.55;
 		filter: blur(1.5px);
 	}
 	100% {
-		transform: translate(160px, -115px) scale(2.3, 0.12);
+		transform: translate(-160px, -115px) scale(2.3, 0.12);
 		opacity: 0;
 		filter: blur(3.5px);
 	}
 }
 
-/* Plane swoops back in from upper-right */
+/* Plane swoops back in from upper-left */
 @keyframes flyBack {
 	0% {
-		transform: translate(160px, -115px) scale(2.3, 0.12);
+		transform: translate(-160px, -115px) scale(2.3, 0.12);
 		opacity: 0;
 		filter: blur(3.5px);
 	}
 	40% {
-		transform: translate(68px, -52px) scale(1.65, 0.48);
+		transform: translate(-68px, -52px) scale(1.65, 0.48);
 		opacity: 0.55;
 		filter: blur(1.5px);
 	}
 	80% {
-		transform: translate(10px, -8px) scale(1.12, 0.88);
+		transform: translate(-10px, -8px) scale(1.12, 0.88);
 		opacity: 1;
 		filter: blur(0px);
 	}
@@ -101,11 +101,10 @@
 /* ── "All Trips" label ─────────────────────────────────── */
 
 .openerLabel {
-	font-family: var(--font-playfair-display), serif;
-	font-size: 1rem;
+	font-family: var(--font-bebas-neue), sans-serif;
+	font-size: 1.15rem;
 	font-weight: 400;
-	font-style: italic;
-	letter-spacing: 0.03em;
+	letter-spacing: 0.14em;
 	white-space: nowrap;
 	opacity: 1;
 	transition: opacity 0.22s ease;
@@ -130,8 +129,8 @@
 .planeIcon {
 	width: 38px;
 	height: 38px;
-	/* rotate to point upper-right, matching the fly direction */
-	transform: rotate(45deg);
+	/* 45 + 180 = 225deg — points upper-left, matching the fly direction */
+	transform: rotate(225deg);
 	/* subtle drop shadow matching label */
 	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
 }
