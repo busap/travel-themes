@@ -278,7 +278,7 @@ export function useGlobe({
 			controls.minDistance = 150;
 			controls.maxDistance = 500;
 
-			globe.pointOfView({ lat: 20, lng: 15, altitude: isMobile ? 1.6 : 2.2 });
+			globe.pointOfView({ lat: 20, lng: 15, altitude: isMobile ? 4 : 2.2 });
 			setIsLoaded(true);
 		};
 
