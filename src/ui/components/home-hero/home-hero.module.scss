@@ -70,7 +70,7 @@
 
 .title {
 	font-family: var(--font-bebas-neue), sans-serif;
-	font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+	font-size: clamp(1.4rem, 3.25vw, 3.5rem);
 	line-height: 1;
 	letter-spacing: 0.14em;
 	@apply font-bold uppercase;
@@ -85,7 +85,7 @@
 }
 
 .subtitle {
-	font-size: 0.6rem;
+	font-size: 0.8rem;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
 	color: rgba(100, 85, 60, 0.6);
