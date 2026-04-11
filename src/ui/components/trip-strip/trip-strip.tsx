@@ -97,11 +97,6 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 					viewBox="0 0 320 320"
 					aria-hidden="true"
 				>
-					<path
-						className={styles.arcFill}
-						d="M 160 160 L 0 160 A 160 160 0 0 0 160 320 Z"
-						stroke="none"
-					/>
 					<path d="M 0 160 A 160 160 0 0 0 160 320" />
 				</svg>
 		</button>;

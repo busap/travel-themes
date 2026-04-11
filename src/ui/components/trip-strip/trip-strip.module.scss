@@ -91,16 +91,7 @@
 	}
 }
 
-.arcFill {
-	fill: #f5f0e8;
-	transition: opacity 0.4s linear;
-}
-
 .arcHidden {
-	.arcFill {
-		opacity: 0;
-	}
-
 	path {
 		stroke-dashoffset: 252;
 	}
@@ -121,9 +112,24 @@
 	border: none;
 	cursor: pointer;
 	color: rgba(60, 44, 16, 0.78);
+	isolation: isolate;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(160deg, #f5f0e8 0%, #ede8de 50%, #e8e2d6 100%);
+		clip-path: circle(180px at calc(100% + 20px) -10px);
+		z-index: -1;
+		transition: opacity 0.3s ease;
+	}
 
 	&:disabled {
 		cursor: default;
+
+		&::before {
+			opacity: 0;
+		}
 	}
 }
 
