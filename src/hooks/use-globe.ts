@@ -48,7 +48,9 @@ export function useGlobe({
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
 	const materialCacheRef = useRef<Map<string, MeshPhongMaterial>>(new Map());
 	const [countries, setCountries] = useState<GeoFeature[]>([]);
-	const [activeCountry, setActiveCountry] = useState<CountryTrip | null>(null);
+	const [activeCountry, setActiveCountry] = useState<CountryTrip | null>(
+		null
+	);
 	const activeCountryRef = useRef<CountryTrip | null>(null);
 	useEffect(() => {
 		activeCountryRef.current = activeCountry;
@@ -229,7 +231,11 @@ export function useGlobe({
 							idToName.get(feat.id) ??
 							idToCountryName[feat.id] ??
 							"";
-						setActiveCountry({ feature: feat, trip, countryName: name });
+						setActiveCountry({
+							feature: feat,
+							trip,
+							countryName: name,
+						});
 						if (containerRef.current)
 							containerRef.current.style.cursor = "pointer";
 					} else {
@@ -256,7 +262,8 @@ export function useGlobe({
 						return;
 					}
 
-					const alreadyShowing = activeCountryRef.current?.feature.id === feat.id;
+					const alreadyShowing =
+						activeCountryRef.current?.feature.id === feat.id;
 					if (alreadyShowing) {
 						setActiveCountry(null);
 						updateHoverStateRef.current(null);
@@ -264,10 +271,12 @@ export function useGlobe({
 					}
 
 					const name =
-						idToName.get(feat.id) ??
-						idToCountryName[feat.id] ??
-						"";
-					setActiveCountry({ feature: feat, trip, countryName: name });
+						idToName.get(feat.id) ?? idToCountryName[feat.id] ?? "";
+					setActiveCountry({
+						feature: feat,
+						trip,
+						countryName: name,
+					});
 					updateHoverStateRef.current(feat.id);
 				});
 
@@ -278,7 +287,11 @@ export function useGlobe({
 			controls.minDistance = 150;
 			controls.maxDistance = 500;
 
-			globe.pointOfView({ lat: 20, lng: 15, altitude: isMobile ? 4 : 2.2 });
+			globe.pointOfView({
+				lat: 20,
+				lng: 15,
+				altitude: isMobile ? 4 : 2.2,
+			});
 			setIsLoaded(true);
 		};
 
@@ -297,7 +310,10 @@ export function useGlobe({
 			updateHoverState(null);
 			const controls = globeInstanceRef.current.controls();
 			if (controls) controls.autoRotate = true;
-			globeInstanceRef.current.pointOfView({ altitude: isMobile ? 1.6 : 2.2 }, 800);
+			globeInstanceRef.current.pointOfView(
+				{ altitude: isMobile ? 1.6 : 2.2 },
+				800
+			);
 			return;
 		}
 

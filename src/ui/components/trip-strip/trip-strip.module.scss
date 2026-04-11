@@ -23,7 +23,6 @@
 	}
 }
 
-
 @keyframes flyBack {
 	0% {
 		transform: translate(-140px, 155px) scale(1.8, 0.2);
@@ -115,13 +114,18 @@
 	isolation: isolate;
 
 	&::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		right: 0;
 		width: 325px;
 		height: 325px;
-		background: linear-gradient(160deg, #f5f0e8 0%, #ede8de 50%, #e8e2d6 100%);
+		background: linear-gradient(
+			160deg,
+			#f5f0e8 0%,
+			#ede8de 50%,
+			#e8e2d6 100%
+		);
 		clip-path: circle(162px at 100% 0%);
 		z-index: -1;
 		transition: opacity 0.3s ease;
@@ -169,7 +173,6 @@
 .planeFlyAway {
 	animation: flyAway 0.52s cubic-bezier(0.4, 0, 1, 1) 0.18s both;
 }
-
 
 .planeFlyBack {
 	animation: flyBack 0.48s cubic-bezier(0, 0, 0.6, 1) 0.35s both;

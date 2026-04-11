@@ -39,7 +39,11 @@ function CloseIcon() {
 	);
 }
 
-export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps) {
+export function TripStrip({
+	trips,
+	onTripHover,
+	onIsOpenChange,
+}: TripStripProps) {
 	const [phase, setPhase] = useState<AnimPhase>("closed");
 
 	const handleOpen = useCallback(() => {
@@ -77,13 +81,14 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 		.join(" ");
 
 	const renderOpener = () => {
-		return <button
-			className={styles.opener}
-			onClick={phase === "closed" ? handleOpen : undefined}
-			disabled={phase !== "closed"}
-			aria-label="Open all trips"
-			aria-expanded={phase === "open"}
-		>
+		return (
+			<button
+				className={styles.opener}
+				onClick={phase === "closed" ? handleOpen : undefined}
+				disabled={phase !== "closed"}
+				aria-label="Open all trips"
+				aria-expanded={phase === "open"}
+			>
 				<span
 					className={`${styles.openerLabel} ${phase !== "closed" ? styles.labelHidden : ""}`}
 				>
@@ -99,43 +104,50 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 				>
 					<path d="M 0 160 A 160 160 0 0 0 160 320" />
 				</svg>
-		</button>;
-	}
+			</button>
+		);
+	};
 
 	const renderList = () => {
-		return <div className={styles.list}>
-			{trips.map((trip, i) => (
-				<div key={trip.id} className={styles.cardWrapper}>
-					<TripCard
-						trip={trip}
-						priority={i < 3}
-						compact
-						onTripHover={isStripInteractive ? onTripHover : undefined}
-						onTripHoverEnd={
-							isStripInteractive && onTripHover
-								? () => onTripHover(null)
-								: undefined
-						}
-					/>
-				</div>
-			))}
-		</div>;
-	}
+		return (
+			<div className={styles.list}>
+				{trips.map((trip, i) => (
+					<div key={trip.id} className={styles.cardWrapper}>
+						<TripCard
+							trip={trip}
+							priority={i < 3}
+							compact
+							onTripHover={
+								isStripInteractive ? onTripHover : undefined
+							}
+							onTripHoverEnd={
+								isStripInteractive && onTripHover
+									? () => onTripHover(null)
+									: undefined
+							}
+						/>
+					</div>
+				))}
+			</div>
+		);
+	};
 
 	const renderStrip = () => {
-		return <aside className={stripClass} aria-hidden={!isStripInteractive}>
-			<button
-				className={styles.closeBtn}
-				onClick={handleClose}
-				aria-label="Close trips panel"
-				tabIndex={isStripInteractive ? 0 : -1}
-			>
-				<CloseIcon />
-			</button>
+		return (
+			<aside className={stripClass} aria-hidden={!isStripInteractive}>
+				<button
+					className={styles.closeBtn}
+					onClick={handleClose}
+					aria-label="Close trips panel"
+					tabIndex={isStripInteractive ? 0 : -1}
+				>
+					<CloseIcon />
+				</button>
 
-			{renderList()}
-		</aside>;
-	}
+				{renderList()}
+			</aside>
+		);
+	};
 
 	return (
 		<div className={styles.container}>
