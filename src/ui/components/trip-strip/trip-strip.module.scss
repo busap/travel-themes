@@ -269,6 +269,28 @@
 		width: 100%;
 	}
 
+	.opener {
+		&::before {
+			width: 210px;
+			height: 210px;
+			clip-path: circle(104px at 100% 0%);
+		}
+	}
+
+	.arcBorder {
+		width: 210px;
+		height: 210px;
+	}
+
+	.openerLabel {
+		font-size: 0.9rem;
+	}
+
+	.planeIcon {
+		width: 36px;
+		height: 36px;
+	}
+
 	.strip {
 		width: 100%;
 		background: #f5f0e8;
