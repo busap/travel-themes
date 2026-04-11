@@ -9,6 +9,7 @@ src/
 ├── app/                    # Next.js App Router
 │   ├── (home)/            # Route group for home page
 │   └── trips/[id]/        # Dynamic trip routes
+├── db/                     # Server-only async DB queries (Prisma). Never import in client components.
 ├── ui/
 │   ├── pages/             # Page components (E2E tested, no stories)
 │   └── components/        # Reusable components (with .stories.tsx)
@@ -16,9 +17,10 @@ src/
 ├── config/                 # Route and theme configuration
 ├── enums/                  # Enums (one per file)
 ├── hooks/                  # Custom React hooks
+├── lib/                    # Client singletons (Prisma, Supabase)
 ├── mocks/                  # Mock data only
 ├── types/                  # Type definitions (one per file)
-└── utils/                  # Helper functions (grouped by domain)
+└── utils/                  # Client-safe sync helpers (no DB imports)
 ```
 
 ### Key Structural Principles
@@ -62,7 +64,7 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 
 **CRITICAL**: Trip detail pages use a flexible theme system. Each trip can have a completely different layout. The home page does not use themes.
 
-**Flow**: Trip ID -> `getThemeForTrip()` -> Theme enum -> `getThemeConfig()` -> ThemeRenderer -> Theme component
+**Flow**: Trip ID -> `getThemeForTrip()` (`src/db/trips.ts`, server) -> Theme enum -> `getThemeConfig()` -> ThemeRenderer -> Theme component
 
 **Rules**:
 
