@@ -78,6 +78,10 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 
 	return (
 		<div className={styles.container}>
+			<div
+				className={`${styles.arcBorder} ${phase !== "closed" ? styles.arcHidden : ""}`}
+				aria-hidden="true"
+			/>
 			<button
 				className={styles.opener}
 				onClick={phase === "closed" ? handleOpen : undefined}
