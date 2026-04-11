@@ -92,7 +92,7 @@
 
 .openerLabel {
 	font-family: var(--font-bebas-neue), sans-serif;
-	font-size: 1.725rem;
+	font-size: 1.5rem;
 	font-weight: 400;
 	letter-spacing: 0.14em;
 	white-space: nowrap;
@@ -114,8 +114,8 @@
 }
 
 .planeIcon {
-	width: 76px;
-	height: 76px;
+	width: 64px;
+	height: 64px;
 	transform: rotate(225deg);
 	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
 }
@@ -166,8 +166,8 @@
 
 .closeBtn {
 	position: absolute;
-	top: 1.2rem;
-	right: 1.2rem;
+	top: 0.5rem;
+	right: 1rem;
 	background: rgba(255, 255, 255, 0.82);
 	backdrop-filter: blur(8px);
 	border: 1px solid rgba(180, 140, 60, 0.28);
@@ -192,8 +192,8 @@
 }
 
 .closeIcon {
-	width: 26px;
-	height: 26px;
+	width: 24px;
+	height: 24px;
 	display: block;
 }
 
