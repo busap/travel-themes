@@ -75,8 +75,8 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	width: 350px;
-	height: 350px;
+	width: 325px;
+	height: 325px;
 	transform: translate(50%, -50%);
 	pointer-events: none;
 	overflow: visible;
@@ -120,7 +120,7 @@
 
 .openerLabel {
 	font-family: var(--font-bebas-neue), sans-serif;
-	font-size: 1.5rem;
+	font-size: 1.25rem;
 	font-weight: 400;
 	letter-spacing: 0.14em;
 	white-space: nowrap;
@@ -142,8 +142,8 @@
 }
 
 .planeIcon {
-	width: 64px;
-	height: 64px;
+	width: 56px;
+	height: 56px;
 	transform: rotate(225deg);
 	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
 }
