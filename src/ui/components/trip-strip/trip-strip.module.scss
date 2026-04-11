@@ -101,15 +101,18 @@
 /* ── "All Trips" label ─────────────────────────────────── */
 
 .openerLabel {
-	font-size: 0.54rem;
-	letter-spacing: 0.22em;
-	text-transform: uppercase;
-	font-weight: 700;
+	font-family: var(--font-playfair-display), serif;
+	font-size: 1rem;
+	font-weight: 400;
+	font-style: italic;
+	letter-spacing: 0.03em;
 	white-space: nowrap;
 	opacity: 1;
 	transition: opacity 0.22s ease;
 	/* subtle text shadow so it reads against any globe background */
-	text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
+	text-shadow:
+		0 1px 6px rgba(255, 255, 255, 0.7),
+		0 2px 12px rgba(255, 255, 255, 0.4);
 }
 
 .labelHidden {
@@ -125,12 +128,12 @@
 }
 
 .planeIcon {
-	width: 24px;
-	height: 24px;
+	width: 38px;
+	height: 38px;
 	/* rotate to point upper-right, matching the fly direction */
 	transform: rotate(45deg);
 	/* subtle drop shadow matching label */
-	filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.5));
+	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
 }
 
 /* label fades (0-220ms) then plane flies (180ms delay, 520ms duration) */
@@ -205,8 +208,8 @@
 }
 
 .closeIcon {
-	width: 20px;
-	height: 20px;
+	width: 26px;
+	height: 26px;
 	display: block;
 }
 
@@ -218,7 +221,7 @@
 	flex-direction: column;
 	gap: 8px;
 	/* top padding clears the absolutely-positioned close button */
-	padding: 54px 8px 8px;
+	padding: 62px 8px 8px;
 	scrollbar-width: none;
 
 	&::-webkit-scrollbar {
