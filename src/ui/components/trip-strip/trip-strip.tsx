@@ -89,9 +89,16 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 				>
 					All Trips
 				</span>
-			<span className={planeClass}>
+				<span className={planeClass}>
 					<PlaneIcon />
 				</span>
+				<svg
+					className={`${styles.arcBorder} ${phase !== "closed" ? styles.arcHidden : ""}`}
+					viewBox="0 0 320 320"
+					aria-hidden="true"
+				>
+					<path d="M 0 160 A 160 160 0 0 0 160 320" />
+				</svg>
 		</button>;
 	}
 
@@ -132,13 +139,6 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 
 	return (
 		<div className={styles.container}>
-			<svg
-				className={`${styles.arcBorder} ${phase !== "closed" ? styles.arcHidden : ""}`}
-				viewBox="0 0 320 320"
-				aria-hidden="true"
-			>
-				<path d="M 0 160 A 160 160 0 0 0 160 320" />
-			</svg>
 			{renderOpener()}
 			{renderStrip()}
 		</div>
