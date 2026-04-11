@@ -1,8 +1,5 @@
 @reference "../../../app/globals.scss";
 
-/* ── Keyframes ─────────────────────────────────────────── */
-
-/* Plane accelerates down-left with blur trail */
 @keyframes flyAway {
 	0% {
 		transform: translate(0, 0) scale(1, 1);
@@ -26,7 +23,6 @@
 	}
 }
 
-/* Plane swoops back in from down-left */
 @keyframes flyBack {
 	0% {
 		transform: translate(-140px, 155px) scale(1.8, 0.2);
@@ -68,15 +64,11 @@
 	}
 }
 
-/* ── Container ─────────────────────────────────────────── */
-
 .container {
 	@apply absolute top-0 right-0 bottom-0 z-20;
 	width: 300px;
 	pointer-events: none;
 }
-
-/* ── Opener — no background, top-right corner ──────────── */
 
 .opener {
 	position: absolute;
@@ -98,8 +90,6 @@
 	}
 }
 
-/* ── "All Trips" label ─────────────────────────────────── */
-
 .openerLabel {
 	font-family: var(--font-bebas-neue), sans-serif;
 	font-size: 1.725rem;
@@ -108,7 +98,6 @@
 	white-space: nowrap;
 	opacity: 1;
 	transition: opacity 0.22s ease;
-	/* subtle text shadow so it reads against any globe background */
 	text-shadow:
 		0 1px 6px rgba(255, 255, 255, 0.7),
 		0 2px 12px rgba(255, 255, 255, 0.4);
@@ -117,8 +106,6 @@
 .labelHidden {
 	opacity: 0;
 }
-
-/* ── Plane icon wrapper ─────────────────────────────────── */
 
 .planeWrapper {
 	display: flex;
@@ -129,18 +116,14 @@
 .planeIcon {
 	width: 76px;
 	height: 76px;
-	/* 45 + 180 = 225deg */
 	transform: rotate(225deg);
-	/* subtle drop shadow matching label */
 	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
 }
 
-/* label fades (0-220ms) then plane flies (180ms delay, 520ms duration) */
 .planeFlyAway {
 	animation: flyAway 0.52s cubic-bezier(0.4, 0, 1, 1) 0.18s both;
 }
 
-/* strip closes (0-400ms), then plane flies back (350ms delay, 480ms duration) */
 .planeFlyBack {
 	animation: flyBack 0.48s cubic-bezier(0, 0, 0.6, 1) 0.35s both;
 }
@@ -149,8 +132,6 @@
 	opacity: 0;
 	visibility: hidden;
 }
-
-/* ── Strip panel ───────────────────────────────────────── */
 
 .strip {
 	position: absolute;
@@ -168,7 +149,6 @@
 	box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
 }
 
-/* strip slides in after plane has flown (600ms delay, 400ms duration) */
 .stripSlideIn {
 	animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s both;
 	pointer-events: auto;
@@ -183,8 +163,6 @@
 	animation: slideOut 0.4s ease-in forwards;
 	pointer-events: none;
 }
-
-/* ── Close button — same bare style as plane opener ────── */
 
 .closeBtn {
 	position: absolute;
@@ -219,14 +197,11 @@
 	display: block;
 }
 
-/* ── Trip list ─────────────────────────────────────────── */
-
 .list {
 	@apply flex-1 overflow-y-auto;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	/* top padding clears the absolutely-positioned close button */
 	padding: 62px 8px 8px;
 	scrollbar-width: none;
 
