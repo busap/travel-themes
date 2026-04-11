@@ -2,7 +2,7 @@
 
 /* ── Keyframes ─────────────────────────────────────────── */
 
-/* Plane accelerates downward with vertical stretch + blur trail */
+/* Plane accelerates down-left with blur trail */
 @keyframes flyAway {
 	0% {
 		transform: translate(0, 0) scale(1, 1);
@@ -10,36 +10,36 @@
 		filter: blur(0px);
 	}
 	20% {
-		transform: translate(0, 10px) scale(0.88, 1.12);
+		transform: translate(-10px, 10px) scale(1.08, 0.92);
 		opacity: 1;
 		filter: blur(0px);
 	}
 	60% {
-		transform: translate(0, 70px) scale(0.48, 1.65);
+		transform: translate(-65px, 70px) scale(1.4, 0.65);
 		opacity: 0.55;
 		filter: blur(1.5px);
 	}
 	100% {
-		transform: translate(0, 180px) scale(0.12, 2.3);
+		transform: translate(-140px, 155px) scale(1.8, 0.2);
 		opacity: 0;
 		filter: blur(3.5px);
 	}
 }
 
-/* Plane swoops back in from below */
+/* Plane swoops back in from down-left */
 @keyframes flyBack {
 	0% {
-		transform: translate(0, 180px) scale(0.12, 2.3);
+		transform: translate(-140px, 155px) scale(1.8, 0.2);
 		opacity: 0;
 		filter: blur(3.5px);
 	}
 	40% {
-		transform: translate(0, 70px) scale(0.48, 1.65);
+		transform: translate(-65px, 70px) scale(1.4, 0.65);
 		opacity: 0.55;
 		filter: blur(1.5px);
 	}
 	80% {
-		transform: translate(0, 10px) scale(0.88, 1.12);
+		transform: translate(-10px, 10px) scale(1.08, 0.92);
 		opacity: 1;
 		filter: blur(0px);
 	}
@@ -129,8 +129,8 @@
 .planeIcon {
 	width: 38px;
 	height: 38px;
-	/* points straight down, matching the fly direction */
-	transform: rotate(180deg);
+	/* original orientation — points upper-right */
+	transform: rotate(45deg);
 	/* subtle drop shadow matching label */
 	filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
 }
