@@ -26,17 +26,32 @@ function PlaneIcon() {
 	);
 }
 
+function CloseIcon() {
+	return (
+		<svg
+			className={styles.closeIcon}
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			aria-hidden="true"
+		>
+			<path d="M19.071 4.929a1 1 0 0 0-1.414 0L12 10.586 6.343 4.929A1 1 0 0 0 4.929 6.343L10.586 12l-5.657 5.657a1 1 0 1 0 1.414 1.414L12 13.414l5.657 5.657a1 1 0 0 0 1.414-1.414L13.414 12l5.657-5.657a1 1 0 0 0 0-1.414z" />
+		</svg>
+	);
+}
+
 export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps) {
 	const [phase, setPhase] = useState<AnimPhase>("closed");
 
 	const handleOpen = useCallback(() => {
 		setPhase("opening");
 		onIsOpenChange?.(true);
-		setTimeout(() => setPhase("open"), 720);
+		// label fades (0-220ms) → plane flies (180-700ms) → strip slides in (600-1000ms)
+		setTimeout(() => setPhase("open"), 1050);
 	}, [onIsOpenChange]);
 
 	const handleClose = useCallback(() => {
 		setPhase("closing");
+		// strip slides out (0-400ms) → plane flies back (350-830ms)
 		setTimeout(() => {
 			setPhase("closed");
 			onIsOpenChange?.(false);
@@ -45,11 +60,11 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 
 	const isStripInteractive = phase === "open";
 
-	const openerClass = [
-		styles.opener,
-		phase === "opening" && styles.openerFlyAway,
-		phase === "closing" && styles.openerFlyBack,
-		phase === "open" && styles.openerHidden,
+	const planeClass = [
+		styles.planeWrapper,
+		phase === "opening" && styles.planeFlyAway,
+		phase === "open" && styles.planeHidden,
+		phase === "closing" && styles.planeFlyBack,
 	]
 		.filter(Boolean)
 		.join(" ");
@@ -65,37 +80,33 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 
 	return (
 		<div className={styles.container}>
-			{/* Opener trigger */}
+			{/* Opener — no background, top-right corner */}
 			<button
-				className={openerClass}
+				className={styles.opener}
 				onClick={phase === "closed" ? handleOpen : undefined}
 				disabled={phase !== "closed"}
 				aria-label="Open all trips"
 				aria-expanded={phase === "open"}
 			>
-				<PlaneIcon />
-				<span className={styles.openerLabel}>All Trips</span>
+				<span
+					className={`${styles.openerLabel} ${phase !== "closed" ? styles.labelHidden : ""}`}
+				>
+					All Trips
+				</span>
+				<span className={planeClass}>
+					<PlaneIcon />
+				</span>
 			</button>
 
 			{/* Strip panel */}
 			<aside className={stripClass} aria-hidden={!isStripInteractive}>
-				{/* Close button */}
 				<button
 					className={styles.closeBtn}
 					onClick={handleClose}
 					aria-label="Close trips panel"
 					tabIndex={isStripInteractive ? 0 : -1}
 				>
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth={2}
-						strokeLinecap="round"
-						aria-hidden="true"
-					>
-						<path d="M18 6 6 18M6 6l12 12" />
-					</svg>
+					<CloseIcon />
 				</button>
 
 				<div className={styles.list}>

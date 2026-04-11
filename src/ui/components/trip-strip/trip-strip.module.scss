@@ -2,25 +2,51 @@
 
 /* ── Keyframes ─────────────────────────────────────────── */
 
+/* Plane accelerates upper-right with stretch + blur trail */
 @keyframes flyAway {
-	from {
-		transform: translateY(-50%) translate(0, 0) rotate(0deg) scale(1);
+	0% {
+		transform: translate(0, 0) scale(1, 1);
 		opacity: 1;
+		filter: blur(0px);
 	}
-	to {
-		transform: translateY(calc(-50% - 120px)) translate(180px, 0) rotate(-20deg) scale(0.3);
+	20% {
+		transform: translate(10px, -8px) scale(1.12, 0.88);
+		opacity: 1;
+		filter: blur(0px);
+	}
+	60% {
+		transform: translate(68px, -52px) scale(1.65, 0.48);
+		opacity: 0.55;
+		filter: blur(1.5px);
+	}
+	100% {
+		transform: translate(160px, -115px) scale(2.3, 0.12);
 		opacity: 0;
+		filter: blur(3.5px);
 	}
 }
 
+/* Plane swoops back in from upper-right */
 @keyframes flyBack {
-	from {
-		transform: translateY(calc(-50% - 120px)) translate(180px, 0) rotate(-20deg) scale(0.3);
+	0% {
+		transform: translate(160px, -115px) scale(2.3, 0.12);
 		opacity: 0;
+		filter: blur(3.5px);
 	}
-	to {
-		transform: translateY(-50%) translate(0, 0) rotate(0deg) scale(1);
+	40% {
+		transform: translate(68px, -52px) scale(1.65, 0.48);
+		opacity: 0.55;
+		filter: blur(1.5px);
+	}
+	80% {
+		transform: translate(10px, -8px) scale(1.12, 0.88);
 		opacity: 1;
+		filter: blur(0px);
+	}
+	100% {
+		transform: translate(0, 0) scale(1, 1);
+		opacity: 1;
+		filter: blur(0px);
 	}
 }
 
@@ -50,70 +76,76 @@
 	pointer-events: none;
 }
 
-/* ── Opener button ─────────────────────────────────────── */
+/* ── Opener — no background, top-right corner ──────────── */
 
 .opener {
 	position: absolute;
-	right: 14px;
-	top: 50%;
-	transform: translateY(-50%);
+	top: 1.25rem;
+	right: 1.25rem;
 	pointer-events: auto;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 6px;
-	padding: 12px 10px;
-	background: rgba(255, 255, 255, 0.82);
-	backdrop-filter: blur(10px);
-	border: 1px solid rgba(180, 140, 60, 0.28);
-	border-radius: 12px;
+	gap: 5px;
+	background: none;
+	border: none;
+	padding: 0;
 	cursor: pointer;
-	color: rgba(70, 52, 20, 0.85);
-	box-shadow:
-		0 4px 16px rgba(0, 0, 0, 0.08),
-		0 1px 3px rgba(0, 0, 0, 0.05);
-	transition:
-		box-shadow 0.15s ease,
-		transform 0.15s ease;
+	color: rgba(60, 44, 16, 0.78);
 
-	&:hover:not(:disabled) {
-		box-shadow:
-			0 6px 24px rgba(0, 0, 0, 0.12),
-			0 2px 6px rgba(0, 0, 0, 0.06);
-		transform: translateY(calc(-50% - 3px));
+	&:disabled {
+		cursor: default;
 	}
 }
 
-.openerFlyAway {
-	animation: flyAway 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
-	pointer-events: none;
-}
-
-.openerFlyBack {
-	animation: flyBack 0.5s cubic-bezier(0, 0, 0.6, 1) 0.35s both;
-	pointer-events: none;
-}
-
-.openerHidden {
-	opacity: 0;
-	pointer-events: none;
-	visibility: hidden;
-}
-
-/* ── Plane icon ────────────────────────────────────────── */
-
-.planeIcon {
-	width: 22px;
-	height: 22px;
-	transform: rotate(45deg);
-}
+/* ── "All Trips" label ─────────────────────────────────── */
 
 .openerLabel {
-	font-size: 0.57rem;
-	letter-spacing: 0.18em;
+	font-size: 0.54rem;
+	letter-spacing: 0.22em;
 	text-transform: uppercase;
 	font-weight: 700;
 	white-space: nowrap;
+	opacity: 1;
+	transition: opacity 0.22s ease;
+	/* subtle text shadow so it reads against any globe background */
+	text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
+}
+
+.labelHidden {
+	opacity: 0;
+}
+
+/* ── Plane icon wrapper ─────────────────────────────────── */
+
+.planeWrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.planeIcon {
+	width: 24px;
+	height: 24px;
+	/* rotate to point upper-right, matching the fly direction */
+	transform: rotate(45deg);
+	/* subtle drop shadow matching label */
+	filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.5));
+}
+
+/* label fades (0-220ms) then plane flies (180ms delay, 520ms duration) */
+.planeFlyAway {
+	animation: flyAway 0.52s cubic-bezier(0.4, 0, 1, 1) 0.18s both;
+}
+
+/* strip closes (0-400ms), then plane flies back (350ms delay, 480ms duration) */
+.planeFlyBack {
+	animation: flyBack 0.48s cubic-bezier(0, 0, 0.6, 1) 0.35s both;
+}
+
+.planeHidden {
+	opacity: 0;
+	visibility: hidden;
 }
 
 /* ── Strip panel ───────────────────────────────────────── */
@@ -129,13 +161,14 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	background: rgba(250, 247, 241, 0.96);
+	background: rgba(250, 247, 241, 0.97);
 	backdrop-filter: blur(14px);
 	box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
 }
 
+/* strip slides in after plane has flown (600ms delay, 400ms duration) */
 .stripSlideIn {
-	animation: slideIn 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.28s both;
+	animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s both;
 	pointer-events: auto;
 }
 
@@ -149,47 +182,43 @@
 	pointer-events: none;
 }
 
-/* ── Close button ──────────────────────────────────────── */
+/* ── Close button — same bare style as plane opener ────── */
 
 .closeBtn {
-	flex-shrink: 0;
-	align-self: flex-end;
-	margin: 10px 10px 4px;
-	width: 28px;
-	height: 28px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: rgba(255, 255, 255, 0.7);
-	border: 1px solid rgba(180, 140, 60, 0.22);
-	border-radius: 50%;
+	position: absolute;
+	top: 1.2rem;
+	right: 1.2rem;
+	background: none;
+	border: none;
+	padding: 4px;
 	cursor: pointer;
-	color: rgba(70, 52, 20, 0.65);
+	color: rgba(60, 44, 16, 0.65);
 	transition:
-		background 0.15s ease,
 		color 0.15s ease,
-		border-color 0.15s ease;
-
-	svg {
-		width: 13px;
-		height: 13px;
-	}
+		transform 0.15s ease;
+	z-index: 1;
 
 	&:hover {
-		background: rgba(255, 255, 255, 0.95);
-		color: rgba(70, 52, 20, 0.9);
-		border-color: rgba(180, 140, 60, 0.45);
+		color: rgba(60, 44, 16, 1);
+		transform: scale(1.15);
 	}
 }
 
-/* ── List ──────────────────────────────────────────────── */
+.closeIcon {
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+
+/* ── Trip list ─────────────────────────────────────────── */
 
 .list {
 	@apply flex-1 overflow-y-auto;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	padding: 4px 8px 8px;
+	/* top padding clears the absolutely-positioned close button */
+	padding: 54px 8px 8px;
 	scrollbar-width: none;
 
 	&::-webkit-scrollbar {
