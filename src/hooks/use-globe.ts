@@ -258,7 +258,8 @@ export function useGlobe({
 
 					const alreadyShowing = activeCountryRef.current?.feature.id === feat.id;
 					if (alreadyShowing) {
-						router.push(getTripRoute(trip.id));
+						setActiveCountry(null);
+						updateHoverStateRef.current(null);
 						return;
 					}
 
