@@ -278,7 +278,7 @@ export function useGlobe({
 			controls.minDistance = 150;
 			controls.maxDistance = 500;
 
-			globe.pointOfView({ lat: 20, lng: 15, altitude: 2.2 });
+			globe.pointOfView({ lat: 20, lng: 15, altitude: isMobile ? 1.6 : 2.2 });
 			setIsLoaded(true);
 		};
 
@@ -297,7 +297,7 @@ export function useGlobe({
 			updateHoverState(null);
 			const controls = globeInstanceRef.current.controls();
 			if (controls) controls.autoRotate = true;
-			globeInstanceRef.current.pointOfView({ altitude: 2.2 }, 800);
+			globeInstanceRef.current.pointOfView({ altitude: isMobile ? 1.6 : 2.2 }, 800);
 			return;
 		}
 
