@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Trip } from "@/types/trip";
 import { useGlobe } from "@/hooks/use-globe";
 import { GlobeTooltipCard } from "./components/globe-tooltip-card";
@@ -9,12 +10,14 @@ interface GlobeVisualizationProps {
 	trips: Trip[];
 	focusTripId?: string | null;
 	isMobile?: boolean;
+	isStripOpen?: boolean;
 }
 
 export function GlobeVisualization({
 	trips,
 	focusTripId,
 	isMobile = false,
+	isStripOpen = false,
 }: GlobeVisualizationProps) {
 	const {
 		containerRef,
@@ -24,6 +27,10 @@ export function GlobeVisualization({
 		handleMouseMove,
 		clearActiveCountry,
 	} = useGlobe({ trips, focusTripId, isMobile });
+
+	useEffect(() => {
+		if (isStripOpen) clearActiveCountry();
+	}, [isStripOpen, clearActiveCountry]);
 
 	const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
 		if (!isMobile || !activeCountry) return;

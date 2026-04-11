@@ -46,6 +46,7 @@ export function HomeHero() {
 						trips={trips}
 						focusTripId={focusTripId}
 						isMobile={isMobile}
+						isStripOpen={isStripOpen}
 					/>
 			</div>
 
