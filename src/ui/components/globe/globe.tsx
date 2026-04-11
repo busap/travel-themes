@@ -8,32 +8,47 @@ import styles from "./globe.module.scss";
 interface GlobeVisualizationProps {
 	trips: Trip[];
 	focusTripId?: string | null;
+	isMobile?: boolean;
 }
 
 export function GlobeVisualization({
 	trips,
 	focusTripId,
+	isMobile = false,
 }: GlobeVisualizationProps) {
 	const {
 		containerRef,
 		isLoaded,
-		hoveredCountry,
+		activeCountry,
 		tooltipPos,
 		handleMouseMove,
-	} = useGlobe({ trips, focusTripId });
+		clearActiveCountry,
+	} = useGlobe({ trips, focusTripId, isMobile });
+
+	const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (!isMobile || !activeCountry) return;
+		if (e.target === e.currentTarget) {
+			clearActiveCountry();
+		}
+	};
 
 	return (
-		<div className={styles.wrapper} onMouseMove={handleMouseMove}>
+		<div
+			className={styles.wrapper}
+			onMouseMove={handleMouseMove}
+			onClick={handleWrapperClick}
+		>
 			<div
 				ref={containerRef}
 				className={`${styles.globe} ${isLoaded ? styles.loaded : ""}`}
 			/>
-			{hoveredCountry && (
+			{activeCountry && (
 				<GlobeTooltipCard
-					trip={hoveredCountry.trip}
-					countryName={hoveredCountry.countryName}
+					trip={activeCountry.trip}
+					countryName={activeCountry.countryName}
 					x={tooltipPos.x}
 					y={tooltipPos.y}
+					mobile={isMobile}
 				/>
 			)}
 		</div>
