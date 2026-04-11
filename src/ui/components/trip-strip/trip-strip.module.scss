@@ -119,7 +119,7 @@
 		position: absolute;
 		inset: 0;
 		background: linear-gradient(160deg, #f5f0e8 0%, #ede8de 50%, #e8e2d6 100%);
-		clip-path: circle(180px at calc(100% + 20px) -10px);
+		clip-path: circle(162px at 100% 0%);
 		z-index: -1;
 		transition: opacity 0.3s ease;
 	}
