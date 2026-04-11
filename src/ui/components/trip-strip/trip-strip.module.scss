@@ -72,8 +72,10 @@
 
 .opener {
 	position: absolute;
-	top: 1.25rem;
-	right: 1.25rem;
+	top: 0;
+	right: 0;
+	padding-top: 1.25rem;
+	padding-right: 1.25rem;
 	pointer-events: auto;
 	display: flex;
 	flex-direction: column;
@@ -81,7 +83,6 @@
 	gap: 5px;
 	background: none;
 	border: none;
-	padding: 0;
 	cursor: pointer;
 	color: rgba(60, 44, 16, 0.78);
 

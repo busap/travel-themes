@@ -76,53 +76,64 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 		.filter(Boolean)
 		.join(" ");
 
-	return (
-		<div className={styles.container}>
-			<button
-				className={styles.opener}
-				onClick={phase === "closed" ? handleOpen : undefined}
-				disabled={phase !== "closed"}
-				aria-label="Open all trips"
-				aria-expanded={phase === "open"}
-			>
+	const renderOpener = () => {
+		return <button
+			className={styles.opener}
+			onClick={phase === "closed" ? handleOpen : undefined}
+			disabled={phase !== "closed"}
+			aria-label="Open all trips"
+			aria-expanded={phase === "open"}
+		>
 				<span
 					className={`${styles.openerLabel} ${phase !== "closed" ? styles.labelHidden : ""}`}
 				>
 					All Trips
 				</span>
-				<span className={planeClass}>
+			<span className={planeClass}>
 					<PlaneIcon />
 				</span>
+		</button>;
+	}
+
+	const renderList = () => {
+		return <div className={styles.list}>
+			{trips.map((trip, i) => (
+				<div key={trip.id} className={styles.cardWrapper}>
+					<TripCard
+						trip={trip}
+						priority={i < 3}
+						compact
+						onTripHover={isStripInteractive ? onTripHover : undefined}
+						onTripHoverEnd={
+							isStripInteractive && onTripHover
+								? () => onTripHover(null)
+								: undefined
+						}
+					/>
+				</div>
+			))}
+		</div>;
+	}
+
+	const renderStrip = () => {
+		return <aside className={stripClass} aria-hidden={!isStripInteractive}>
+			<button
+				className={styles.closeBtn}
+				onClick={handleClose}
+				aria-label="Close trips panel"
+				tabIndex={isStripInteractive ? 0 : -1}
+			>
+				<CloseIcon />
 			</button>
 
-			<aside className={stripClass} aria-hidden={!isStripInteractive}>
-				<button
-					className={styles.closeBtn}
-					onClick={handleClose}
-					aria-label="Close trips panel"
-					tabIndex={isStripInteractive ? 0 : -1}
-				>
-					<CloseIcon />
-				</button>
+			{renderList()}
+		</aside>;
+	}
 
-				<div className={styles.list}>
-					{trips.map((trip, i) => (
-						<div key={trip.id} className={styles.cardWrapper}>
-							<TripCard
-								trip={trip}
-								priority={i < 3}
-								compact
-								onTripHover={isStripInteractive ? onTripHover : undefined}
-								onTripHoverEnd={
-									isStripInteractive && onTripHover
-										? () => onTripHover(null)
-										: undefined
-								}
-							/>
-						</div>
-					))}
-				</div>
-			</aside>
+	return (
+		<div className={styles.container}>
+			{renderOpener()}
+			{renderStrip()}
 		</div>
 	);
 }
