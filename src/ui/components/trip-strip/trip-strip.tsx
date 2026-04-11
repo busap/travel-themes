@@ -45,13 +45,11 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 	const handleOpen = useCallback(() => {
 		setPhase("opening");
 		onIsOpenChange?.(true);
-		// label fades (0-220ms) → plane flies (180-700ms) → strip slides in (600-1000ms)
 		setTimeout(() => setPhase("open"), 1050);
 	}, [onIsOpenChange]);
 
 	const handleClose = useCallback(() => {
 		setPhase("closing");
-		// strip slides out (0-400ms) → plane flies back (350-830ms)
 		setTimeout(() => {
 			setPhase("closed");
 			onIsOpenChange?.(false);
@@ -80,7 +78,6 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 
 	return (
 		<div className={styles.container}>
-			{/* Opener — no background, top-right corner */}
 			<button
 				className={styles.opener}
 				onClick={phase === "closed" ? handleOpen : undefined}
@@ -98,7 +95,6 @@ export function TripStrip({ trips, onTripHover, onIsOpenChange }: TripStripProps
 				</span>
 			</button>
 
-			{/* Strip panel */}
 			<aside className={stripClass} aria-hidden={!isStripInteractive}>
 				<button
 					className={styles.closeBtn}
