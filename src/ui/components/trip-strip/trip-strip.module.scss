@@ -244,3 +244,35 @@
 	border-radius: 12px;
 	overflow: hidden;
 }
+
+@media (max-width: 1024px) {
+	.container {
+		left: 0;
+		width: 100%;
+	}
+
+	.strip {
+		width: 100%;
+	}
+
+	.list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px;
+		padding: 62px 12px 12px;
+	}
+
+	.cardWrapper {
+		height: 200px;
+	}
+
+	@media (max-width: 480px) {
+		.list {
+			grid-template-columns: 1fr;
+		}
+
+		.cardWrapper {
+			height: 180px;
+		}
+	}
+}
