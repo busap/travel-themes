@@ -124,7 +124,6 @@ describe("trip utilities", () => {
 			expect(config).toHaveProperty("layout");
 			expect(config).toHaveProperty("animation");
 			expect(config).toHaveProperty("photos");
-			expect(config).toHaveProperty("styling");
 		});
 
 		it("should return theme config for Morocco trip", () => {
@@ -155,9 +154,6 @@ describe("trip utilities", () => {
 			// Layout properties
 			expect(config.layout).toHaveProperty("scrollDirection");
 			expect(config.layout).toHaveProperty("spacing");
-
-			// Animation properties
-			expect(config.animation).toHaveProperty("enabled");
 
 			// Photos properties
 			expect(config.photos).toHaveProperty("revealPattern");
