@@ -27,27 +27,32 @@ import { countryNameToId, idToCountryName } from "@/utils/globe-country-map";
 interface UseGlobeProps {
 	trips: Trip[];
 	focusTripId?: string | null;
+	isMobile?: boolean;
 }
 
 interface UseGlobeReturn {
 	containerRef: React.RefObject<HTMLDivElement | null>;
 	isLoaded: boolean;
-	hoveredCountry: CountryTrip | null;
+	activeCountry: CountryTrip | null;
 	tooltipPos: { x: number; y: number };
 	handleMouseMove: (e: React.MouseEvent) => void;
+	clearActiveCountry: () => void;
 }
 
 export function useGlobe({
 	trips,
 	focusTripId,
+	isMobile = false,
 }: UseGlobeProps): UseGlobeReturn {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
 	const materialCacheRef = useRef<Map<string, MeshPhongMaterial>>(new Map());
 	const [countries, setCountries] = useState<GeoFeature[]>([]);
-	const [hoveredCountry, setHoveredCountry] = useState<CountryTrip | null>(
-		null
-	);
+	const [activeCountry, setActiveCountry] = useState<CountryTrip | null>(null);
+	const activeCountryRef = useRef<CountryTrip | null>(null);
+	useEffect(() => {
+		activeCountryRef.current = activeCountry;
+	}, [activeCountry]);
 	const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 	const [isLoaded, setIsLoaded] = useState(false);
 	const router = useRouter();
@@ -204,9 +209,11 @@ export function useGlobe({
 				})
 				.polygonsTransitionDuration(300)
 				.onPolygonHover((polygon: object | null) => {
+					if (isMobile) return;
+
 					if (!polygon) {
 						hoveredIdRef.current = null;
-						setHoveredCountry(null);
+						setActiveCountry(null);
 						if (containerRef.current)
 							containerRef.current.style.cursor = "default";
 						updateHoverStateRef.current(null);
@@ -222,15 +229,11 @@ export function useGlobe({
 							idToName.get(feat.id) ??
 							idToCountryName[feat.id] ??
 							"";
-						setHoveredCountry({
-							feature: feat,
-							trip,
-							countryName: name,
-						});
+						setActiveCountry({ feature: feat, trip, countryName: name });
 						if (containerRef.current)
 							containerRef.current.style.cursor = "pointer";
 					} else {
-						setHoveredCountry(null);
+						setActiveCountry(null);
 						if (containerRef.current)
 							containerRef.current.style.cursor = "default";
 					}
@@ -240,7 +243,31 @@ export function useGlobe({
 				.onPolygonClick((polygon: object) => {
 					const feat = polygon as GeoFeature;
 					const trip = idToTrip.get(feat.id);
-					if (trip) router.push(getTripRoute(trip.id));
+
+					if (!isMobile) {
+						if (trip) router.push(getTripRoute(trip.id));
+						return;
+					}
+
+					// Mobile: first tap shows card, second tap on same country navigates
+					if (!trip) {
+						setActiveCountry(null);
+						updateHoverStateRef.current(null);
+						return;
+					}
+
+					const alreadyShowing = activeCountryRef.current?.feature.id === feat.id;
+					if (alreadyShowing) {
+						router.push(getTripRoute(trip.id));
+						return;
+					}
+
+					const name =
+						idToName.get(feat.id) ??
+						idToCountryName[feat.id] ??
+						"";
+					setActiveCountry({ feature: feat, trip, countryName: name });
+					updateHoverStateRef.current(feat.id);
 				});
 
 			const controls = globe.controls();
@@ -294,6 +321,11 @@ export function useGlobe({
 		updateHoverState(targetCountryId);
 	}, [focusTripId, countries, idToTrip, updateHoverState]);
 
+	const clearActiveCountry = useCallback(() => {
+		setActiveCountry(null);
+		updateHoverStateRef.current(null);
+	}, []);
+
 	// Pause auto-rotate when mouse is over the globe sphere; resume when it leaves
 	const handleMouseMove = useCallback((e: React.MouseEvent) => {
 		setTooltipPos({ x: e.clientX, y: e.clientY });
@@ -332,8 +364,9 @@ export function useGlobe({
 	return {
 		containerRef,
 		isLoaded,
-		hoveredCountry,
+		activeCountry,
 		tooltipPos,
 		handleMouseMove,
+		clearActiveCountry,
 	};
 }
