@@ -42,7 +42,11 @@ export function HomeHero() {
 			<div
 				className={`${styles.globeContainer} ${isStripOpen ? styles.globeContainerOpen : ""}`}
 			>
-				<GlobeVisualization trips={trips} focusTripId={focusTripId} />
+				<GlobeVisualization
+						trips={trips}
+						focusTripId={focusTripId}
+						isMobile={isMobile}
+					/>
 			</div>
 
 			<TripStrip
