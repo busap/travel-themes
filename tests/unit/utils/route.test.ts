@@ -37,8 +37,8 @@ describe("route utilities", () => {
 		});
 
 		it("should throw error when parameter is undefined", () => {
-			// @ts-expect-error - Testing runtime error for undefined parameter
 			expect(() =>
+				// @ts-expect-error - Testing runtime error for undefined parameter
 				buildRoute(RouteKey.TripDetail, { id: undefined })
 			).toThrow('Missing required parameter "id" for route "tripDetail"');
 		});

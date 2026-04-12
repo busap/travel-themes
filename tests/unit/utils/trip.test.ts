@@ -6,6 +6,7 @@ import {
 	getTripThemeConfig,
 } from "@/utils/trip";
 import { Theme } from "@/enums/theme";
+import { Country } from "@/enums/country";
 
 describe("trip utilities", () => {
 	describe("getTripById", () => {
@@ -14,7 +15,7 @@ describe("trip utilities", () => {
 			expect(trip).toBeDefined();
 			expect(trip?.id).toBe("japan-2023");
 			expect(trip?.name).toBe("Japan Adventures");
-			expect(trip?.countries).toEqual(["Japan"]);
+			expect(trip?.countries).toEqual([Country.JP]);
 		});
 
 		it("should return different trips by ID", () => {
@@ -74,10 +75,14 @@ describe("trip utilities", () => {
 				expect(trip).toHaveProperty("id");
 				expect(trip).toHaveProperty("name");
 				expect(trip).toHaveProperty("countries");
+				expect(trip).toHaveProperty("year");
+				expect(trip).toHaveProperty("description");
 				expect(trip).toHaveProperty("coverPhoto");
 				expect(trip).toHaveProperty("photos");
 				expect(typeof trip.id).toBe("string");
 				expect(typeof trip.name).toBe("string");
+				expect(typeof trip.year).toBe("number");
+				expect(typeof trip.description).toBe("string");
 				expect(Array.isArray(trip.countries)).toBe(true);
 				expect(Array.isArray(trip.photos)).toBe(true);
 			});
