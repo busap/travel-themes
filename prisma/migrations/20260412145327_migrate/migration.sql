@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Trip" ALTER COLUMN "year" SET NOT NULL,
+ALTER COLUMN "description" SET NOT NULL;
