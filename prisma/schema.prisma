@@ -11,8 +11,8 @@ model Trip {
   id          String     @id
   name        String
   countries   String[]
-  year        Int?
-  description String?
+  year        Int
+  description String
   coverPhoto  String
   photos      Photo[]
   tripTheme   TripTheme?

@@ -1,5 +1,6 @@
 import { Trip } from "@/types/trip";
 import { Theme } from "@/enums/theme";
+import { Country } from "@/enums/country";
 import { prisma } from "@/lib/prisma";
 import type {
 	Trip as PrismaTrip,
@@ -12,13 +13,18 @@ type PrismaTripWithRelations = PrismaTrip & {
 	tripTheme: PrismaTripTheme | null;
 };
 
+function parseCountry(value: string): Country {
+	if (Object.values(Country).includes(value as Country)) return value as Country;
+	throw new Error(`Unknown country code: ${value}`);
+}
+
 function mapPrismaTrip(row: PrismaTripWithRelations): Trip {
 	return {
 		id: row.id,
 		name: row.name,
-		countries: row.countries,
-		year: row.year ?? undefined,
-		description: row.description ?? undefined,
+		countries: row.countries.map(parseCountry),
+		year: row.year,
+		description: row.description,
 		coverPhoto: row.coverPhoto,
 		photos: row.photos
 			.sort((a: PrismaPhoto, b: PrismaPhoto) => a.order - b.order)
