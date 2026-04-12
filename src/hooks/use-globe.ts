@@ -167,9 +167,17 @@ export function useGlobe({
 		updateHoverStateRef.current = updateHoverState;
 	}, [updateHoverState]);
 
-	// Initialize globe
+	// Push updated country data to the globe once it is initialized and data arrives
 	useEffect(() => {
-		if (!containerRef.current || countries.length === 0) return;
+		if (!globeInstanceRef.current || countries.length === 0) return;
+		globeInstanceRef.current.polygonsData(countries);
+	}, [countries]);
+
+	// Initialize globe — runs immediately without waiting for country data so
+	// the canvas is always mounted. Country polygons are injected by the effect
+	// above once the topojson fetch resolves.
+	useEffect(() => {
+		if (!containerRef.current) return;
 
 		let globe: GlobeInstance | undefined;
 
@@ -195,7 +203,7 @@ export function useGlobe({
 				.showAtmosphere(true)
 				.atmosphereColor("rgba(78, 167, 243, 0.25)")
 				.atmosphereAltitude(0.18)
-				.polygonsData(countries)
+				.polygonsData([])
 				.polygonCapMaterial((d: object) => getMaterial(d as GeoFeature))
 				.polygonSideColor((d: object) => {
 					const feat = d as GeoFeature;
@@ -304,7 +312,7 @@ export function useGlobe({
 		return () => {
 			if (globe) globe._destructor();
 		};
-	}, [countries, visitedIds, idToTrip, idToName, getMaterial, router]);
+	}, [visitedIds, idToTrip, idToName, getMaterial, router]);
 
 	// React to focusTripId: rotate globe to that country and highlight it
 	useEffect(() => {
