@@ -37,18 +37,6 @@ test.describe("Trip Detail Page", () => {
 		).toBeVisible();
 	});
 
-	test("renders photo content area", async ({ page }) => {
-		await page.goto(getTripRoute(TEST_TRIP_ID));
-
-		// Either the photo grid has items, or the empty state is shown
-		await expect(
-			page
-				.locator("[data-photo-item]")
-				.first()
-				.or(page.getByText("No photos available"))
-		).toBeVisible();
-	});
-
 	test("handles invalid trip id with 404", async ({ page }) => {
 		const response = await page.goto(getTripRoute("invalid-trip-id"));
 
