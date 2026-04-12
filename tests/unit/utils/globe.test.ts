@@ -61,6 +61,18 @@ describe("computeCentroid", () => {
 		expect(lat).toBeCloseTo(15);
 	});
 
+	it("keeps the earlier ring when a later one is smaller", () => {
+		// poly A: 4 points (large) → becomes best; poly B: 2 points → does not replace
+		const { lat, lng } = computeCentroid(
+			multiPolygon([
+				[[[10, 10], [20, 10], [20, 20], [10, 20]]], // 4 points — should win
+				[[[0, 0], [1, 1]]], // 2 points — should be ignored
+			])
+		);
+		expect(lng).toBeCloseTo(15);
+		expect(lat).toBeCloseTo(15);
+	});
+
 	it("returns finite numbers", () => {
 		const { lat, lng } = computeCentroid(
 			polygon([[[130, 30], [140, 30], [140, 40], [130, 40]]])

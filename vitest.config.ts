@@ -9,11 +9,21 @@ export default defineConfig({
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "json", "html"],
-			include: ["src/**/*.ts", "src/**/*.tsx"],
+			// Only measure the pure-logic layer — the parts unit tests
+			// are responsible for. React components, hooks, the DB layer,
+			// and infrastructure setup are covered by E2E / Storybook and
+			// cannot be run in the node environment without jsdom setup.
+			include: [
+				"src/utils/**/*.ts",
+				"src/config/**/*.ts",
+				"src/enums/**/*.ts",
+				"src/mocks/**/*.ts",
+				// src/db/** omitted — requires generated Prisma client;
+				// tested end-to-end once the DB is seeded
+			],
 			exclude: [
 				"node_modules/",
 				"src/**/*.stories.tsx",
-				"src/app/**/*", // Exclude Next.js app router files
 				".storybook/",
 				"tests/",
 			],
