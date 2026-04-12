@@ -71,7 +71,13 @@ describe("globe-country-map", () => {
 
 		it("should be consistent with countryNameToId for unambiguous entries", () => {
 			// For entries that don't have aliases, round-trip should work
-			const unambiguous = ["Japan", "France", "Germany", "Australia", "Norway"];
+			const unambiguous = [
+				"Japan",
+				"France",
+				"Germany",
+				"Australia",
+				"Norway",
+			];
 			unambiguous.forEach((name) => {
 				const id = countryNameToId[name];
 				expect(idToCountryName[id]).toBe(name);

@@ -43,7 +43,9 @@ describe("theme-config", () => {
 		});
 
 		it("should return correct configs for known themes", () => {
-			expect(getThemeConfig(Theme.Collage).component).toBe("collage-theme");
+			expect(getThemeConfig(Theme.Collage).component).toBe(
+				"collage-theme"
+			);
 			expect(getThemeConfig(Theme.Aurora).component).toBe("aurora-theme");
 			expect(getThemeConfig(Theme.Mosaic).component).toBe("mosaic-theme");
 		});

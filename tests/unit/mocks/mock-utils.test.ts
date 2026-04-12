@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { pickRandom, pickMultiple, randomInt, randomBoolean } from "@/mocks/mock-utils";
+import {
+	pickRandom,
+	pickMultiple,
+	randomInt,
+	randomBoolean,
+} from "@/mocks/mock-utils";
 
 describe("mock utilities", () => {
 	describe("pickRandom", () => {
