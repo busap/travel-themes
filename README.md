@@ -128,6 +128,18 @@ Photo-centric travel website where trips are displayed through themed visual pre
 
 ## TODO
 
+### Add unit tests for src/db/ once Prisma client is generated
+
+`src/db/**` is excluded from the Vitest coverage scope because the
+generated client (`src/generated/prisma/`) does not exist yet. Once
+it is generated (`npm run db:generate`), re-include it in the coverage
+config and add `tests/unit/db/trips.test.ts` that mocks `@/lib/prisma`
+and covers:
+
+- `getTripById` — found / not found, country mapping, photo sort order, null→undefined coercion, invalid country throws
+- `getAllTrips` — empty result, multiple trips mapped correctly
+- `getThemeForTrip` — known theme, null falls back to `Theme.Collage`, unknown string falls back to `Theme.Collage`
+
 ### Add e2e theme tests as trips are seeded
 
 `tests/e2e/themes/` has one file per theme. Currently only `mosaic.spec.ts`
