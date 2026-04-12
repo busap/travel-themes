@@ -50,6 +50,8 @@ next-env.d.ts
 
 # agent rules
 CLAUDE.md
+.agents/
+skills-lock.json
 
 *storybook.log
 storybook-static
