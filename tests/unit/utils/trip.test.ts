@@ -90,7 +90,7 @@ describe("trip utilities", () => {
 	});
 
 	describe("getThemeForTrip", () => {
-		it("should return Minimal theme for Japan trip", () => {
+		it("should return Collage theme for Japan trip", () => {
 			const theme = getThemeForTrip("japan-2023");
 			expect(theme).toBe(Theme.Collage);
 		});
