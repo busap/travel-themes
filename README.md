@@ -140,6 +140,18 @@ and covers:
 - `getAllTrips` — empty result, multiple trips mapped correctly
 - `getThemeForTrip` — known theme, null falls back to `Theme.Collage`, unknown string falls back to `Theme.Collage`
 
+### Add globe tooltip e2e test once DB is seeded
+
+`tests/e2e/home/globe.spec.ts` defers the tooltip interaction test because:
+1. The globe auto-rotates, making country polygon positions non-deterministic
+2. Visited countries only exist once trips are seeded
+
+When ready: disable auto-rotation (`controls.autoRotate = false`) via a
+test-only hook or `page.evaluate`, then hover the known centroid of a seeded
+country and assert that `GlobeTooltipCard` renders the trip name and country
+name. Also test the mobile variant (portal-rendered `<Link>`) using a mobile
+viewport.
+
 ### Add e2e theme tests as trips are seeded
 
 `tests/e2e/themes/` has one file per theme. Currently only `mosaic.spec.ts`
