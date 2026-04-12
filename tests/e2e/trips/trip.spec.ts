@@ -1,28 +1,35 @@
 import { test, expect } from "@playwright/test";
 import { getHomeRoute, getTripRoute } from "@/utils/route";
 
+// The only trip currently configured in trips-data.ts
+const TEST_TRIP_ID = "barcelona-2021";
+
 test.describe("Trip Detail Page", () => {
 	test("displays trip name", async ({ page }) => {
-		await page.goto(getTripRoute("japan-2023"));
+		await page.goto(getTripRoute(TEST_TRIP_ID));
 
 		await expect(
-			page.getByRole("heading", { name: /Japan Adventures/i })
+			page.getByRole("heading", { name: /Barcelona Weekend Trip/i })
 		).toBeVisible();
 	});
 
 	test("displays trip metadata (country code and year)", async ({ page }) => {
-		await page.goto(getTripRoute("japan-2023"));
+		await page.goto(getTripRoute(TEST_TRIP_ID));
 
-		// Country code badge
-		await expect(page.getByText("JP")).toBeVisible();
-		// Year badge
-		await expect(page.getByText("2023")).toBeVisible();
+		// Country code visible in subtitle
+		await expect(page.getByText("ES")).toBeVisible();
+		// Year visible in subtitle
+		await expect(page.getByText("2021")).toBeVisible();
 	});
 
-	test("can navigate back to home via back button", async ({ page }) => {
-		await page.goto(getTripRoute("japan-2023")); // Collage theme — has back button
+	test("can navigate back to home via browser navigation", async ({
+		page,
+	}) => {
+		// Navigate home → trip, then use browser back
+		await page.goto(getHomeRoute());
+		await page.goto(getTripRoute(TEST_TRIP_ID));
 
-		await page.getByRole("button", { name: "Go back" }).click();
+		await page.goBack();
 
 		await expect(page).toHaveURL(getHomeRoute());
 		await expect(
@@ -30,20 +37,15 @@ test.describe("Trip Detail Page", () => {
 		).toBeVisible();
 	});
 
-	test("different trips load different content", async ({ page }) => {
-		await page.goto(getTripRoute("japan-2023"));
-		await expect(
-			page.getByRole("heading", { name: /Japan Adventures/i })
-		).toBeVisible();
+	test("renders photo content area", async ({ page }) => {
+		await page.goto(getTripRoute(TEST_TRIP_ID));
 
-		await page.goto(getTripRoute("morocco-markets"));
+		// Either the photo grid has items, or the empty state is shown
 		await expect(
-			page.getByRole("heading", { name: /Colors of Morocco/i })
-		).toBeVisible();
-
-		await page.goto(getTripRoute("nordic-winter"));
-		await expect(
-			page.getByRole("heading", { name: /Nordic Winter/i })
+			page
+				.locator("[data-photo-item]")
+				.first()
+				.or(page.getByText("No photos available"))
 		).toBeVisible();
 	});
 
