@@ -125,3 +125,23 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - `TripCard` gained a `compact` variant (collapses expandable content until hover) for strip use.
 - Removed `TripCardVariant` enum and `variants/` sub-components (ImmersiveCard, PolaroidCard variant) — no longer needed.
 - Pattern: home page globe focus is controlled by `focusTripId` state passed down from `HomeHero`.
+
+## TODO
+
+### Switch storage from Supabase to Cloudinary (~20 trips / 1 GB limit)
+
+1. Create a Cloudinary account and get your cloud name
+2. Add env var: `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
+3. Update `next.config.ts` — replace Supabase remote pattern with Cloudinary:
+   ```ts
+   { protocol: "https", hostname: "res.cloudinary.com" }
+   ```
+4. Update `publicUrl()` in `prisma/seed.ts` to build Cloudinary URLs:
+   ```ts
+   function publicUrl(path: string) {
+     return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/trip-photos/${path}`;
+   }
+   ```
+5. Upload all images to Cloudinary (same folder structure: `trip-photos/[id]/cover/`, `trip-photos/[id]/photos/`)
+6. Re-run `npm run db:seed` to update all URLs in the DB
+7. Pre-compressing images before upload is no longer needed — `f_auto,q_auto` in the URL handles it
