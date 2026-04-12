@@ -22,7 +22,7 @@ import {
 	raycaster,
 	TOPO_JSON_URL,
 } from "@/utils/globe";
-import { countryNameToId, idToCountryName } from "@/utils/globe-country-map";
+import { countryCodeToId, idToCountryName } from "@/utils/globe-country-map";
 
 interface UseGlobeProps {
 	trips: Trip[];
@@ -71,7 +71,7 @@ export function useGlobe({
 
 		for (const trip of trips) {
 			for (const country of trip.countries) {
-				const id = countryNameToId[country];
+				const id = countryCodeToId[country];
 				if (id) {
 					visited.add(id);
 					tripMap.set(id, trip);
