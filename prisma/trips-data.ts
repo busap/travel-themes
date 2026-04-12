@@ -1,13 +1,13 @@
-import { Country } from "../src/enums/country";
-import { Theme } from "../src/enums/theme";
+import { Country } from "@/enums/country";
+import { Theme } from "@/enums/theme";
 
 export const tripsData = [
 	{
-		id: "tokyo-2023",
-		name: "Tokyo Nights",
-		countries: [Country.JP],
-		year: 2023,
-		description: "Neon lights and ancient temples",
-		theme: Theme.Aurora,
+		id: "barcelona-2021",
+		name: "Barcelona Weekend Trip",
+		countries: [Country.ES],
+		year: 2021,
+		description: "Sun, tapas, and Gaudí around every corner",
+		theme: Theme.Mosaic,
 	},
 ];
