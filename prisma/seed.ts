@@ -20,7 +20,8 @@ function publicUrl(path: string): string {
 
 async function listFiles(path: string): Promise<string[]> {
 	const { data, error } = await supabase.storage.from(BUCKET).list(path);
-	if (error) throw new Error(`Storage list error at "${path}": ${error.message}`);
+	if (error)
+		throw new Error(`Storage list error at "${path}": ${error.message}`);
 	return (data ?? []).map((f) => f.name).filter((n) => !n.startsWith("."));
 }
 
@@ -28,7 +29,9 @@ async function seed() {
 	for (const config of tripsData) {
 		const coverFiles = await listFiles(`${config.id}/cover`);
 		if (!coverFiles.length) {
-			console.warn(`⚠️  No cover image found for "${config.id}", skipping`);
+			console.warn(
+				`⚠️  No cover image found for "${config.id}", skipping`
+			);
 			continue;
 		}
 		const coverPhoto = publicUrl(`${config.id}/cover/${coverFiles[0]}`);

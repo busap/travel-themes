@@ -14,7 +14,8 @@ type PrismaTripWithRelations = PrismaTrip & {
 };
 
 function parseCountry(value: string): Country {
-	if (Object.values(Country).includes(value as Country)) return value as Country;
+	if (Object.values(Country).includes(value as Country))
+		return value as Country;
 	throw new Error(`Unknown country code: ${value}`);
 }
 
