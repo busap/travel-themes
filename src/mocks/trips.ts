@@ -1,4 +1,5 @@
 import { Trip } from "@/types/trip";
+import { Country } from "@/enums/country";
 import {
 	pickRandom,
 	pickMultiple,
@@ -30,27 +31,27 @@ const tripNames = [
 	"Hidden Gems",
 ];
 
-const countriesPool = [
-	"France",
-	"Japan",
-	"Iceland",
-	"Morocco",
-	"Switzerland",
-	"Italy",
-	"Greece",
-	"Thailand",
-	"Norway",
-	"Peru",
-	"New Zealand",
-	"Spain",
-	"Portugal",
-	"Croatia",
-	"Turkey",
-	"Mexico",
-	"Canada",
-	"Australia",
-	"Vietnam",
-	"Indonesia",
+const countriesPool: Country[] = [
+	Country.FR,
+	Country.JP,
+	Country.IS,
+	Country.MA,
+	Country.CH,
+	Country.IT,
+	Country.GR,
+	Country.TH,
+	Country.NO,
+	Country.PE,
+	Country.NZ,
+	Country.ES,
+	Country.PT,
+	Country.HR,
+	Country.TR,
+	Country.MX,
+	Country.CA,
+	Country.AU,
+	Country.VN,
+	Country.ID,
 ];
 
 const descriptions = [
@@ -98,12 +99,10 @@ export const randomTrip = (seed?: string): Trip => {
 	const id =
 		seed || `trip-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 	const name = pickRandom(tripNames);
-	const countryCount = randomBoolean(0.3) ? 2 : 1;
+	const countryCount = randomInt(1, 2);
 	const countries = pickMultiple(countriesPool, countryCount);
-	const year = randomBoolean(0.8) ? randomInt(2020, 2024) : undefined;
-	const description = randomBoolean(0.7)
-		? pickRandom(descriptions)
-		: undefined;
+	const year = randomInt(2020, 2024);
+	const description = pickRandom(descriptions);
 	const coverPhoto = `https://images.unsplash.com/${pickRandom(unsplashPhotos)}?w=800&q=80`;
 
 	const photoCount = randomInt(1, 4);
@@ -131,7 +130,7 @@ export const trips: Trip[] = [
 	{
 		id: "japan-2023",
 		name: "Japan Adventures",
-		countries: ["Japan"],
+		countries: [Country.JP],
 		year: 2023,
 		description: "Cherry blossoms, ancient temples, and neon-lit streets",
 		coverPhoto:
@@ -290,7 +289,7 @@ export const trips: Trip[] = [
 	{
 		id: "morocco-markets",
 		name: "Colors of Morocco",
-		countries: ["Morocco"],
+		countries: [Country.MA],
 		year: 2022,
 		description: "Vibrant souks, desert sunsets, and timeless medinas",
 		coverPhoto:
@@ -437,7 +436,7 @@ export const trips: Trip[] = [
 	{
 		id: "nordic-winter",
 		name: "Nordic Winter",
-		countries: ["Norway", "Iceland"],
+		countries: [Country.NO, Country.IS],
 		year: 2024,
 		description: "Northern lights, frozen waterfalls, and snowy fjords",
 		coverPhoto:
@@ -598,7 +597,7 @@ export const trips: Trip[] = [
 	{
 		id: "italian-escape",
 		name: "Italian Escape",
-		countries: ["Italy"],
+		countries: [Country.IT],
 		year: 2023,
 		description: "Renaissance art, rolling hills, and coastal beauty",
 		coverPhoto:
@@ -753,7 +752,7 @@ export const trips: Trip[] = [
 	{
 		id: "greek-islands",
 		name: "Greek Islands",
-		countries: ["Greece"],
+		countries: [Country.GR],
 		year: 2022,
 		description: "White-washed villages, azure waters, and ancient history",
 		coverPhoto:
@@ -898,7 +897,7 @@ export const trips: Trip[] = [
 	{
 		id: "thailand-adventure",
 		name: "Tropical Thailand",
-		countries: ["Thailand"],
+		countries: [Country.TH],
 		year: 2024,
 		description: "Golden temples, jungle adventures, and island paradise",
 		coverPhoto:
@@ -1052,7 +1051,7 @@ export const trips: Trip[] = [
 	{
 		id: "paris-romance",
 		name: "Parisian Dreams",
-		countries: ["France"],
+		countries: [Country.FR],
 		year: 2023,
 		description: "Art, architecture, and timeless elegance",
 		coverPhoto:
@@ -1205,7 +1204,7 @@ export const trips: Trip[] = [
 	{
 		id: "swiss-alps",
 		name: "Alpine Adventure",
-		countries: ["Switzerland"],
+		countries: [Country.CH],
 		year: 2024,
 		description: "Majestic peaks, pristine lakes, and chocolate dreams",
 		coverPhoto:
@@ -1362,7 +1361,7 @@ export const trips: Trip[] = [
 	{
 		id: "spain-fiesta",
 		name: "Spanish Fiesta",
-		countries: ["Spain"],
+		countries: [Country.ES],
 		year: 2022,
 		description: "Flamenco rhythms, Gothic quarters, and Mediterranean sun",
 		coverPhoto:
@@ -1506,7 +1505,7 @@ export const trips: Trip[] = [
 	{
 		id: "australian-outback",
 		name: "Australian Adventure",
-		countries: ["Australia"],
+		countries: [Country.AU],
 		year: 2023,
 		description: "Reef wonders, outback adventures, and coastal beauty",
 		coverPhoto:
@@ -1661,7 +1660,7 @@ export const trips: Trip[] = [
 	{
 		id: "new-zealand",
 		name: "New Zealand Quest",
-		countries: ["New Zealand"],
+		countries: [Country.NZ],
 		year: 2024,
 		description: "Dramatic landscapes, Maori culture, and adventure sports",
 		coverPhoto:
@@ -1815,7 +1814,7 @@ export const trips: Trip[] = [
 	{
 		id: "bali-dreams",
 		name: "Bali Dreams",
-		countries: ["Indonesia"],
+		countries: [Country.ID],
 		year: 2024,
 		description: "Rice terraces, sacred temples, and neon-drenched nights",
 		coverPhoto:
@@ -1883,7 +1882,7 @@ export const trips: Trip[] = [
 	{
 		id: "portugal-coastline",
 		name: "Portuguese Coastline",
-		countries: ["Portugal"],
+		countries: [Country.PT],
 		year: 2024,
 		description: "Clifftop villages, golden beaches, and Atlantic sunsets",
 		coverPhoto:
@@ -2135,7 +2134,7 @@ export const trips: Trip[] = [
 	{
 		id: "world-in-frames",
 		name: "World in Frames",
-		countries: ["France", "Japan", "Iceland", "Morocco", "Peru"],
+		countries: [Country.FR, Country.JP, Country.IS, Country.MA, Country.PE],
 		year: 2024,
 		description:
 			"Five continents, twenty moments — a journey told in strips of light",
