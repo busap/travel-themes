@@ -50,13 +50,16 @@ async function seed() {
 				year: config.year,
 				description: config.description,
 				coverPhoto,
-				photos: {
-					create: photoFiles.map((file, index) => ({
-						src: publicUrl(`${config.id}/photos/${file}`),
-						order: index,
-					})),
-				},
 			},
+		});
+
+		await prisma.photo.deleteMany({ where: { tripId: config.id } });
+		await prisma.photo.createMany({
+			data: photoFiles.map((file, index) => ({
+				tripId: config.id,
+				src: publicUrl(`${config.id}/photos/${file}`),
+				order: index,
+			})),
 		});
 
 		await prisma.tripTheme.upsert({
