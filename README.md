@@ -134,21 +134,21 @@ Photo-centric travel website where trips are displayed through themed visual pre
 exists (for `barcelona-2021`). As new trips are added to `prisma/trips-data.ts`
 and seeded, add a spec file for each theme that covers its specific UI:
 
-| Theme | Test ideas |
-|---|---|
-| Collage | back button (`aria-label="Go back"`), horizontal scroll, polaroid cards |
-| Aurora | gradient background renders, scroll reveal triggers |
-| Drift | editorial sections visible |
-| Feed | vertical card flow renders |
-| Trail | cursor trail canvas present |
-| SmoothScroll | smooth scroll container renders |
-| DragShuffle | draggable stack renders |
-| Showcase | spotlight panel renders |
-| PhotoCarousel | carousel navigation (prev/next) |
-| Trippy | layered scroll elements present |
-| ImageGridHero | pinned grid assembly renders |
-| GridHover | hover-reactive grid renders |
-| Parallax | parallax strips render |
+| Theme         | Test ideas                                                              |
+| ------------- | ----------------------------------------------------------------------- |
+| Collage       | back button (`aria-label="Go back"`), horizontal scroll, polaroid cards |
+| Aurora        | gradient background renders, scroll reveal triggers                     |
+| Drift         | editorial sections visible                                              |
+| Feed          | vertical card flow renders                                              |
+| Trail         | cursor trail canvas present                                             |
+| SmoothScroll  | smooth scroll container renders                                         |
+| DragShuffle   | draggable stack renders                                                 |
+| Showcase      | spotlight panel renders                                                 |
+| PhotoCarousel | carousel navigation (prev/next)                                         |
+| Trippy        | layered scroll elements present                                         |
+| ImageGridHero | pinned grid assembly renders                                            |
+| GridHover     | hover-reactive grid renders                                             |
+| Parallax      | parallax strips render                                                  |
 
 ### Switch storage from Supabase to Cloudinary (~20 trips / 1 GB limit)
 
