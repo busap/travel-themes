@@ -167,15 +167,12 @@ export function useGlobe({
 		updateHoverStateRef.current = updateHoverState;
 	}, [updateHoverState]);
 
-	// Push updated country data to the globe once it is initialized and data arrives
 	useEffect(() => {
 		if (!globeInstanceRef.current || countries.length === 0) return;
 		globeInstanceRef.current.polygonsData(countries);
 	}, [countries]);
 
-	// Initialize globe — runs immediately without waiting for country data so
-	// the canvas is always mounted. Country polygons are injected by the effect
-	// above once the topojson fetch resolves.
+	// Initialize globe
 	useEffect(() => {
 		if (!containerRef.current) return;
 
