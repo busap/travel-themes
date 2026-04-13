@@ -6,8 +6,7 @@ const TEST_TRIP_ID = "barcelona-2021";
 
 test.describe("Trip Detail Page", () => {
 	test("displays trip name", async ({ page }) => {
-		const response = await page.goto(getTripRoute(TEST_TRIP_ID));
-		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
+		await page.goto(getTripRoute(TEST_TRIP_ID));
 
 		await expect(
 			page.getByRole("heading", { name: /Barcelona Weekend Trip/i })
@@ -15,8 +14,7 @@ test.describe("Trip Detail Page", () => {
 	});
 
 	test("displays trip metadata (country code and year)", async ({ page }) => {
-		const response = await page.goto(getTripRoute(TEST_TRIP_ID));
-		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
+		await page.goto(getTripRoute(TEST_TRIP_ID));
 
 		// Country code visible in subtitle
 		await expect(page.getByText("ES")).toBeVisible();
