@@ -167,9 +167,14 @@ export function useGlobe({
 		updateHoverStateRef.current = updateHoverState;
 	}, [updateHoverState]);
 
+	useEffect(() => {
+		if (!globeInstanceRef.current || countries.length === 0) return;
+		globeInstanceRef.current.polygonsData(countries);
+	}, [countries]);
+
 	// Initialize globe
 	useEffect(() => {
-		if (!containerRef.current || countries.length === 0) return;
+		if (!containerRef.current) return;
 
 		let globe: GlobeInstance | undefined;
 
@@ -195,7 +200,7 @@ export function useGlobe({
 				.showAtmosphere(true)
 				.atmosphereColor("rgba(78, 167, 243, 0.25)")
 				.atmosphereAltitude(0.18)
-				.polygonsData(countries)
+				.polygonsData([])
 				.polygonCapMaterial((d: object) => getMaterial(d as GeoFeature))
 				.polygonSideColor((d: object) => {
 					const feat = d as GeoFeature;
@@ -304,7 +309,7 @@ export function useGlobe({
 		return () => {
 			if (globe) globe._destructor();
 		};
-	}, [countries, visitedIds, idToTrip, idToName, getMaterial, router]);
+	}, [visitedIds, idToTrip, idToName, getMaterial, router]);
 
 	// React to focusTripId: rotate globe to that country and highlight it
 	useEffect(() => {
