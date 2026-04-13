@@ -22,7 +22,14 @@ function multiPolygon(polys: number[][][][]): GeoFeature {
 describe("computeCentroid", () => {
 	it("returns lat and lng properties", () => {
 		const result = computeCentroid(
-			polygon([[[0, 0], [4, 0], [4, 4], [0, 4]]])
+			polygon([
+				[
+					[0, 0],
+					[4, 0],
+					[4, 4],
+					[0, 4],
+				],
+			])
 		);
 		expect(result).toHaveProperty("lat");
 		expect(result).toHaveProperty("lng");
@@ -31,7 +38,14 @@ describe("computeCentroid", () => {
 	it("computes the average of a Polygon ring", () => {
 		// Square: lng (x) 0,4,4,0 → avg 2; lat (y) 0,0,4,4 → avg 2
 		const { lat, lng } = computeCentroid(
-			polygon([[[0, 0], [4, 0], [4, 4], [0, 4]]])
+			polygon([
+				[
+					[0, 0],
+					[4, 0],
+					[4, 4],
+					[0, 4],
+				],
+			])
 		);
 		expect(lng).toBeCloseTo(2);
 		expect(lat).toBeCloseTo(2);
@@ -41,8 +55,18 @@ describe("computeCentroid", () => {
 		// Inner ring should be ignored
 		const { lat, lng } = computeCentroid(
 			polygon([
-				[[0, 0], [6, 0], [6, 6], [0, 6]], // outer — avg 3, 3
-				[[2, 2], [4, 2], [4, 4], [2, 4]], // hole — should be ignored
+				[
+					[0, 0],
+					[6, 0],
+					[6, 6],
+					[0, 6],
+				], // outer — avg 3, 3
+				[
+					[2, 2],
+					[4, 2],
+					[4, 4],
+					[2, 4],
+				], // hole — should be ignored
 			])
 		);
 		expect(lng).toBeCloseTo(3);
@@ -53,8 +77,20 @@ describe("computeCentroid", () => {
 		// poly A: 2 points (small); poly B: 4 points (large) → B wins
 		const { lat, lng } = computeCentroid(
 			multiPolygon([
-				[[[0, 0], [1, 1]]], // 2 points
-				[[[10, 10], [20, 10], [20, 20], [10, 20]]], // 4 points
+				[
+					[
+						[0, 0],
+						[1, 1],
+					],
+				], // 2 points
+				[
+					[
+						[10, 10],
+						[20, 10],
+						[20, 20],
+						[10, 20],
+					],
+				], // 4 points
 			])
 		);
 		expect(lng).toBeCloseTo(15);
@@ -65,8 +101,20 @@ describe("computeCentroid", () => {
 		// poly A: 4 points (large) → becomes best; poly B: 2 points → does not replace
 		const { lat, lng } = computeCentroid(
 			multiPolygon([
-				[[[10, 10], [20, 10], [20, 20], [10, 20]]], // 4 points — should win
-				[[[0, 0], [1, 1]]], // 2 points — should be ignored
+				[
+					[
+						[10, 10],
+						[20, 10],
+						[20, 20],
+						[10, 20],
+					],
+				], // 4 points — should win
+				[
+					[
+						[0, 0],
+						[1, 1],
+					],
+				], // 2 points — should be ignored
 			])
 		);
 		expect(lng).toBeCloseTo(15);
@@ -75,7 +123,14 @@ describe("computeCentroid", () => {
 
 	it("returns finite numbers", () => {
 		const { lat, lng } = computeCentroid(
-			polygon([[[130, 30], [140, 30], [140, 40], [130, 40]]])
+			polygon([
+				[
+					[130, 30],
+					[140, 30],
+					[140, 40],
+					[130, 40],
+				],
+			])
 		);
 		expect(Number.isFinite(lat)).toBe(true);
 		expect(Number.isFinite(lng)).toBe(true);

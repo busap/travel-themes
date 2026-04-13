@@ -143,6 +143,7 @@ and covers:
 ### Add globe tooltip e2e test once DB is seeded
 
 `tests/e2e/home/globe.spec.ts` defers the tooltip interaction test because:
+
 1. The globe auto-rotates, making country polygon positions non-deterministic
 2. Visited countries only exist once trips are seeded
 

@@ -71,7 +71,9 @@ describe("buildPhotosAnimations", () => {
 	it("entryPortion + holdPortion + exitPortion equals 1 for each item", () => {
 		const animations = buildPhotosAnimations(photos(8));
 		for (const a of animations) {
-			expect(a.entryPortion + a.holdPortion + a.exitPortion).toBeCloseTo(1);
+			expect(a.entryPortion + a.holdPortion + a.exitPortion).toBeCloseTo(
+				1
+			);
 		}
 	});
 });

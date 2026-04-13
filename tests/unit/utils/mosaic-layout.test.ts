@@ -24,12 +24,18 @@ describe("getGridCellSize", () => {
 	});
 
 	it("gridColumn is a span string", () => {
-		const { gridColumn } = getGridCellSize(photo("https://example.com/a.jpg"), 0);
+		const { gridColumn } = getGridCellSize(
+			photo("https://example.com/a.jpg"),
+			0
+		);
 		expect(gridColumn).toMatch(/^span \d+$/);
 	});
 
 	it("gridRow is a span string", () => {
-		const { gridRow } = getGridCellSize(photo("https://example.com/a.jpg"), 0);
+		const { gridRow } = getGridCellSize(
+			photo("https://example.com/a.jpg"),
+			0
+		);
 		expect(gridRow).toMatch(/^span \d+$/);
 	});
 
@@ -53,8 +59,13 @@ describe("getGridCellSize", () => {
 
 	it("different src values can produce different sizes at the same index", () => {
 		const sizes = new Set(
-			Array.from({ length: 10 }, (_, i) =>
-				getGridCellSize(photo(`https://example.com/img${i * 137}.jpg`), 0).size
+			Array.from(
+				{ length: 10 },
+				(_, i) =>
+					getGridCellSize(
+						photo(`https://example.com/img${i * 137}.jpg`),
+						0
+					).size
 			)
 		);
 		expect(sizes.size).toBeGreaterThan(1);

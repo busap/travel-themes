@@ -66,8 +66,9 @@ describe("getPolaroidTransform", () => {
 	});
 
 	it("not all rotations are the same — values vary across the table", () => {
-		const rotations = Array.from({ length: 16 }, (_, i) =>
-			getPolaroidTransform(i).rotation
+		const rotations = Array.from(
+			{ length: 16 },
+			(_, i) => getPolaroidTransform(i).rotation
 		);
 		const unique = new Set(rotations);
 		expect(unique.size).toBeGreaterThan(1);
