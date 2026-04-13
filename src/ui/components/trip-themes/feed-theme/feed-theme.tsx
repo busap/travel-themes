@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { useRef, useEffect } from "react";
+import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -60,7 +61,7 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 		<div className={styles.tripHeader}>
 			<h1 className={styles.tripName}>{trip.name}</h1>
 			<p className={styles.tripMeta}>
-				{trip.countries.join(", ")} {trip.year && `· ${trip.year}`}
+				{getCountryNames(trip.countries)} {trip.year && `· ${trip.year}`}
 			</p>
 			{trip.description && (
 				<p className={styles.tripDescription}>{trip.description}</p>

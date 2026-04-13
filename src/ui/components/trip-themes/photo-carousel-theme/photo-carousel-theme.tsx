@@ -4,6 +4,7 @@ import { useRef, useMemo, useEffect, CSSProperties, PointerEvent } from "react";
 import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
+import { getCountryNames } from "@/utils/country";
 import styles from "./photo-carousel-theme.module.scss";
 import { Photo } from "@/types/photo";
 
@@ -220,7 +221,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 					{trip.name}
 				</h1>
 				<p className={`${styles.subtitle} ${bodyClasses}`}>
-					{trip.countries.join(" · ")}
+					{getCountryNames(trip.countries, " · ")}
 					{trip.year ? ` · ${trip.year}` : ""}
 				</p>
 			</div>

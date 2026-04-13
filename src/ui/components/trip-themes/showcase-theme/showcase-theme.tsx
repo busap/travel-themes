@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import styles from "./showcase-theme.module.scss";
 
@@ -137,7 +138,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 						{trip.name}
 					</h1>
 					<p className={`${styles.tripMeta} ${bodyClasses}`}>
-						{trip.countries.join(", ")}{" "}
+						{getCountryNames(trip.countries)}{" "}
 						{trip.year && `· ${trip.year}`}
 					</p>
 				</div>

@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { useRef, useState, useEffect } from "react";
+import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Inter, Bebas_Neue } from "next/font/google";
 import { useMousePosition } from "@/hooks/use-mouse-position";
@@ -185,7 +186,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 			<p
 				className={`${styles.subtitle} ${bodyClasses} ${inter.className}`}
 			>
-				{trip.countries.join(", ")} {trip.year && `• ${trip.year}`}
+				{getCountryNames(trip.countries)} {trip.year && `• ${trip.year}`}
 			</p>
 		</div>
 	);

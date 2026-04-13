@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { useRef, useEffect } from "react";
+import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -252,7 +253,7 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	const renderHeroText = () => (
 		<div className={styles.heroText} ref={heroTextRef}>
 			<p className={styles.eyebrow}>
-				{trip.countries.join(" · ")}
+				{getCountryNames(trip.countries, " · ")}
 				{trip.year && <span> · {trip.year}</span>}
 			</p>
 			<h1 className={styles.title}>{trip.name}</h1>

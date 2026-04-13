@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { useRef, useMemo } from "react";
+import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
 import { AuroraBackground } from "./aurora-background";
@@ -74,7 +75,7 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 			<p
 				className={`${styles.subtitle} ${bodyClasses} ${crimson.className}`}
 			>
-				{trip.countries.join(", ")} {trip.year && `• ${trip.year}`}
+				{getCountryNames(trip.countries)} {trip.year && `• ${trip.year}`}
 			</p>
 		</div>
 	);

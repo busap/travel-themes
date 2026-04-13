@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
+import { getCountryName, getCountryNames } from "@/utils/country";
 import styles from "./drag-shuffle-theme.module.scss";
 
 type SwipeDirection = "left" | "right";
@@ -164,7 +165,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 				{trip.name}
 			</h1>
 			<p className={`${styles.tripDescription} ${bodyClasses}`}>
-				{trip.countries.join(", ")}
+				{getCountryNames(trip.countries)}
 				{trip.year ? ` • ${trip.year}` : ""}
 			</p>
 			{trip.description && (
@@ -208,7 +209,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 		const placeName =
 			photo.title?.trim() ||
-			`${trip.countries[0]} stop ${activeIndex + stackIndex + 1}`;
+			`${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`;
 
 		return (
 			<article

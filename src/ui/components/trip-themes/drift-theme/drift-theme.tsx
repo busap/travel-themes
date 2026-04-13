@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
+import { getCountryNames } from "@/utils/country";
 import { useRef, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
@@ -335,7 +336,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 				data-entrance="subtitle"
 				className={`${styles.subtitle} ${bodyClasses} ${crimson.className}`}
 			>
-				{trip.countries.join(", ")}
+				{getCountryNames(trip.countries)}
 				{trip.year ? ` \u2022 ${trip.year}` : ""}
 			</p>
 		</div>

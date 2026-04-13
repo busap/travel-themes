@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { useState, useCallback } from "react";
+import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Syne, Space_Grotesk } from "next/font/google";
 import styles from "./grid-hover-theme.module.scss";
@@ -120,7 +121,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 
 			<div className={styles.titleLayer}>
 				<p className={`${styles.eyebrow} ${spaceGrotesk.className}`}>
-					{trip.countries.join(" · ")}
+					{getCountryNames(trip.countries, " · ")}
 					{trip.year ? ` · ${trip.year}` : ""}
 				</p>
 				<h1 className={`${styles.title} ${syne.className}`}>

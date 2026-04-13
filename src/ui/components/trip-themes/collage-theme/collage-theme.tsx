@@ -3,6 +3,7 @@
 import { Trip } from "@/types/trip";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
+import { getCountryNames } from "@/utils/country";
 import { PolaroidCard } from "@/ui/components/polaroid-card/polaroid-card";
 import { ScrollHint } from "@/ui/components/scroll-hint/scroll-hint";
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
@@ -62,7 +63,7 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 			<div className={styles.headerInfo}>
 				<h1 className={styles.title}>{trip.name}</h1>
 				<p className={styles.subtitle}>
-					{trip.countries.join(", ")} {trip.year && `• ${trip.year}`}
+					{getCountryNames(trip.countries)} {trip.year && `• ${trip.year}`}
 				</p>
 			</div>
 		</div>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
+import { getCountryNames } from "@/utils/country";
 import { useMemo } from "react";
 import { CursorImageTrail } from "./cursor-image-trail";
 import styles from "./trail-theme.module.scss";
@@ -26,7 +27,7 @@ export function TrailTheme({ trip }: TrailThemeProps) {
 		<div className={styles.meta}>
 			<h1 className={`${styles.title} ${titleClasses}`}>{trip.name}</h1>
 			<p className={subtitleClasses}>
-				{trip.countries.join(", ")}
+				{getCountryNames(trip.countries)}
 				{trip.year ? ` • ${trip.year}` : ""}
 			</p>
 		</div>

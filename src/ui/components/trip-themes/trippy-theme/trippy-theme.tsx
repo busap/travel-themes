@@ -7,6 +7,7 @@ import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getCountryNames } from "@/utils/country";
 import styles from "./trippy-theme.module.scss";
 
 if (typeof window !== "undefined") {
@@ -180,7 +181,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
 					{trip.name}
 				</h1>
 				<p className={styles.subtitle}>
-					{trip.countries.join(" · ")}
+					{getCountryNames(trip.countries, " · ")}
 					{trip.year ? ` · ${trip.year}` : ""}
 				</p>
 			</header>

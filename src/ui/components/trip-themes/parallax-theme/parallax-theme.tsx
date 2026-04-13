@@ -6,6 +6,7 @@ import { DM_Serif_Display } from "next/font/google";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { seededRandom } from "@/utils/random";
+import { getCountryNames } from "@/utils/country";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./parallax-theme.module.scss";
@@ -319,7 +320,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 							data-subtitle
 							aria-hidden
 						>
-							{trip.countries.join(" · ")}
+							{getCountryNames(trip.countries, " · ")}
 							{trip.year ? ` · ${trip.year}` : ""}
 						</p>
 						<h1
