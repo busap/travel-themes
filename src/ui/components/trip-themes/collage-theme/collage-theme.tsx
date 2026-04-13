@@ -4,7 +4,6 @@ import { Trip } from "@/types/trip";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PolaroidCard } from "@/ui/components/polaroid-card/polaroid-card";
-import { PolaroidCardVariant } from "@/enums/polaroid-card-variant";
 import { ScrollHint } from "@/ui/components/scroll-hint/scroll-hint";
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
 import { useHorizontalScroll } from "@/hooks/use-horizontal-scroll";
@@ -83,7 +82,6 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 							className={getCardWrapperClass(isVisible)}
 						>
 							<PolaroidCard
-								variant={PolaroidCardVariant.Photo}
 								imageSrc={photo.src}
 								imageAlt={photo.title || `Photo ${index + 1}`}
 								caption={photo.title}

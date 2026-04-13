@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PolaroidCard } from "./polaroid-card";
-import { PolaroidCardVariant } from "@/enums/polaroid-card-variant";
 
 const meta = {
 	title: "Components/PolaroidCard",
@@ -14,32 +13,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const TripVariant: Story = {
-	args: {
-		variant: PolaroidCardVariant.Trip,
-		imageSrc:
-			"https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
-		title: "Mountain Adventure",
-		subtitle: "Switzerland, Norway • 2023",
-		description: "An unforgettable journey through the Alps",
-		href: "/trips/1",
-		rotation: -3,
-		scale: 1,
-		offset: { x: 0, y: 0 },
-		priority: false,
-	},
-	decorators: [
-		(Story) => (
-			<div style={{ width: "400px" }}>
-				<Story />
-			</div>
-		),
-	],
-};
-
 export const PhotoVariant: Story = {
 	args: {
-		variant: PolaroidCardVariant.Photo,
 		imageSrc:
 			"https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
 		imageAlt: "Mountain landscape",
@@ -62,7 +37,7 @@ export const AllVariants = {
 		<div
 			style={{
 				display: "grid",
-				gridTemplateColumns: "repeat(3, 1fr)",
+				gridTemplateColumns: "repeat(2, 1fr)",
 				gap: "48px",
 				padding: "48px",
 			}}
@@ -75,32 +50,9 @@ export const AllVariants = {
 						fontWeight: 600,
 					}}
 				>
-					Trip Card
-				</h3>
-				<PolaroidCard
-					variant={PolaroidCardVariant.Trip}
-					imageSrc="https://images.unsplash.com/photo-1506905925346-21bda4d32df4"
-					title="Mountain Adventure"
-					subtitle="Switzerland • 2023"
-					description="Epic alpine journey"
-					href="/trips/1"
-					rotation={-2}
-					scale={1}
-					offset={{ x: 0, y: 0 }}
-				/>
-			</div>
-			<div>
-				<h3
-					style={{
-						marginBottom: "16px",
-						fontSize: "14px",
-						fontWeight: 600,
-					}}
-				>
 					Photo (Portrait)
 				</h3>
 				<PolaroidCard
-					variant={PolaroidCardVariant.Photo}
 					imageSrc="https://images.unsplash.com/photo-1506905925346-21bda4d32df4"
 					imageAlt="Mountain view"
 					caption="Alpine summit"
@@ -120,7 +72,6 @@ export const AllVariants = {
 					Photo (Square)
 				</h3>
 				<PolaroidCard
-					variant={PolaroidCardVariant.Photo}
 					imageSrc="https://images.unsplash.com/photo-1506905925346-21bda4d32df4"
 					imageAlt="Mountain view"
 					caption="Peak experience"
@@ -152,7 +103,6 @@ export const Gallery = {
 			].map((transform, index) => (
 				<PolaroidCard
 					key={index}
-					variant={PolaroidCardVariant.Photo}
 					imageSrc="https://images.unsplash.com/photo-1506905925346-21bda4d32df4"
 					imageAlt={`Photo ${index + 1}`}
 					caption={`Memory ${index + 1}`}
