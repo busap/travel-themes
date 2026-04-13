@@ -23,6 +23,7 @@ import {
 	TOPO_JSON_URL,
 } from "@/utils/globe";
 import { countryCodeToId, idToCountryName } from "@/utils/globe-country-map";
+import { getCountryName } from "@/utils/country";
 
 interface UseGlobeProps {
 	trips: Trip[];
@@ -75,7 +76,7 @@ export function useGlobe({
 				if (id) {
 					visited.add(id);
 					tripMap.set(id, trip);
-					nameMap.set(id, country);
+					nameMap.set(id, getCountryName(country));
 				}
 			}
 		}
