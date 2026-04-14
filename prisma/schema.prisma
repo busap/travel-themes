@@ -14,6 +14,7 @@ model Trip {
   year        Int
   description String
   coverPhoto  String
+  createdAt   DateTime   @default(now())
   photos      Photo[]
   tripTheme   TripTheme?
 }
