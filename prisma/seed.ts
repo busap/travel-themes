@@ -23,13 +23,23 @@ function publicUrl(path: string): string {
 }
 
 async function listFiles(path: string): Promise<string[]> {
-	const { data, error } = await supabase.storage.from(BUCKET).list(path);
+	const { data, error } = await supabase.storage
+		.from(BUCKET)
+		.list(path, { limit: 1000 });
 	if (error)
 		throw new Error(`Storage list error at "${path}": ${error.message}`);
 	return (data ?? []).map((f) => f.name).filter((n) => !n.startsWith("."));
 }
 
 async function seed() {
+	const knownIds = tripsData.map((t) => t.id);
+	const deleted = await prisma.trip.deleteMany({
+		where: { id: { notIn: knownIds } },
+	});
+	if (deleted.count > 0) {
+		console.log(`🗑️  Deleted ${deleted.count} stale trip(s)`);
+	}
+
 	for (const config of tripsData) {
 		const coverFiles = await listFiles(`${config.id}/cover`);
 		if (!coverFiles.length) {
