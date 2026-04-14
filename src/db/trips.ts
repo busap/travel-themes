@@ -48,7 +48,7 @@ export async function getAllTrips(): Promise<Trip[]> {
 	try {
 		const rows = await prisma.trip.findMany({
 			include: { photos: true, tripTheme: true },
-			orderBy: { name: "asc" },
+			orderBy: [{ year: "desc" }, { createdAt: "desc" }],
 		});
 		return rows.map(mapPrismaTrip);
 	} catch {
