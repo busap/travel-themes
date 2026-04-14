@@ -171,7 +171,7 @@ export function useGlobe({
 	useEffect(() => {
 		if (!globeInstanceRef.current || countries.length === 0) return;
 		globeInstanceRef.current.polygonsData(countries);
-	}, [countries]);
+	}, [countries, isLoaded]);
 
 	// Initialize globe
 	useEffect(() => {
