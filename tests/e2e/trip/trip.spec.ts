@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { getHomeRoute, getTripRoute } from "@/utils/route";
 
 // The only trip currently configured in trips-data.ts
-const TEST_TRIP_ID = "barcelona-2021";
+const TEST_TRIP_ID = "2021-barcelona";
 
 test.describe("Trip Detail Page", () => {
 	test("displays trip name", async ({ page }) => {
@@ -13,11 +13,11 @@ test.describe("Trip Detail Page", () => {
 		).toBeVisible();
 	});
 
-	test("displays trip metadata (country code and year)", async ({ page }) => {
+	test("displays trip metadata (country and year)", async ({ page }) => {
 		await page.goto(getTripRoute(TEST_TRIP_ID));
 
 		// Country code visible in subtitle
-		await expect(page.getByText("ES")).toBeVisible();
+		await expect(page.getByText("Spain")).toBeVisible();
 		// Year visible in subtitle
 		await expect(page.getByText("2021")).toBeVisible();
 	});
