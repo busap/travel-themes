@@ -186,7 +186,8 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 			<p
 				className={`${styles.subtitle} ${bodyClasses} ${inter.className}`}
 			>
-				{getCountryNames(trip.countries)} {trip.year && `• ${trip.year}`}
+				{getCountryNames(trip.countries)}{" "}
+				{trip.year && `• ${trip.year}`}
 			</p>
 		</div>
 	);

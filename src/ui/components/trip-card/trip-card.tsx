@@ -40,7 +40,9 @@ export function TripCard({
 			<div className={styles.hoverGradient} />
 
 			<div className={styles.badgeContainer}>
-				<div className={styles.countryBadge}>{getCountryName(trip.countries[0])}</div>
+				<div className={styles.countryBadge}>
+					{getCountryName(trip.countries[0])}
+				</div>
 			</div>
 
 			<div className={styles.content}>

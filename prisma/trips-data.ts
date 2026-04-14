@@ -7,7 +7,8 @@ export const tripsData = [
 		name: "Cologne Detour",
 		countries: [Country.DE],
 		year: 2021,
-		description: "Cologne's cathedral and quiet roads through the countryside",
+		description:
+			"Cologne's cathedral and quiet roads through the countryside",
 		theme: Theme.GridHover,
 	},
 	{
@@ -47,7 +48,8 @@ export const tripsData = [
 		name: "Ireland Road Trip",
 		countries: [Country.IE],
 		year: 2022,
-		description: "Pints of Guinness, Westeros filming locations, and cliffs at the edge of the world",
+		description:
+			"Pints of Guinness, Westeros filming locations, and cliffs at the edge of the world",
 		theme: Theme.Parallax,
 	},
 	{
@@ -55,7 +57,8 @@ export const tripsData = [
 		name: "Jordan Desert Trail",
 		countries: [Country.JO],
 		year: 2023,
-		description: "Ancient ruins, Bedouin fires, and the silence of Wadi Rum",
+		description:
+			"Ancient ruins, Bedouin fires, and the silence of Wadi Rum",
 		theme: Theme.Trail,
 	},
 	{
@@ -79,7 +82,8 @@ export const tripsData = [
 		name: "Andalucía in Summer",
 		countries: [Country.ES],
 		year: 2023,
-		description: "From Málaga's beaches to Córdoba's mezquita, Sevilla's flamenco and sangria at sunset",
+		description:
+			"From Málaga's beaches to Córdoba's mezquita, Sevilla's flamenco and sangria at sunset",
 		theme: Theme.Drift,
 	},
 	{
@@ -87,7 +91,8 @@ export const tripsData = [
 		name: "Dubai Stopover",
 		countries: [Country.AE],
 		year: 2023,
-		description: "Towers of glass, golden deserts, and the hidden city beneath the glitter",
+		description:
+			"Towers of glass, golden deserts, and the hidden city beneath the glitter",
 		theme: Theme.Showcase,
 	},
 	{
@@ -95,7 +100,8 @@ export const tripsData = [
 		name: "A Month in Thailand",
 		countries: [Country.TH],
 		year: 2023,
-		description: "Bangkok chaos, lots of curry, many temples, weeks on the islands and a sawasdee ka at every turn",
+		description:
+			"Bangkok chaos, lots of curry, many temples, weeks on the islands and a sawasdee ka at every turn",
 		theme: Theme.Collage,
 	},
 ];

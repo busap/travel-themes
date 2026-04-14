@@ -63,7 +63,8 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 			<div className={styles.headerInfo}>
 				<h1 className={styles.title}>{trip.name}</h1>
 				<p className={styles.subtitle}>
-					{getCountryNames(trip.countries)} {trip.year && `• ${trip.year}`}
+					{getCountryNames(trip.countries)}{" "}
+					{trip.year && `• ${trip.year}`}
 				</p>
 			</div>
 		</div>

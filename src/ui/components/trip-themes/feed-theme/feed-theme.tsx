@@ -61,7 +61,8 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 		<div className={styles.tripHeader}>
 			<h1 className={styles.tripName}>{trip.name}</h1>
 			<p className={styles.tripMeta}>
-				{getCountryNames(trip.countries)} {trip.year && `· ${trip.year}`}
+				{getCountryNames(trip.countries)}{" "}
+				{trip.year && `· ${trip.year}`}
 			</p>
 			{trip.description && (
 				<p className={styles.tripDescription}>{trip.description}</p>

@@ -75,7 +75,8 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 			<p
 				className={`${styles.subtitle} ${bodyClasses} ${crimson.className}`}
 			>
-				{getCountryNames(trip.countries)} {trip.year && `• ${trip.year}`}
+				{getCountryNames(trip.countries)}{" "}
+				{trip.year && `• ${trip.year}`}
 			</p>
 		</div>
 	);
