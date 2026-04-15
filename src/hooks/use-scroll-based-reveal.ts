@@ -7,6 +7,8 @@ interface UseScrollBasedRevealOptions {
 	itemCount?: number;
 	/** How many items ahead of the rightmost visible item to pre-mount. */
 	mountAhead?: number;
+	/** How many items behind the leftmost visible item to keep mounted. */
+	mountBehind?: number;
 }
 
 export interface UseScrollBasedRevealResult {
@@ -26,6 +28,7 @@ export function useScrollBasedReveal({
 	totalItems,
 	itemCount,
 	mountAhead = 6,
+	mountBehind = 3,
 }: UseScrollBasedRevealOptions): UseScrollBasedRevealResult {
 	const count = itemCount ?? totalItems;
 
@@ -73,6 +76,7 @@ export function useScrollBasedReveal({
 			if (newlyVisible.length === 0) return;
 
 			const maxVisible = Math.max(...newlyVisible);
+			const minVisible = Math.min(...newlyVisible);
 
 			setVisibleItems((prev) => {
 				const next = new Set(prev);
@@ -81,14 +85,26 @@ export function useScrollBasedReveal({
 			});
 
 			setMountedItems((prev) => {
-				const mountTarget = Math.min(
-					maxVisible + mountAhead,
-					totalItems - 1
-				);
-				// Already covers everything up to mountTarget
-				if (prev.has(mountTarget)) return prev;
-				const next = new Set(prev);
-				for (let i = 0; i <= mountTarget; i++) next.add(i);
+				const windowStart = Math.max(0, minVisible - mountBehind);
+				const windowEnd = Math.min(count - 1, maxVisible + mountAhead);
+
+				const next = new Set<number>();
+				for (let i = windowStart; i <= windowEnd; i++) {
+					next.add(i);
+				}
+
+				// Avoid unnecessary state updates when window is unchanged.
+				if (next.size === prev.size) {
+					let same = true;
+					for (const index of next) {
+						if (!prev.has(index)) {
+							same = false;
+							break;
+						}
+					}
+					if (same) return prev;
+				}
+
 				return next;
 			});
 		};
@@ -96,7 +112,7 @@ export function useScrollBasedReveal({
 		handleScroll();
 		container.addEventListener("scroll", handleScroll);
 		return () => container.removeEventListener("scroll", handleScroll);
-	}, [containerRef, enabled, mountAhead, totalItems]);
+	}, [containerRef, count, enabled, mountAhead, mountBehind]);
 
 	return { visibleItems, mountedItems };
 }

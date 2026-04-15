@@ -43,8 +43,20 @@
 	/* Preserves the flex row's scroll geometry while PolaroidCard hasn't
 	   mounted yet. Matches portrait variant: w-60 image + 2×p-3 frame
 	   padding + caption area (mt-3 + h-5). */
-	min-width: 16.5rem;
-	min-height: 22.25rem;
+	width: 16.5rem;
+	height: 22.25rem;
+
+	@media (min-width: 640px) {
+		/* w-72 image + 2×p-4 + caption area (mt-4 + h-6) */
+		width: 20rem;
+		height: 27rem;
+	}
+
+	@media (min-width: 768px) {
+		/* w-80 image + 2×p-4 + caption area (mt-4 + h-6) */
+		width: 22rem;
+		height: 29.5rem;
+	}
 }
 
 .cardWrapperHidden {
