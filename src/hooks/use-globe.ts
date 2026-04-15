@@ -27,6 +27,10 @@ import { getCountryName } from "@/utils/country";
 
 const INTRO_CAMERA_ANIMATION_MS = 1500;
 
+function normalizeCountryId(id: string | number): string {
+	return String(id).padStart(3, "0");
+}
+
 interface UseGlobeProps {
 	trips: Trip[];
 	focusTripId?: string | null;
@@ -50,6 +54,10 @@ export function useGlobe({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
 	const materialCacheRef = useRef<Map<string, MeshPhongMaterial>>(new Map());
+	const materialTextureSrcRef = useRef<Map<string, string>>(new Map());
+	const pendingStyleRefreshRef = useRef(false);
+	const texturesReadyRef = useRef(false);
+	const textureBatchIdRef = useRef(0);
 	const isMobileRef = useRef(isMobile);
 	useEffect(() => {
 		isMobileRef.current = isMobile;
@@ -64,7 +72,16 @@ export function useGlobe({
 	}, [activeCountry]);
 	const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 	const [isLoaded, setIsLoaded] = useState(false);
+	const [isIntroComplete, setIsIntroComplete] = useState(false);
+	const isIntroCompleteRef = useRef(false);
+	useEffect(() => {
+		isIntroCompleteRef.current = isIntroComplete;
+	}, [isIntroComplete]);
 	const router = useRouter();
+	const routerRef = useRef(router);
+	useEffect(() => {
+		routerRef.current = router;
+	}, [router]);
 	const hoveredIdRef = useRef<string | null>(null);
 	const introCompleteTimeoutRef = useRef<ReturnType<
 		typeof setTimeout
@@ -88,29 +105,16 @@ export function useGlobe({
 
 		return { visitedIds: visited, idToTrip: tripMap, idToName: nameMap };
 	}, [trips]);
-
+	const visitedIdsRef = useRef(visitedIds);
+	const idToTripRef = useRef(idToTrip);
+	const idToNameRef = useRef(idToName);
+	const countriesRef = useRef(countries);
 	useEffect(() => {
-		const loader = new TextureLoader();
-		const cache = materialCacheRef.current;
-
-		for (const [id, trip] of idToTrip.entries()) {
-			if (cache.has(id)) continue;
-
-			const material = new MeshPhongMaterial({
-				transparent: true,
-				opacity: 0.65,
-				color: 0xf59e0b,
-			});
-			cache.set(id, material);
-
-			loader.load(trip.coverPhoto, (texture) => {
-				material.map = texture;
-				material.color.set(0xffffff);
-				material.opacity = 0.45;
-				material.needsUpdate = true;
-			});
-		}
-	}, [idToTrip]);
+		visitedIdsRef.current = visitedIds;
+		idToTripRef.current = idToTrip;
+		idToNameRef.current = idToName;
+		countriesRef.current = countries;
+	}, [visitedIds, idToTrip, idToName, countries]);
 
 	useEffect(() => {
 		fetch(TOPO_JSON_URL)
@@ -126,44 +130,149 @@ export function useGlobe({
 			});
 	}, []);
 
-	const getMaterial = useCallback(
-		(feat: GeoFeature): Material => {
-			if (!visitedIds.has(feat.id)) return defaultMaterial;
-			return materialCacheRef.current.get(feat.id) ?? defaultMaterial;
-		},
-		[visitedIds]
-	);
+	const getMaterial = useCallback((feat: GeoFeature): Material => {
+		const countryId = normalizeCountryId(feat.id);
+		if (!texturesReadyRef.current || !visitedIdsRef.current.has(countryId))
+			return defaultMaterial;
+		return materialCacheRef.current.get(countryId) ?? defaultMaterial;
+	}, []);
 
-	const updateHoverState = useCallback(
-		(hId: string | null) => {
-			if (!globeInstanceRef.current) return;
+	const applyPolygonStyleCallbacks = useCallback(() => {
+		const globe = globeInstanceRef.current;
+		if (!globe) {
+			pendingStyleRefreshRef.current = true;
+			return;
+		}
+		globe
+			.polygonCapMaterial((d: object) => getMaterial(d as GeoFeature))
+			.polygonSideColor((d: object) => {
+				const feat = d as GeoFeature;
+				return texturesReadyRef.current &&
+					visitedIdsRef.current.has(normalizeCountryId(feat.id))
+					? "rgba(251, 191, 36, 0.3)"
+					: "rgba(30, 41, 59, 0.02)";
+			})
+			.polygonStrokeColor((d: object) => {
+				const feat = d as GeoFeature;
+				return texturesReadyRef.current &&
+					visitedIdsRef.current.has(normalizeCountryId(feat.id))
+					? "rgba(200, 140, 30, 0.6)"
+					: "rgba(148, 163, 184, 0.35)";
+			})
+			.polygonAltitude((d: object) => {
+				const feat = d as GeoFeature;
+				return texturesReadyRef.current &&
+					visitedIdsRef.current.has(normalizeCountryId(feat.id))
+					? 0.012
+					: 0.001;
+			});
+		pendingStyleRefreshRef.current = false;
+	}, [getMaterial]);
 
-			for (const [id, mat] of materialCacheRef.current.entries()) {
-				mat.opacity = id === hId ? 0.85 : 0.45;
-				mat.needsUpdate = true;
+	const applyCountriesData = useCallback(() => {
+		const globe = globeInstanceRef.current;
+		if (!globe) return;
+		globe.polygonsData(countriesRef.current);
+	}, []);
+
+	const applyGlobeStyling = useCallback(() => {
+		const globe = globeInstanceRef.current;
+		if (!globe) {
+			pendingStyleRefreshRef.current = true;
+			return;
+		}
+		applyPolygonStyleCallbacks();
+		applyCountriesData();
+	}, [applyCountriesData, applyPolygonStyleCallbacks]);
+
+	useEffect(() => {
+		const loader = new TextureLoader();
+		const cache = materialCacheRef.current;
+		const textureSrcMap = materialTextureSrcRef.current;
+		const currentBatchId = ++textureBatchIdRef.current;
+		let remainingLoads = 0;
+
+		// Phase 1: show default/empty globe while trip textures load.
+		texturesReadyRef.current = false;
+		applyGlobeStyling();
+
+		for (const [id, trip] of idToTrip.entries()) {
+			let material = cache.get(id);
+			if (!material) {
+				material = new MeshPhongMaterial({
+					transparent: true,
+					opacity: 0.65,
+					color: 0xf59e0b,
+				});
+				cache.set(id, material);
 			}
 
-			globeInstanceRef.current
-				.polygonAltitude((d: object) => {
-					const feat = d as GeoFeature;
-					const isVisited = visitedIds.has(feat.id);
-					const isHovered = feat.id === hId;
-					if (isHovered && isVisited) return 0.02;
-					if (isVisited) return 0.012;
-					return 0.001;
-				})
-				.polygonStrokeColor((d: object) => {
-					const feat = d as GeoFeature;
-					const isVisited = visitedIds.has(feat.id);
-					const isHovered = feat.id === hId;
-					if (isHovered && isVisited)
-						return "rgba(255, 235, 80, 1.0)";
-					if (isVisited) return "rgba(200, 140, 30, 0.6)";
-					return "rgba(148, 163, 184, 0.35)";
-				});
-		},
-		[visitedIds]
-	);
+			const previousSrc = textureSrcMap.get(id);
+			if (previousSrc === trip.coverPhoto && material.map) continue;
+			textureSrcMap.set(id, trip.coverPhoto);
+			remainingLoads += 1;
+
+			loader.load(trip.coverPhoto, (texture) => {
+				if (currentBatchId !== textureBatchIdRef.current) return;
+				const currentMaterial = cache.get(id);
+				if (!currentMaterial) return;
+				currentMaterial.map = texture;
+				currentMaterial.color.set(0xffffff);
+				currentMaterial.opacity = 0.45;
+				currentMaterial.needsUpdate = true;
+				remainingLoads -= 1;
+				if (remainingLoads === 0) {
+					// Phase 2: all current trip textures ready; apply once.
+					texturesReadyRef.current = true;
+					if (isIntroCompleteRef.current) {
+						applyPolygonStyleCallbacks();
+						applyCountriesData();
+					} else {
+						pendingStyleRefreshRef.current = true;
+					}
+				}
+			});
+		}
+
+		if (remainingLoads === 0) {
+			texturesReadyRef.current = idToTrip.size > 0;
+			if (isIntroCompleteRef.current) {
+				applyPolygonStyleCallbacks();
+				applyCountriesData();
+			} else {
+				pendingStyleRefreshRef.current = true;
+			}
+		}
+	}, [applyCountriesData, applyGlobeStyling, applyPolygonStyleCallbacks, idToTrip]);
+
+	const updateHoverState = useCallback((hId: string | null) => {
+		if (!globeInstanceRef.current) return;
+
+		for (const [id, mat] of materialCacheRef.current.entries()) {
+			mat.opacity = id === hId ? 0.85 : 0.45;
+			mat.needsUpdate = true;
+		}
+
+		globeInstanceRef.current
+			.polygonAltitude((d: object) => {
+				const feat = d as GeoFeature;
+				const countryId = normalizeCountryId(feat.id);
+				const isVisited = visitedIdsRef.current.has(countryId);
+				const isHovered = countryId === hId;
+				if (isHovered && isVisited) return 0.02;
+				if (isVisited) return 0.012;
+				return 0.001;
+			})
+			.polygonStrokeColor((d: object) => {
+				const feat = d as GeoFeature;
+				const countryId = normalizeCountryId(feat.id);
+				const isVisited = visitedIdsRef.current.has(countryId);
+				const isHovered = countryId === hId;
+				if (isHovered && isVisited) return "rgba(255, 235, 80, 1.0)";
+				if (isVisited) return "rgba(200, 140, 30, 0.6)";
+				return "rgba(148, 163, 184, 0.35)";
+			});
+	}, []);
 
 	const updateHoverStateRef = useRef(updateHoverState);
 	useEffect(() => {
@@ -171,14 +280,20 @@ export function useGlobe({
 	}, [updateHoverState]);
 
 	useEffect(() => {
-		if (!globeInstanceRef.current || countries.length === 0) return;
-		globeInstanceRef.current.polygonsData(countries);
-	}, [countries, isLoaded]);
+		applyPolygonStyleCallbacks();
+	}, [applyPolygonStyleCallbacks, visitedIds]);
+
+	useEffect(() => {
+		applyCountriesData();
+	}, [applyCountriesData, countries]);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
 
 		let globe: GlobeInstance | undefined;
+		setIsLoaded(false);
+		setIsIntroComplete(false);
+		isIntroCompleteRef.current = false;
 
 		const initGlobe = async () => {
 			const GlobeModule = await import("globe.gl");
@@ -206,19 +321,27 @@ export function useGlobe({
 				.polygonCapMaterial((d: object) => getMaterial(d as GeoFeature))
 				.polygonSideColor((d: object) => {
 					const feat = d as GeoFeature;
-					return visitedIds.has(feat.id)
+					return visitedIdsRef.current.has(
+						normalizeCountryId(feat.id)
+					)
 						? "rgba(251, 191, 36, 0.3)"
 						: "rgba(30, 41, 59, 0.02)";
 				})
 				.polygonStrokeColor((d: object) => {
 					const feat = d as GeoFeature;
-					return visitedIds.has(feat.id)
+					return visitedIdsRef.current.has(
+						normalizeCountryId(feat.id)
+					)
 						? "rgba(200, 140, 30, 0.6)"
 						: "rgba(148, 163, 184, 0.35)";
 				})
 				.polygonAltitude((d: object) => {
 					const feat = d as GeoFeature;
-					return visitedIds.has(feat.id) ? 0.012 : 0.001;
+					return visitedIdsRef.current.has(
+						normalizeCountryId(feat.id)
+					)
+						? 0.012
+						: 0.001;
 				})
 				.polygonsTransitionDuration(300)
 				.onPolygonHover((polygon: object | null) => {
@@ -234,13 +357,14 @@ export function useGlobe({
 					}
 
 					const feat = polygon as GeoFeature;
-					const trip = idToTrip.get(feat.id);
-					hoveredIdRef.current = feat.id;
+					const countryId = normalizeCountryId(feat.id);
+					const trip = idToTripRef.current.get(countryId);
+					hoveredIdRef.current = countryId;
 
 					if (trip) {
 						const name =
-							idToName.get(feat.id) ??
-							idToCountryName[feat.id] ??
+							idToNameRef.current.get(countryId) ??
+							idToCountryName[countryId] ??
 							"";
 						setActiveCountry({
 							feature: feat,
@@ -255,14 +379,15 @@ export function useGlobe({
 							containerRef.current.style.cursor = "default";
 					}
 
-					updateHoverStateRef.current(feat.id);
+					updateHoverStateRef.current(countryId);
 				})
 				.onPolygonClick((polygon: object) => {
 					const feat = polygon as GeoFeature;
-					const trip = idToTrip.get(feat.id);
+					const countryId = normalizeCountryId(feat.id);
+					const trip = idToTripRef.current.get(countryId);
 
 					if (!isMobileRef.current) {
-						if (trip) router.push(getTripRoute(trip.id));
+						if (trip) routerRef.current.push(getTripRoute(trip.id));
 						return;
 					}
 
@@ -273,7 +398,9 @@ export function useGlobe({
 					}
 
 					const alreadyShowing =
-						activeCountryRef.current?.feature.id === feat.id;
+						normalizeCountryId(
+							activeCountryRef.current?.feature.id ?? ""
+						) === countryId;
 					if (alreadyShowing) {
 						setActiveCountry(null);
 						updateHoverStateRef.current(null);
@@ -281,14 +408,20 @@ export function useGlobe({
 					}
 
 					const name =
-						idToName.get(feat.id) ?? idToCountryName[feat.id] ?? "";
+						idToNameRef.current.get(countryId) ??
+						idToCountryName[countryId] ??
+						"";
 					setActiveCountry({
 						feature: feat,
 						trip,
 						countryName: name,
 					});
-					updateHoverStateRef.current(feat.id);
+					updateHoverStateRef.current(countryId);
 				});
+
+			if (pendingStyleRefreshRef.current) {
+				applyGlobeStyling();
+			}
 
 			const controls = globe.controls();
 			controls.autoRotate = true;
@@ -304,6 +437,8 @@ export function useGlobe({
 			});
 
 			globe.onGlobeReady(() => {
+				setIsLoaded(true);
+				applyGlobeStyling();
 				globe!.pointOfView(
 					{
 						lat: 20,
@@ -314,9 +449,13 @@ export function useGlobe({
 				);
 
 				introCompleteTimeoutRef.current = setTimeout(() => {
-					setIsLoaded(true);
+					setIsIntroComplete(true);
+					isIntroCompleteRef.current = true;
 					const readyControls = globe!.controls();
 					if (readyControls) readyControls.autoRotate = true;
+					if (pendingStyleRefreshRef.current) {
+						applyGlobeStyling();
+					}
 				}, INTRO_CAMERA_ANIMATION_MS);
 			});
 		};
@@ -330,10 +469,14 @@ export function useGlobe({
 			}
 			if (globe) globe._destructor();
 		};
-	}, [visitedIds, idToTrip, idToName, getMaterial, router]);
+	}, [applyGlobeStyling, getMaterial]);
 
 	useEffect(() => {
-		if (!isLoaded || !globeInstanceRef.current || countries.length === 0)
+		if (
+			!isIntroComplete ||
+			!globeInstanceRef.current ||
+			countries.length === 0
+		)
 			return;
 
 		if (!focusTripId) {
@@ -348,7 +491,7 @@ export function useGlobe({
 		}
 
 		let targetCountryId: string | null = null;
-		for (const [id, trip] of idToTrip.entries()) {
+		for (const [id, trip] of idToTripRef.current.entries()) {
 			if (trip.id === focusTripId) {
 				targetCountryId = id;
 				break;
@@ -356,7 +499,9 @@ export function useGlobe({
 		}
 		if (!targetCountryId) return;
 
-		const feature = countries.find((f) => f.id === targetCountryId);
+		const feature = countries.find(
+			(f) => normalizeCountryId(f.id) === targetCountryId
+		);
 		if (!feature) return;
 
 		const { lat, lng } = computeCentroid(feature);
@@ -366,14 +511,7 @@ export function useGlobe({
 
 		globeInstanceRef.current.pointOfView({ lat, lng, altitude: 1.4 }, 1000);
 		updateHoverState(targetCountryId);
-	}, [
-		focusTripId,
-		countries,
-		idToTrip,
-		updateHoverState,
-		isLoaded,
-		isMobile,
-	]);
+	}, [focusTripId, countries, updateHoverState, isIntroComplete, isMobile]);
 
 	const clearActiveCountry = useCallback(() => {
 		setActiveCountry(null);
