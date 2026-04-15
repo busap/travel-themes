@@ -209,7 +209,7 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
 								fill
 								sizes="(max-width: 768px) 95vw, 88vw"
 								priority={i < 2}
-								loading={i < 2 ? undefined : "eager"}
+								loading={i < 4 ? undefined : "lazy"}
 							/>
 							<div className={styles.photoChroma} aria-hidden />
 						</div>

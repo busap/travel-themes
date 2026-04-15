@@ -107,7 +107,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 	const duration = config.animation?.timeline?.duration ?? 0.8;
 	const ease = config.animation?.timeline?.ease ?? "power3.out";
 	const stagger = config.animation?.timeline?.stagger ?? 0.12;
-	const triggerStart = config.animation?.scrollTrigger?.start ?? "top 85%";
+	const triggerStart = config.animation?.scrollTrigger?.start ?? "top 60%";
 	const titleClasses = "text-5xl font-light tracking-wide";
 	const bodyClasses = "text-lg text-zinc-600";
 

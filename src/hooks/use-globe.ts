@@ -297,12 +297,25 @@ export function useGlobe({
 			controls.minDistance = 150;
 			controls.maxDistance = 500;
 
+			// Start 90° offset so the rotate-in animation is visible
 			globe.pointOfView({
 				lat: 20,
-				lng: 15,
+				lng: 15 - 90,
 				altitude: isMobileRef.current ? 4 : 2.2,
 			});
-			setIsLoaded(true);
+
+			globe.onGlobeReady(() => {
+				// Animate to final position once the globe is fully initialised
+				globe!.pointOfView(
+					{
+						lat: 20,
+						lng: 15,
+						altitude: isMobileRef.current ? 4 : 2.2,
+					},
+					1500
+				);
+				setIsLoaded(true);
+			});
 		};
 
 		initGlobe();
