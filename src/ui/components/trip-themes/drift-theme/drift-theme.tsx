@@ -282,15 +282,18 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 			const captions = section.querySelectorAll(
 				'[data-entrance="caption"]'
 			);
+			const waveIndex = Number(section.getAttribute("data-wave") ?? -1);
 
-			// Section is already inside the viewport when the effect runs
-			// (e.g. the first wave is visible on load). Show it immediately
-			// so it is never stuck in the hidden pre-animation state.
-			if (section.getBoundingClientRect().top < viewportH) {
-				gsap.set(
-					[...Array.from(photos), ...Array.from(captions)],
-					{ opacity: 1, x: 0, y: 0, scale: 1 }
-				);
+			if (
+				waveIndex === 0 &&
+				section.getBoundingClientRect().top < viewportH
+			) {
+				gsap.set([...Array.from(photos), ...Array.from(captions)], {
+					opacity: 1,
+					x: 0,
+					y: 0,
+					scale: 1,
+				});
 				return;
 			}
 
@@ -369,14 +372,15 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 				className={styles.photo}
 				style={{ transform: `rotate(${rotation}deg)` }}
 			>
-				<Image
-					src={photo.src}
-					alt={photo.title || `Photo ${index + 1}`}
-					className={styles.photoImage}
-					width={600}
-					height={450}
-					sizes="(max-width: 768px) 90vw, 550px"
-				/>
+				<div className={styles.photoMedia}>
+					<Image
+						src={photo.src}
+						alt={photo.title || `Photo ${index + 1}`}
+						className={styles.photoImage}
+						fill
+						sizes="(max-width: 768px) 90vw, 550px"
+					/>
+				</div>
 				{photo.title && (
 					<p
 						data-entrance="caption"
