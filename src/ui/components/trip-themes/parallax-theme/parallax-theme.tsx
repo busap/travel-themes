@@ -1,6 +1,12 @@
 "use client";
 
-import { CSSProperties, useEffect, useRef, useMemo } from "react";
+import {
+	CSSProperties,
+	useEffect,
+	useRef,
+	useMemo,
+	useState,
+} from "react";
 import Image from "next/image";
 import { DM_Serif_Display } from "next/font/google";
 import { Trip } from "@/types/trip";
@@ -24,7 +30,12 @@ const dmSerif = DM_Serif_Display({
 
 const STRIP_COUNT = 7;
 const SECTION_PX = 1200;
-const TRANSITION_FRAC = 0.65;
+const SECTION_HOLD_PX = 320;
+const SECTION_STRIDE_PX = SECTION_PX + SECTION_HOLD_PX;
+const TRANSITION_DELAY_FRAC = 0.18;
+const TRANSITION_FRAC = 0.52;
+const PHOTO_WINDOW_BEHIND = 1;
+const PHOTO_WINDOW_AHEAD = 2;
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -71,9 +82,57 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const counterRef = useRef<HTMLSpanElement>(null);
 	const scrub = config.animation?.scrollTrigger?.scrub ?? 1.2;
-
+	const [activePhotoRange, setActivePhotoRange] = useState<{
+		start: number;
+		end: number;
+	}>(() => ({
+		start: 0,
+		end: Math.min(2, Math.max(0, trip.photos.length - 1)),
+	}));
+	const lastRangeRef = useRef(activePhotoRange);
 	const photos = trip.photos;
 	const count = photos.length;
+	const totalScrollHeight = useMemo(
+		() => (count - 1) * SECTION_STRIDE_PX,
+		[count]
+	);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		if (!container || count <= 0) return;
+
+		const updatePhotoWindow = () => {
+			const start = container.offsetTop;
+			const scrollRange = Math.max(totalScrollHeight, 1);
+			const rawProgress = (window.scrollY - start) / scrollRange;
+			const clampedProgress = Math.min(1, Math.max(0, rawProgress));
+			const focusIndex = Math.round(clampedProgress * (count - 1));
+
+			const nextRange = {
+				start: Math.max(0, focusIndex - PHOTO_WINDOW_BEHIND),
+				end: Math.min(count - 1, focusIndex + PHOTO_WINDOW_AHEAD),
+			};
+			const prev = lastRangeRef.current;
+			if (prev.start === nextRange.start && prev.end === nextRange.end) {
+				return;
+			}
+			lastRangeRef.current = nextRange;
+			setActivePhotoRange(nextRange);
+		};
+
+		const onScrollOrResize = () => {
+			window.requestAnimationFrame(updatePhotoWindow);
+		};
+
+		window.addEventListener("scroll", onScrollOrResize, { passive: true });
+		window.addEventListener("resize", onScrollOrResize);
+		window.requestAnimationFrame(updatePhotoWindow);
+
+		return () => {
+			window.removeEventListener("scroll", onScrollOrResize);
+			window.removeEventListener("resize", onScrollOrResize);
+		};
+	}, [count, totalScrollHeight]);
 
 	const allStripAnims = useMemo<StripAnim[][]>(
 		() =>
@@ -84,8 +143,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 			),
 		[photos]
 	);
-
-	const totalScrollHeight = useMemo(() => (count - 1) * SECTION_PX, [count]);
 
 	useEffect(() => {
 		if (!containerRef.current || count === 0) return;
@@ -101,18 +158,24 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 			);
 
 			if (prefersReduced) {
-				photoLayers.forEach((layer, p) => {
-					gsap.set(layer, { autoAlpha: p === 0 ? 1 : 0 });
+				photoLayers.forEach((layer) => {
+					const photoIndex = Number(
+						layer.dataset.photoIndex ?? "0"
+					);
+					gsap.set(layer, {
+						autoAlpha: photoIndex === 0 ? 1 : 0,
+					});
 				});
 				return;
 			}
 
-			photoLayers.forEach((layer, p) => {
+			photoLayers.forEach((layer) => {
+				const photoIndex = Number(layer.dataset.photoIndex ?? "0");
 				const strips = Array.from(
 					layer.querySelectorAll<HTMLElement>("[data-strip]")
 				);
 
-				if (p === 0) {
+				if (photoIndex === 0) {
 					gsap.fromTo(
 						strips,
 						{
@@ -130,10 +193,11 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 					return;
 				}
 
-				const sectionStart = (p - 1) * SECTION_PX;
+				const sectionStart = (photoIndex - 1) * SECTION_STRIDE_PX;
 
 				strips.forEach((strip, s) => {
-					const anim = allStripAnims[p][s];
+					const anim = allStripAnims[photoIndex]?.[s];
+					if (!anim) return;
 
 					gsap.set(strip, {
 						xPercent: anim.entryDir,
@@ -147,8 +211,8 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						immediateRender: false,
 						scrollTrigger: {
 							trigger: container,
-							start: `top+=${Math.round(sectionStart + anim.startRatio * SECTION_PX)} top`,
-							end: `top+=${Math.round(sectionStart + anim.endRatio * SECTION_PX)} top`,
+							start: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX)} top`,
+							end: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX)} top`,
 							scrub,
 						},
 					});
@@ -162,13 +226,13 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						onEnter: () => {
 							if (counterRef.current)
 								counterRef.current.textContent = String(
-									p + 1
+									photoIndex + 1
 								).padStart(2, "0");
 						},
 						onLeaveBack: () => {
 							if (counterRef.current)
 								counterRef.current.textContent = String(
-									p
+									photoIndex
 								).padStart(2, "0");
 						},
 					});
@@ -257,6 +321,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 								key={`${photo.src}-${p}`}
 								className={styles.photoLayer}
 								data-photo-layer
+								data-photo-index={p}
 								style={{ zIndex: p } as CSSProperties}
 							>
 								{Array.from({ length: STRIP_COUNT }, (_, s) => (
@@ -279,20 +344,25 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 												} as CSSProperties
 											}
 										>
-											<Image
-												src={photo.src}
-												alt={
-													photo.title ||
-													`${trip.name} — photo ${p + 1}`
-												}
-												fill
-												className={styles.image}
-												sizes="100vw"
-												priority={p === 0 && s < 3}
-												loading={
-													p === 0 ? undefined : "lazy"
-												}
-											/>
+											{p >= activePhotoRange.start &&
+												p <= activePhotoRange.end && (
+												<Image
+													src={photo.src}
+													alt={
+														photo.title ||
+														`${trip.name} — photo ${p + 1}`
+													}
+													fill
+													className={styles.image}
+													sizes="(max-width: 768px) 100vw, 68vw"
+													priority={s === 0 && p < 2}
+													loading={
+														s === 0 && p < 2
+															? undefined
+															: "lazy"
+													}
+												/>
+											)}
 										</div>
 									</div>
 								))}
