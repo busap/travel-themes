@@ -275,11 +275,24 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 
 		// Animate per wave section — photos stagger in as a group when the wave scrolls into view
 		const waveSections = container.querySelectorAll("[data-wave]");
+		const viewportH = window.innerHeight;
+
 		waveSections.forEach((section) => {
 			const photos = section.querySelectorAll('[data-entrance="photo"]');
 			const captions = section.querySelectorAll(
 				'[data-entrance="caption"]'
 			);
+
+			// Section is already inside the viewport when the effect runs
+			// (e.g. the first wave is visible on load). Show it immediately
+			// so it is never stuck in the hidden pre-animation state.
+			if (section.getBoundingClientRect().top < viewportH) {
+				gsap.set(
+					[...Array.from(photos), ...Array.from(captions)],
+					{ opacity: 1, x: 0, y: 0, scale: 1 }
+				);
+				return;
+			}
 
 			const tl = gsap.timeline({
 				scrollTrigger: {

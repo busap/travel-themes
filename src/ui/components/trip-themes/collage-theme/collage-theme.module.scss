@@ -40,6 +40,11 @@
 
 .cardWrapper {
 	@apply transition-all duration-700;
+	/* Preserves the flex row's scroll geometry while PolaroidCard hasn't
+	   mounted yet. Matches portrait variant: w-60 image + 2×p-3 frame
+	   padding + caption area (mt-3 + h-5). */
+	min-width: 16.5rem;
+	min-height: 22.25rem;
 }
 
 .cardWrapperHidden {
