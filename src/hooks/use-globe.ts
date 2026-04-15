@@ -25,6 +25,8 @@ import {
 import { countryCodeToId, idToCountryName } from "@/utils/globe-country-map";
 import { getCountryName } from "@/utils/country";
 
+const INTRO_CAMERA_ANIMATION_MS = 1500;
+
 interface UseGlobeProps {
 	trips: Trip[];
 	focusTripId?: string | null;
@@ -64,6 +66,9 @@ export function useGlobe({
 	const [isLoaded, setIsLoaded] = useState(false);
 	const router = useRouter();
 	const hoveredIdRef = useRef<string | null>(null);
+	const introCompleteTimeoutRef = useRef<ReturnType<
+		typeof setTimeout
+	> | null>(null);
 
 	const { visitedIds, idToTrip, idToName } = useMemo(() => {
 		const visited = new Set<string>();
@@ -84,7 +89,6 @@ export function useGlobe({
 		return { visitedIds: visited, idToTrip: tripMap, idToName: nameMap };
 	}, [trips]);
 
-	// Preload textures for visited countries
 	useEffect(() => {
 		const loader = new TextureLoader();
 		const cache = materialCacheRef.current;
@@ -108,7 +112,6 @@ export function useGlobe({
 		}
 	}, [idToTrip]);
 
-	// Fetch country GeoJSON
 	useEffect(() => {
 		fetch(TOPO_JSON_URL)
 			.then((res) => res.json())
@@ -162,7 +165,6 @@ export function useGlobe({
 		[visitedIds]
 	);
 
-	// Keep a ref so onPolygonHover (registered once during init) always calls the latest version
 	const updateHoverStateRef = useRef(updateHoverState);
 	useEffect(() => {
 		updateHoverStateRef.current = updateHoverState;
@@ -173,7 +175,6 @@ export function useGlobe({
 		globeInstanceRef.current.polygonsData(countries);
 	}, [countries, isLoaded]);
 
-	// Initialize globe
 	useEffect(() => {
 		if (!containerRef.current) return;
 
@@ -265,7 +266,6 @@ export function useGlobe({
 						return;
 					}
 
-					// Mobile: first tap shows card, second tap on same country navigates
 					if (!trip) {
 						setActiveCountry(null);
 						updateHoverStateRef.current(null);
@@ -297,7 +297,6 @@ export function useGlobe({
 			controls.minDistance = 150;
 			controls.maxDistance = 500;
 
-			// Start 90° offset so the rotate-in animation is visible
 			globe.pointOfView({
 				lat: 20,
 				lng: 15 - 90,
@@ -305,29 +304,37 @@ export function useGlobe({
 			});
 
 			globe.onGlobeReady(() => {
-				// Animate to final position once the globe is fully initialised
 				globe!.pointOfView(
 					{
 						lat: 20,
 						lng: 15,
 						altitude: isMobileRef.current ? 4 : 2.2,
 					},
-					1500
+					INTRO_CAMERA_ANIMATION_MS
 				);
-				setIsLoaded(true);
+
+				introCompleteTimeoutRef.current = setTimeout(() => {
+					setIsLoaded(true);
+					const readyControls = globe!.controls();
+					if (readyControls) readyControls.autoRotate = true;
+				}, INTRO_CAMERA_ANIMATION_MS);
 			});
 		};
 
 		initGlobe();
 
 		return () => {
+			if (introCompleteTimeoutRef.current) {
+				clearTimeout(introCompleteTimeoutRef.current);
+				introCompleteTimeoutRef.current = null;
+			}
 			if (globe) globe._destructor();
 		};
 	}, [visitedIds, idToTrip, idToName, getMaterial, router]);
 
-	// React to focusTripId: rotate globe to that country and highlight it
 	useEffect(() => {
-		if (!globeInstanceRef.current || countries.length === 0) return;
+		if (!isLoaded || !globeInstanceRef.current || countries.length === 0)
+			return;
 
 		if (!focusTripId) {
 			updateHoverState(null);
@@ -359,14 +366,20 @@ export function useGlobe({
 
 		globeInstanceRef.current.pointOfView({ lat, lng, altitude: 1.4 }, 1000);
 		updateHoverState(targetCountryId);
-	}, [focusTripId, countries, idToTrip, updateHoverState, isMobile]);
+	}, [
+		focusTripId,
+		countries,
+		idToTrip,
+		updateHoverState,
+		isLoaded,
+		isMobile,
+	]);
 
 	const clearActiveCountry = useCallback(() => {
 		setActiveCountry(null);
 		updateHoverStateRef.current(null);
 	}, []);
 
-	// Pause auto-rotate when mouse is over the globe sphere; resume when it leaves
 	const handleMouseMove = useCallback((e: React.MouseEvent) => {
 		setTooltipPos({ x: e.clientX, y: e.clientY });
 
@@ -387,7 +400,6 @@ export function useGlobe({
 		if (controls) controls.autoRotate = !isOverGlobe;
 	}, []);
 
-	// Handle resize
 	useEffect(() => {
 		const handleResize = () => {
 			if (globeInstanceRef.current && containerRef.current) {
