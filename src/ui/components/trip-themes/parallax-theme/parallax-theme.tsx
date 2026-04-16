@@ -145,6 +145,14 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 			),
 		[photos]
 	);
+	const mountedRangeStart = Math.max(
+		0,
+		activePhotoRange.start - PHOTO_MOUNT_BUFFER_BEHIND
+	);
+	const mountedRangeEnd = Math.min(
+		count - 1,
+		activePhotoRange.end + PHOTO_MOUNT_BUFFER_AHEAD
+	);
 
 	useEffect(() => {
 		if (!containerRef.current || count === 0) return;
@@ -206,7 +214,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 					strips,
 					{
 						xPercent: (i) => (i % 2 === 0 ? -108 : 108),
-						autoAlpha: 0,
+						autoAlpha: 1,
 					},
 					{
 						xPercent: 0,
@@ -298,6 +306,8 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 				const strips = Array.from(
 					layer.querySelectorAll<HTMLElement>("[data-strip]")
 				);
+				if (strips.length === 0) return;
+
 				const sectionStart = (photoIndex - 1) * SECTION_STRIDE_PX;
 				const layerRevealStart = Math.round(
 					sectionStart + TRANSITION_DELAY_FRAC * SECTION_PX
@@ -327,18 +337,21 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						y: anim.entryY,
 					});
 
-					gsap.to(strip, {
-						xPercent: 0,
-						y: 0,
-						ease: anim.ease,
-						immediateRender: false,
-						scrollTrigger: {
-							trigger: container,
-							start: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX)} top`,
-							end: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX)} top`,
-							scrub,
+					gsap.to(
+						strip,
+						{
+							xPercent: 0,
+							y: 0,
+							ease: anim.ease,
+							immediateRender: false,
+							scrollTrigger: {
+								trigger: container,
+								start: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX} top`,
+								end: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX} top`,
+								scrub,
+							},
 						},
-					});
+					);
 				});
 			});
 		}, container);
@@ -364,74 +377,66 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						className={styles.photosWrapper}
 						aria-label="Trip photo gallery"
 					>
-						{photos.map((photo, p) => (
-							<div
-								key={`${photo.src}-${p}`}
-								className={styles.photoLayer}
-								data-photo-layer
-								data-photo-index={p}
-								style={
-									{
-										zIndex: p,
-										opacity: 0,
-										visibility: "hidden",
-									} as CSSProperties
-								}
-							>
-								{Array.from({ length: STRIP_COUNT }, (_, s) => (
-									<div
-										key={s}
-										className={styles.stripSlide}
-										data-strip={s}
-										style={
-											{
-												top: `${(s / STRIP_COUNT) * 100}%`,
-												height: `${100 / STRIP_COUNT}%`,
-											} as CSSProperties
-										}
-									>
+						{photos.map((photo, p) => {
+							const isPhotoMounted =
+								p >= mountedRangeStart && p <= mountedRangeEnd;
+
+							return (
+								<div
+									key={`${photo.src}-${p}`}
+									className={styles.photoLayer}
+									data-photo-layer
+									data-photo-index={p}
+									style={
+										{
+											zIndex: p,
+											opacity: 0,
+											visibility: "hidden",
+										} as CSSProperties
+									}
+								>
+									{isPhotoMounted && (
+										<Image
+											src={photo.src}
+											alt={
+												photo.title ||
+												`${trip.name} — photo ${p + 1}`
+											}
+											fill
+											className={styles.photoImageSingle}
+											sizes="(max-width: 768px) 100vw, 68vw"
+											priority={p < 2}
+											loading={p < 2 ? undefined : "lazy"}
+										/>
+									)}
+									{Array.from({ length: STRIP_COUNT }, (_, s) => (
 										<div
-											className={styles.imagePos}
+											key={s}
+											className={styles.stripPhoto}
+											data-strip={s}
 											style={
 												{
-													top: `${-(s / STRIP_COUNT) * 100}vh`,
+													top: `${(s / STRIP_COUNT) * 100}%`,
+													height: `${100 / STRIP_COUNT}%`,
 												} as CSSProperties
 											}
 										>
-											{p >=
-												Math.max(
-													0,
-													activePhotoRange.start -
-														PHOTO_MOUNT_BUFFER_BEHIND
-												) &&
-												p <=
-													Math.min(
-														count - 1,
-														activePhotoRange.end +
-															PHOTO_MOUNT_BUFFER_AHEAD
-													) && (
-												<Image
-													src={photo.src}
-													alt={
-														photo.title ||
-														`${trip.name} — photo ${p + 1}`
-													}
-													fill
-													className={styles.image}
-													sizes="(max-width: 768px) 100vw, 68vw"
-													priority={s === 0 && p < 2}
-													loading={
-														s === 0 && p < 2
-															? undefined
-															: "lazy"
-													}
-												/>
-											)}
+											<div
+												className={styles.stripPhotoImage}
+												style={
+													{
+														top: `${-(s / STRIP_COUNT) * 100}vh`,
+														backgroundImage: isPhotoMounted
+															? `url(${photo.src})`
+															: undefined,
+													} as CSSProperties
+												}
+											/>
 										</div>
-									</div>
-								))}
-							</div>
-						))}
+									))}
+								</div>
+							);
+						})}
 					</div>
 
 					<div className={styles.separators} aria-hidden>
