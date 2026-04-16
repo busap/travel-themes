@@ -36,6 +36,8 @@ const TRANSITION_DELAY_FRAC = 0.18;
 const TRANSITION_FRAC = 0.52;
 const PHOTO_WINDOW_BEHIND = 1;
 const PHOTO_WINDOW_AHEAD = 2;
+const PHOTO_MOUNT_BUFFER_BEHIND = 3;
+const PHOTO_MOUNT_BUFFER_AHEAD = 3;
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -169,74 +171,51 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 				return;
 			}
 
+			if (counterRef.current) {
+				counterRef.current.textContent = "01";
+				ScrollTrigger.create({
+					trigger: container,
+					start: "top top",
+					end: `top+=${Math.round(Math.max(totalScrollHeight, 1))} top`,
+					onUpdate: (self) => {
+						const nextIndex = Math.min(
+							count - 1,
+							Math.max(0, Math.round(self.progress * (count - 1)))
+						);
+						if (counterRef.current) {
+							counterRef.current.textContent = String(
+								nextIndex + 1
+							).padStart(2, "0");
+						}
+					},
+				});
+			}
+
 			photoLayers.forEach((layer) => {
 				const photoIndex = Number(layer.dataset.photoIndex ?? "0");
-				const strips = Array.from(
-					layer.querySelectorAll<HTMLElement>("[data-strip]")
-				);
-
-				if (photoIndex === 0) {
-					gsap.fromTo(
-						strips,
-						{
-							xPercent: (i) => (i % 2 === 0 ? -108 : 108),
-							autoAlpha: 0,
-						},
-						{
-							xPercent: 0,
-							autoAlpha: 1,
-							duration: 0.65,
-							ease: "power3.out",
-							stagger: { each: 0.07, from: "center" },
-						}
-					);
+				if (photoIndex !== 0) {
+					gsap.set(layer, { autoAlpha: 0 });
 					return;
 				}
 
-				const sectionStart = (photoIndex - 1) * SECTION_STRIDE_PX;
-
-				strips.forEach((strip, s) => {
-					const anim = allStripAnims[photoIndex]?.[s];
-					if (!anim) return;
-
-					gsap.set(strip, {
-						xPercent: anim.entryDir,
-						y: anim.entryY,
-					});
-
-					gsap.to(strip, {
+				const strips = Array.from(
+					layer.querySelectorAll<HTMLElement>("[data-strip]")
+				);
+				gsap.set(layer, { autoAlpha: 1 });
+				gsap.fromTo(
+					strips,
+					{
+						xPercent: (i) => (i % 2 === 0 ? -108 : 108),
+						autoAlpha: 0,
+					},
+					{
 						xPercent: 0,
-						y: 0,
-						ease: anim.ease,
-						immediateRender: false,
-						scrollTrigger: {
-							trigger: container,
-							start: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX)} top`,
-							end: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX)} top`,
-							scrub,
-						},
-					});
-				});
-
-				if (counterRef.current) {
-					const midpoint = sectionStart + SECTION_PX * 0.55;
-					ScrollTrigger.create({
-						trigger: container,
-						start: `top+=${Math.round(midpoint)} top`,
-						onEnter: () => {
-							if (counterRef.current)
-								counterRef.current.textContent = String(
-									photoIndex + 1
-								).padStart(2, "0");
-						},
-						onLeaveBack: () => {
-							if (counterRef.current)
-								counterRef.current.textContent = String(
-									photoIndex
-								).padStart(2, "0");
-						},
-					});
-				}
+						autoAlpha: 1,
+						duration: 0.65,
+						ease: "power3.out",
+						stagger: { each: 0.07, from: "center" },
+					}
+				);
 			});
 
 			const titleEl =
@@ -296,6 +275,75 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 		}, container);
 
 		return () => ctx.revert();
+	}, [count, totalScrollHeight]);
+
+	useEffect(() => {
+		if (!containerRef.current || count === 0) return;
+
+		const container = containerRef.current;
+		const prefersReduced = window.matchMedia(
+			"(prefers-reduced-motion: reduce)"
+		).matches;
+		if (prefersReduced) return;
+
+		const ctx = gsap.context(() => {
+			const photoLayers = Array.from(
+				container.querySelectorAll<HTMLElement>("[data-photo-layer]")
+			);
+
+			photoLayers.forEach((layer) => {
+				const photoIndex = Number(layer.dataset.photoIndex ?? "0");
+				if (photoIndex === 0) return;
+
+				const strips = Array.from(
+					layer.querySelectorAll<HTMLElement>("[data-strip]")
+				);
+				const sectionStart = (photoIndex - 1) * SECTION_STRIDE_PX;
+				const layerRevealStart = Math.round(
+					sectionStart + TRANSITION_DELAY_FRAC * SECTION_PX
+				);
+
+				gsap.set(layer, { autoAlpha: 0 });
+				ScrollTrigger.create({
+					trigger: container,
+					start: `top+=${layerRevealStart} top`,
+					onEnter: () => {
+						gsap.set(layer, { autoAlpha: 1 });
+					},
+					onEnterBack: () => {
+						gsap.set(layer, { autoAlpha: 1 });
+					},
+					onLeaveBack: () => {
+						gsap.set(layer, { autoAlpha: 0 });
+					},
+				});
+
+				strips.forEach((strip, s) => {
+					const anim = allStripAnims[photoIndex]?.[s];
+					if (!anim) return;
+
+					gsap.set(strip, {
+						xPercent: anim.entryDir,
+						y: anim.entryY,
+					});
+
+					gsap.to(strip, {
+						xPercent: 0,
+						y: 0,
+						ease: anim.ease,
+						immediateRender: false,
+						scrollTrigger: {
+							trigger: container,
+							start: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX)} top`,
+							end: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX)} top`,
+							scrub,
+						},
+					});
+				});
+			});
+		}, container);
+
+		return () => ctx.revert();
 	}, [count, scrub, allStripAnims]);
 
 	if (count === 0) return null;
@@ -322,7 +370,13 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 								className={styles.photoLayer}
 								data-photo-layer
 								data-photo-index={p}
-								style={{ zIndex: p } as CSSProperties}
+								style={
+									{
+										zIndex: p,
+										opacity: 0,
+										visibility: "hidden",
+									} as CSSProperties
+								}
 							>
 								{Array.from({ length: STRIP_COUNT }, (_, s) => (
 									<div
@@ -344,8 +398,18 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 												} as CSSProperties
 											}
 										>
-											{p >= activePhotoRange.start &&
-												p <= activePhotoRange.end && (
+											{p >=
+												Math.max(
+													0,
+													activePhotoRange.start -
+														PHOTO_MOUNT_BUFFER_BEHIND
+												) &&
+												p <=
+													Math.min(
+														count - 1,
+														activePhotoRange.end +
+															PHOTO_MOUNT_BUFFER_AHEAD
+													) && (
 												<Image
 													src={photo.src}
 													alt={
