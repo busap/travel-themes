@@ -88,7 +88,9 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 							{mountedPhotos.has(index) && (
 								<PolaroidCard
 									imageSrc={photo.src}
-									imageAlt={photo.title || `Photo ${index + 1}`}
+									imageAlt={
+										photo.title || `Photo ${index + 1}`
+									}
 									caption={photo.title}
 									rotation={rotation}
 									verticalOffset={offset.y}

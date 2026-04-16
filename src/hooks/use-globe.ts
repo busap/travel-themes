@@ -243,7 +243,12 @@ export function useGlobe({
 				pendingStyleRefreshRef.current = true;
 			}
 		}
-	}, [applyCountriesData, applyGlobeStyling, applyPolygonStyleCallbacks, idToTrip]);
+	}, [
+		applyCountriesData,
+		applyGlobeStyling,
+		applyPolygonStyleCallbacks,
+		idToTrip,
+	]);
 
 	const updateHoverState = useCallback((hId: string | null) => {
 		if (!globeInstanceRef.current) return;

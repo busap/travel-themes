@@ -33,12 +33,14 @@ export function useScrollBasedReveal({
 	const count = itemCount ?? totalItems;
 
 	const getInitialVisible = (): Set<number> => {
-		if (!enabled) return new Set(Array.from({ length: count }, (_, i) => i));
+		if (!enabled)
+			return new Set(Array.from({ length: count }, (_, i) => i));
 		return new Set<number>();
 	};
 
 	const getInitialMounted = (): Set<number> => {
-		if (!enabled) return new Set(Array.from({ length: count }, (_, i) => i));
+		if (!enabled)
+			return new Set(Array.from({ length: count }, (_, i) => i));
 		// Pre-mount the first batch so the initial render is not empty
 		return new Set(
 			Array.from({ length: Math.min(mountAhead + 2, count) }, (_, i) => i)
