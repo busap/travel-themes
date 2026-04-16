@@ -1,12 +1,6 @@
 "use client";
 
-import {
-	CSSProperties,
-	useEffect,
-	useRef,
-	useMemo,
-	useState,
-} from "react";
+import { CSSProperties, useEffect, useRef, useMemo, useState } from "react";
 import Image from "next/image";
 import { DM_Serif_Display } from "next/font/google";
 import { Trip } from "@/types/trip";
@@ -169,9 +163,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 
 			if (prefersReduced) {
 				photoLayers.forEach((layer) => {
-					const photoIndex = Number(
-						layer.dataset.photoIndex ?? "0"
-					);
+					const photoIndex = Number(layer.dataset.photoIndex ?? "0");
 					gsap.set(layer, {
 						autoAlpha: photoIndex === 0 ? 1 : 0,
 					});
@@ -337,21 +329,18 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						y: anim.entryY,
 					});
 
-					gsap.to(
-						strip,
-						{
-							xPercent: 0,
-							y: 0,
-							ease: anim.ease,
-							immediateRender: false,
-							scrollTrigger: {
-								trigger: container,
-								start: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX} top`,
-								end: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX} top`,
-								scrub,
-							},
+					gsap.to(strip, {
+						xPercent: 0,
+						y: 0,
+						ease: anim.ease,
+						immediateRender: false,
+						scrollTrigger: {
+							trigger: container,
+							start: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX} top`,
+							end: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX} top`,
+							scrub,
 						},
-					);
+					});
 				});
 			});
 		}, container);
@@ -409,31 +398,37 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 											loading={p < 2 ? undefined : "lazy"}
 										/>
 									)}
-									{Array.from({ length: STRIP_COUNT }, (_, s) => (
-										<div
-											key={s}
-											className={styles.stripPhoto}
-											data-strip={s}
-											style={
-												{
-													top: `${(s / STRIP_COUNT) * 100}%`,
-													height: `${100 / STRIP_COUNT}%`,
-												} as CSSProperties
-											}
-										>
+									{Array.from(
+										{ length: STRIP_COUNT },
+										(_, s) => (
 											<div
-												className={styles.stripPhotoImage}
+												key={s}
+												className={styles.stripPhoto}
+												data-strip={s}
 												style={
 													{
-														top: `${-(s / STRIP_COUNT) * 100}vh`,
-														backgroundImage: isPhotoMounted
-															? `url(${photo.src})`
-															: undefined,
+														top: `${(s / STRIP_COUNT) * 100}%`,
+														height: `${100 / STRIP_COUNT}%`,
 													} as CSSProperties
 												}
-											/>
-										</div>
-									))}
+											>
+												<div
+													className={
+														styles.stripPhotoImage
+													}
+													style={
+														{
+															top: `${-(s / STRIP_COUNT) * 100}vh`,
+															backgroundImage:
+																isPhotoMounted
+																	? `url(${photo.src})`
+																	: undefined,
+														} as CSSProperties
+													}
+												/>
+											</div>
+										)
+									)}
 								</div>
 							);
 						})}
