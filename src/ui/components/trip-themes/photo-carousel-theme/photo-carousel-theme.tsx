@@ -99,11 +99,15 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	}, [loadedCounts]);
 
 	useEffect(() => {
-		setLoadedCounts(rows.map((_, i) => (i === 0 ? INITIAL_LOAD_PER_ROW : 0)));
-		loadedCountsRef.current = rows.map((_, i) =>
+		const resetCounts = rows.map((_, i) =>
 			i === 0 ? INITIAL_LOAD_PER_ROW : 0
 		);
+		loadedCountsRef.current = resetCounts;
 		travelSinceLoadRef.current = [0, 0, 0];
+		const frameId = requestAnimationFrame(() => {
+			setLoadedCounts(resetCounts);
+		});
+		return () => cancelAnimationFrame(frameId);
 	}, [rows]);
 
 	useEffect(() => {
@@ -141,24 +145,27 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	}, [rows.length]);
 
 	useEffect(() => {
-		setLoadedCounts((prev) => {
-			const next = [...prev];
-			let changed = false;
+		const frameId = requestAnimationFrame(() => {
+			setLoadedCounts((prev) => {
+				const next = [...prev];
+				let changed = false;
 
-			activeRows.forEach((isActive, rowIndex) => {
-				if (!isActive) return;
-				const minNeeded = Math.min(
-					INITIAL_LOAD_PER_ROW,
-					rows[rowIndex].length
-				);
-				if (next[rowIndex] < minNeeded) {
-					next[rowIndex] = minNeeded;
-					changed = true;
-				}
+				activeRows.forEach((isActive, rowIndex) => {
+					if (!isActive) return;
+					const minNeeded = Math.min(
+						INITIAL_LOAD_PER_ROW,
+						rows[rowIndex].length
+					);
+					if (next[rowIndex] < minNeeded) {
+						next[rowIndex] = minNeeded;
+						changed = true;
+					}
+				});
+
+				return changed ? next : prev;
 			});
-
-			return changed ? next : prev;
 		});
+		return () => cancelAnimationFrame(frameId);
 	}, [activeRows, rows]);
 
 	useEffect(() => {
@@ -293,20 +300,20 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 				>
 					{items.length > 0
 						? items.map((photo, i) => (
-						<div
-							key={`${photo.src}-${rowIndex}-${i}`}
-							className={styles.imageCard}
-						>
-							<Image
-								src={photo.src}
-								alt={photo.title || `Photo ${i + 1}`}
-								fill
-								draggable={false}
-								className={styles.image}
-								sizes="(max-width: 768px) 180px, 280px"
-							/>
-						</div>
-						  ))
+								<div
+									key={`${photo.src}-${rowIndex}-${i}`}
+									className={styles.imageCard}
+								>
+									<Image
+										src={photo.src}
+										alt={photo.title || `Photo ${i + 1}`}
+										fill
+										draggable={false}
+										className={styles.image}
+										sizes="(max-width: 768px) 180px, 280px"
+									/>
+								</div>
+							))
 						: Array.from(
 								{
 									length: isActive
@@ -319,7 +326,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 										className={`${styles.imageCard} ${styles.imageSkeleton}`}
 									/>
 								)
-						  )}
+							)}
 				</div>
 			</div>
 		);
