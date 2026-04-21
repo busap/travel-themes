@@ -27,7 +27,8 @@ interface DragShuffleThemeProps {
 }
 
 const SWIPE_THRESHOLD = 120;
-const MAX_VISIBLE_CARDS = 3;
+const PRELOAD_BUFFER = 2;
+const MAX_VISIBLE_CARDS = 1 + PRELOAD_BUFFER;
 const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
@@ -65,6 +66,14 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const prefersReducedMotion = () => {
 		if (typeof window === "undefined") return false;
 		return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	};
+
+	const preloadNextCard = (index: number) => {
+		if (typeof window === "undefined" || deckPhotos.length === 0) return;
+		const photo = deckPhotos[index % deckPhotos.length];
+		if (!photo) return;
+		const img = new window.Image();
+		img.src = photo.src;
 	};
 
 	const clearGestureState = () => {
@@ -125,6 +134,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		event.currentTarget.setPointerCapture(event.pointerId);
 		pointerStartRef.current = { x: event.clientX, y: event.clientY };
 		setIsPointerDragging(true);
+		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
 	};
 
 	const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -230,6 +240,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 					alt={placeName}
 					fill
 					priority={isTopCard}
+					loading={isTopCard ? undefined : "eager"}
 					className={styles.cardImage}
 					sizes="(max-width: 768px) 78vw, 420px"
 				/>
