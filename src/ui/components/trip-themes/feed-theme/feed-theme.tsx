@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import gsap from "gsap";
@@ -18,9 +18,14 @@ interface FeedThemeProps {
 	config: ThemeConfig;
 }
 
+const INITIAL_LOAD_COUNT = 3;
+
 export function FeedTheme({ trip, config }: FeedThemeProps) {
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const feedRef = useRef<HTMLDivElement>(null);
+	const [loadedIndices, setLoadedIndices] = useState<Set<number>>(
+		() => new Set(Array.from({ length: INITIAL_LOAD_COUNT }, (_, i) => i))
+	);
 
 	const duration = config.animation?.timeline?.duration ?? 0.5;
 	const ease = config.animation?.timeline?.ease ?? "power2.out";
@@ -57,6 +62,44 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 		};
 	}, [validatedPhotos.length, duration, ease, stagger]);
 
+	// Progressive image loading via IntersectionObserver within the phone frame
+	useEffect(() => {
+		if (!viewportRef.current || validatedPhotos.length <= INITIAL_LOAD_COUNT) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						const index = Number(
+							(entry.target as HTMLElement).dataset.cardIndex
+						);
+						setLoadedIndices((prev: Set<number>) => {
+							if (prev.has(index)) return prev;
+							const next = new Set(prev);
+							next.add(index);
+							return next;
+						});
+						observer.unobserve(entry.target);
+					}
+				});
+			},
+			{
+				root: viewportRef.current,
+				rootMargin: "100px",
+			}
+		);
+
+		const cards = feedRef.current?.querySelectorAll("[data-card-index]");
+		cards?.forEach((card: Element) => {
+			const index = Number((card as HTMLElement).dataset.cardIndex);
+			if (index >= INITIAL_LOAD_COUNT) {
+				observer.observe(card);
+			}
+		});
+
+		return () => observer.disconnect();
+	}, [validatedPhotos.length]);
+
 	const renderHeader = () => (
 		<div className={styles.tripHeader}>
 			<h1 className={styles.tripName}>{trip.name}</h1>
@@ -86,16 +129,28 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 		photo: (typeof validatedPhotos)[number],
 		index: number
 	) => {
+		const isFirst = index === 0;
+		const shouldLoadImage = loadedIndices.has(index);
+
 		return (
-			<div key={index} className={styles.feedCard} data-feed-card>
+			<div
+				key={index}
+				className={styles.feedCard}
+				data-feed-card
+				data-card-index={index}
+			>
 				<div className={styles.feedCardImage}>
-					<Image
-						src={photo.src}
-						alt={photo.title || `Photo ${index + 1}`}
-						fill
-						sizes="375px"
-						style={{ objectFit: "cover" }}
-					/>
+					{shouldLoadImage && (
+						<Image
+							src={photo.src}
+							alt={photo.title || `Photo ${index + 1}`}
+							fill
+							sizes="375px"
+							style={{ objectFit: "cover" }}
+							priority={isFirst}
+							loading={isFirst ? undefined : "eager"}
+						/>
+					)}
 				</div>
 				<div className={styles.feedCardFooter}>
 					{renderHeartIcon()}
