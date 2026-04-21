@@ -1,13 +1,14 @@
 "use client";
 
 import { Trip } from "@/types/trip";
+import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { useRef, useState, useEffect } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Inter, Bebas_Neue } from "next/font/google";
 import { useMousePosition } from "@/hooks/use-mouse-position";
-import { getGridCellSize } from "@/utils/mosaic-layout";
+import { getGridCellSize, GridSize, GridCellAssignment } from "@/utils/mosaic-layout";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./mosaic-theme.module.scss";
@@ -27,6 +28,95 @@ const bebas = Bebas_Neue({
 	weight: ["400"],
 	display: "swap",
 });
+
+function getCellSizes(size: GridSize): string {
+	switch (size) {
+		case "3x3":
+		case "3x4":
+			// span 3/12 cols: 25% desktop, 50% mobile (6-col grid)
+			return "(max-width: 768px) 50vw, (max-width: 1200px) 28vw, 25vw";
+		case "4x3":
+			// span 4/12 cols: 33% desktop, 67% mobile
+			return "(max-width: 768px) 67vw, (max-width: 1200px) 37vw, 33vw";
+		case "6x3":
+		case "6x4":
+			// span 6/12 cols: 50% desktop, 100% mobile
+			return "(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 50vw";
+	}
+}
+
+interface MosaicCellProps {
+	photo: Photo;
+	index: number;
+	gridSize: GridCellAssignment;
+	isExpanded: boolean;
+	onCellClick: (index: number, el: HTMLDivElement | null) => void;
+}
+
+function MosaicCell({
+	photo,
+	index,
+	gridSize,
+	isExpanded,
+	onCellClick,
+}: MosaicCellProps) {
+	const cellRef = useRef<HTMLDivElement>(null);
+	const [cellLoaded, setCellLoaded] = useState(false);
+	const [imageReady, setImageReady] = useState(false);
+	const isInInitialViewport = useRef(false);
+
+	useEffect(() => {
+		if (!cellRef.current) return;
+		const el = cellRef.current;
+		const rect = el.getBoundingClientRect();
+
+		if (rect.top < window.innerHeight) {
+			isInInitialViewport.current = true;
+			setCellLoaded(true);
+			return;
+		}
+
+		const trigger = ScrollTrigger.create({
+			trigger: el,
+			start: "top 120%",
+			onEnter: () => setCellLoaded(true),
+		});
+
+		return () => trigger.kill();
+	}, []);
+
+	return (
+		<div
+			ref={cellRef}
+			data-photo-item
+			data-photo-index={index}
+			className={`${styles.photoItem} ${isExpanded ? styles.photoItemExpanded : ""}`}
+			style={{
+				gridColumn: gridSize.gridColumn,
+				gridRow: gridSize.gridRow,
+				opacity: 0,
+			}}
+			onClick={(e) => onCellClick(index, e.currentTarget as HTMLDivElement)}
+		>
+			{cellLoaded && (
+				<Image
+					src={photo.src}
+					alt={photo.title || `Photo ${index + 1}`}
+					className={styles.photoImage}
+					fill
+					sizes={getCellSizes(gridSize.size)}
+					priority={isInInitialViewport.current}
+					loading={isInInitialViewport.current ? undefined : "lazy"}
+					style={{ objectFit: "cover", opacity: imageReady ? 1 : 0 }}
+					onLoad={() => setImageReady(true)}
+				/>
+			)}
+			{(!cellLoaded || !imageReady) && (
+				<div className={styles.skeleton} />
+			)}
+		</div>
+	);
+}
 
 interface MosaicThemeProps {
 	trip: Trip;
@@ -217,32 +307,14 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 					const isExpanded = expandedPhotoIndex === index;
 
 					return (
-						<div
+						<MosaicCell
 							key={index}
-							data-photo-item
-							data-photo-index={index}
-							className={`${styles.photoItem} ${isExpanded ? styles.photoItemExpanded : ""}`}
-							style={{
-								gridColumn: gridSize.gridColumn,
-								gridRow: gridSize.gridRow,
-								opacity: 0,
-							}}
-							onClick={(e) =>
-								handlePhotoClick(
-									index,
-									e.currentTarget as HTMLDivElement
-								)
-							}
-						>
-							<Image
-								src={photo.src}
-								alt={photo.title || `Photo ${index + 1}`}
-								className={styles.photoImage}
-								fill
-								sizes="(max-width: 768px) 90vw, (max-width: 1200px) 50vw, 33vw"
-								style={{ objectFit: "cover" }}
-							/>
-						</div>
+							photo={photo}
+							index={index}
+							gridSize={gridSize}
+							isExpanded={isExpanded}
+							onCellClick={handlePhotoClick}
+						/>
 					);
 				})}
 			</div>
