@@ -55,12 +55,21 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 		[scrollTriggerConfig?.scrub, config.animation?.timeline?.ease]
 	);
 
+	const preloadImage = (src: string) => {
+		const img = new window.Image();
+		img.src = src;
+	};
+
 	useScrollPinnedReveal({
 		containerRef,
 		enabled: true,
 		itemCount: validatedPhotos.length,
 		pinDuration,
 		config: scrollConfig,
+		onSectionEnter: (index) => {
+			const next = validatedPhotos[index + 1];
+			if (next) preloadImage(next.src);
+		},
 	});
 
 	const renderBackground = () => <AuroraBackground ref={svgRef} />;
@@ -134,6 +143,8 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 									width={800}
 									height={600}
 									sizes="(max-width: 768px) 90vw, 900px"
+									priority={index === 0}
+									loading={index === 0 ? undefined : "lazy"}
 								/>
 								<p
 									className={`${styles.photoCaption} ${crimson.className}`}
