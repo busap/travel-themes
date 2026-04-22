@@ -37,6 +37,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 	const [visibleRows, setVisibleRows] = useState<Set<number>>(
 		new Set(Array.from({ length: INITIAL_VISIBLE_ROWS }, (_, i) => i))
 	);
+	const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 	const rowSentinelRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
 	const cellCount =
@@ -132,6 +133,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 						const rowIndex = Math.floor(cellIndex / GRID_COLS);
 						const isFirstInRow = cellIndex % GRID_COLS === 0;
 						const isRowVisible = visibleRows.has(rowIndex);
+						const isLoaded = loadedImages.has(cellIndex);
 
 						return (
 							<div
@@ -157,20 +159,34 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 								onMouseLeave={() => setHoveredCell(null)}
 							>
 								{showPhoto && isRowVisible && (
-									<div className={styles.photoReveal}>
-										<Image
-											src={photo!.src}
-											alt={
-												photo!.title ||
-												`Photo ${cellIndex + 1}`
-											}
-											fill
-											sizes="(max-width: 768px) 25vw, 17vw"
-											style={{ objectFit: "cover" }}
-											priority={rowIndex < INITIAL_VISIBLE_ROWS}
+									<>
+										<div
+											className={[
+												styles.skeleton,
+												isLoaded ? styles.skeletonHidden : "",
+											].join(" ")}
 										/>
-										<div className={styles.photoSheen} />
-									</div>
+										<div className={styles.photoReveal}>
+											<Image
+												src={photo!.src}
+												alt={
+													photo!.title ||
+													`Photo ${cellIndex + 1}`
+												}
+												fill
+												sizes="(max-width: 768px) 25vw, 17vw"
+												style={{ objectFit: "cover" }}
+												priority={rowIndex < INITIAL_VISIBLE_ROWS}
+												onLoad={() =>
+													setLoadedImages(
+														(prev) =>
+															new Set([...prev, cellIndex])
+													)
+												}
+											/>
+											<div className={styles.photoSheen} />
+										</div>
+									</>
 								)}
 							</div>
 						);
