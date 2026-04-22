@@ -127,7 +127,6 @@ function WaveSection({
 	onReady,
 }: WaveSectionProps) {
 	const sectionRef = useRef<HTMLElement>(null);
-	const setupDoneRef = useRef(false);
 
 	const isNearViewport = useIntersectionObserver(sectionRef, {
 		rootMargin: "200px 0px",
@@ -135,11 +134,10 @@ function WaveSection({
 
 	const shouldRenderImages = isFirstWave || isNearViewport;
 
-	// Set up GSAP once images are in the DOM
+	// Set up GSAP once images are in the DOM. Cleanup kills the timeline so
+	// React strict-mode's double-invocation can safely re-run the setup.
 	useEffect(() => {
-		if (!shouldRenderImages || !sectionRef.current || setupDoneRef.current)
-			return;
-		setupDoneRef.current = true;
+		if (!shouldRenderImages || !sectionRef.current) return;
 
 		const section = sectionRef.current;
 		const photos = section.querySelectorAll<Element>(
@@ -212,20 +210,13 @@ function WaveSection({
 				i * animConfig.stagger + 0.3
 			);
 		});
+
+		return () => {
+			tl.scrollTrigger?.kill();
+			tl.kill();
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRenderImages]);
-
-	// Kill this wave's ScrollTrigger on unmount
-	useEffect(() => {
-		const section = sectionRef.current;
-		return () => {
-			if (section) {
-				ScrollTrigger.getAll().forEach((t) => {
-					if (t.trigger === section) t.kill();
-				});
-			}
-		};
-	}, []);
 
 	const renderPhoto = (
 		photo: Photo,
