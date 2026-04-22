@@ -59,8 +59,13 @@
 	}
 }
 
+.photoMedia {
+	@apply relative w-full;
+	aspect-ratio: 4 / 3;
+}
+
 .photoImage {
-	@apply w-full h-auto object-cover;
+	@apply object-cover;
 }
 
 .caption {
