@@ -362,13 +362,21 @@ function WaveSection({
 		);
 	};
 
+	// On remount (wave was virtualised then scrolled back to) apply a CSS
+	// fade-in so content doesn't pop in. On first mount GSAP handles opacity.
+	const contentClass = isMounted && hasAnimatedRef.current
+		? styles.waveContentFadeIn
+		: undefined;
+
 	return (
 		<section
 			ref={sectionRef}
 			data-wave={waveIndex}
 			className={styles.wave}
 		>
-			{renderImages()}
+			{isMounted && (
+				<div className={contentClass}>{renderImages()}</div>
+			)}
 		</section>
 	);
 }
