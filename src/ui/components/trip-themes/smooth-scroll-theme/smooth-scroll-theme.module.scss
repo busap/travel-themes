@@ -47,13 +47,29 @@
 	will-change: transform;
 }
 
-.animatedPhotoLayoutOne,
-.animatedPhotoLayoutTwo,
-.animatedPhotoLayoutThree,
-.animatedPhotoLayoutFour,
+.animatedPhotoLayoutOne {
+	width: min(96vw, 1300px);
+	height: min(82vh, 820px);
+}
+
+.animatedPhotoLayoutTwo {
+	width: min(90vw, 1160px);
+	height: min(76vh, 740px);
+}
+
+.animatedPhotoLayoutThree {
+	width: min(97vw, 1260px);
+	height: min(72vh, 720px);
+}
+
+.animatedPhotoLayoutFour {
+	width: min(88vw, 1040px);
+	height: min(78vh, 770px);
+}
+
 .animatedPhotoLayoutFive {
-	width: 100vw;
-	height: 100vh;
+	width: min(94vw, 1220px);
+	height: min(74vh, 710px);
 }
 
 .scrollIndicator {
