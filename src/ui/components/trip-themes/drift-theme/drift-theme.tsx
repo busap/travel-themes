@@ -4,13 +4,12 @@ import { Trip } from "@/types/trip";
 import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryNames } from "@/utils/country";
-import { useRef, useMemo, useEffect, useCallback } from "react";
+import { useRef, useMemo, useEffect, useCallback, useState } from "react";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
 import { seededRandom } from "@/utils/random";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import styles from "./drift-theme.module.scss";
 
 if (typeof window !== "undefined") {
@@ -127,17 +126,31 @@ function WaveSection({
 	onReady,
 }: WaveSectionProps) {
 	const sectionRef = useRef<HTMLElement>(null);
+	const hasAnimatedRef = useRef(false);
 
-	const isNearViewport = useIntersectionObserver(sectionRef, {
-		rootMargin: "200px 0px",
-	});
+	// First wave is always mounted; others start unmounted and are controlled
+	// by a bidirectional IntersectionObserver with a generous rootMargin so
+	// the DOM window around the visible area stays small on long trips.
+	const [isMounted, setIsMounted] = useState(isFirstWave);
 
-	const shouldRenderImages = isFirstWave || isNearViewport;
-
-	// Set up GSAP once images are in the DOM. Cleanup kills the timeline so
-	// React strict-mode's double-invocation can safely re-run the setup.
 	useEffect(() => {
-		if (!shouldRenderImages || !sectionRef.current) return;
+		if (isFirstWave) return;
+		const section = sectionRef.current;
+		if (!section) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => setIsMounted(entry.isIntersecting),
+			{ rootMargin: "500px 0px" }
+		);
+		observer.observe(section);
+		return () => observer.disconnect();
+	}, [isFirstWave]);
+
+	// Set up GSAP when images mount. On remount after a virtual unmount,
+	// skip the entrance animation and show photos at their final state.
+	// Cleanup kills the timeline so strict-mode double-invocation works cleanly.
+	useEffect(() => {
+		if (!isMounted || !sectionRef.current) return;
 
 		const section = sectionRef.current;
 		const photos = section.querySelectorAll<Element>(
@@ -151,7 +164,7 @@ function WaveSection({
 			typeof window !== "undefined" &&
 			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-		if (prefersReduced) {
+		if (prefersReduced || hasAnimatedRef.current) {
 			gsap.set([...Array.from(photos), ...Array.from(captions)], {
 				opacity: 1,
 				x: 0,
@@ -173,6 +186,7 @@ function WaveSection({
 
 		// For wave 0: signal the container to become visible now that photos are hidden
 		onReady?.();
+		hasAnimatedRef.current = true;
 
 		const tl = gsap.timeline({
 			scrollTrigger: {
@@ -216,7 +230,7 @@ function WaveSection({
 			tl.kill();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [shouldRenderImages]);
+	}, [isMounted]);
 
 	const renderPhoto = (
 		photo: Photo,
@@ -256,7 +270,7 @@ function WaveSection({
 	const compositionClass = COMPOSITION_CLASS_MAP[wave.compositionKey];
 
 	const renderImages = () => {
-		if (!shouldRenderImages) return null;
+		if (!isMounted) return null;
 
 		if (wave.compositionKey === "trio-one-two") {
 			return (
