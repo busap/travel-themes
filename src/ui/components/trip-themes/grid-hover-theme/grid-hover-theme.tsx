@@ -159,34 +159,29 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 								onMouseLeave={() => setHoveredCell(null)}
 							>
 								{showPhoto && isRowVisible && (
-									<>
-										<div
-											className={[
-												styles.skeleton,
-												isLoaded ? styles.skeletonHidden : "",
-											].join(" ")}
+									<div className={styles.photoReveal}>
+										<Image
+											src={photo!.src}
+											alt={
+												photo!.title ||
+												`Photo ${cellIndex + 1}`
+											}
+											fill
+											sizes="(max-width: 768px) 25vw, 17vw"
+											style={{ objectFit: "cover" }}
+											priority={rowIndex < INITIAL_VISIBLE_ROWS}
+											onLoad={() =>
+												setLoadedImages(
+													(prev) =>
+														new Set([...prev, cellIndex])
+												)
+											}
 										/>
-										<div className={styles.photoReveal}>
-											<Image
-												src={photo!.src}
-												alt={
-													photo!.title ||
-													`Photo ${cellIndex + 1}`
-												}
-												fill
-												sizes="(max-width: 768px) 25vw, 17vw"
-												style={{ objectFit: "cover" }}
-												priority={rowIndex < INITIAL_VISIBLE_ROWS}
-												onLoad={() =>
-													setLoadedImages(
-														(prev) =>
-															new Set([...prev, cellIndex])
-													)
-												}
-											/>
-											<div className={styles.photoSheen} />
-										</div>
-									</>
+										{!isLoaded && (
+											<div className={styles.skeleton} />
+										)}
+										<div className={styles.photoSheen} />
+									</div>
 								)}
 							</div>
 						);

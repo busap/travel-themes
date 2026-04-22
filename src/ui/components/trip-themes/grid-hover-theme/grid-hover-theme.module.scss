@@ -98,13 +98,6 @@
 	);
 	background-size: 200% 100%;
 	animation: skeletonShimmer 1.4s ease-in-out infinite;
-	transition: opacity 0.35s ease;
-}
-
-.skeletonHidden {
-	opacity: 0;
-	animation: none;
-	pointer-events: none;
 }
 
 @keyframes skeletonShimmer {
@@ -118,7 +111,6 @@
 
 .photoReveal {
 	@apply absolute inset-0;
-	z-index: 2;
 	opacity: 0;
 	transform: scale(1.07);
 	clip-path: inset(50% 50% 50% 50%);
