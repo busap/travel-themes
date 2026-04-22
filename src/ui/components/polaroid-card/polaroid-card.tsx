@@ -3,11 +3,13 @@
 import Image from "next/image";
 import { useState } from "react";
 import { ImagePlaceholder } from "@/ui/components/image-placeholder/image-placeholder";
+import { BLUR_DATA_URL } from "@/utils/blur-placeholder";
 import styles from "./polaroid-card.module.scss";
 
 export interface PolaroidCardProps {
 	imageSrc: string;
 	imageAlt: string;
+	blurDataURL?: string;
 	caption?: string;
 	aspectRatio?: "square" | "portrait";
 	onImageError?: () => void;
@@ -20,6 +22,7 @@ export interface PolaroidCardProps {
 export function PolaroidCard({
 	imageSrc,
 	imageAlt,
+	blurDataURL,
 	caption,
 	aspectRatio,
 	onImageError,
@@ -55,6 +58,8 @@ export function PolaroidCard({
 							alt={imageAlt}
 							fill
 							priority={priority}
+							placeholder="blur"
+							blurDataURL={blurDataURL ?? BLUR_DATA_URL}
 							className={styles.photoImage}
 							sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
 							onError={handleImageError}

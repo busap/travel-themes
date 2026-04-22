@@ -231,16 +231,17 @@ function WaveSection({
 			className={styles.photo}
 			style={{ transform: `rotate(${rotation}deg)` }}
 		>
-			<Image
-				src={photo.src}
-				alt={photo.title || `Photo ${photoIndex + 1}`}
-				className={styles.photoImage}
-				width={600}
-				height={450}
-				sizes="(max-width: 768px) 90vw, 550px"
-				priority={isFirstWave && photoIndex === 0}
-				loading={!isFirstWave ? "lazy" : undefined}
-			/>
+			<div className={styles.photoMedia}>
+				<Image
+					src={photo.src}
+					alt={photo.title || `Photo ${photoIndex + 1}`}
+					className={styles.photoImage}
+					fill
+					sizes="(max-width: 768px) 90vw, 550px"
+					priority={isFirstWave && photoIndex === 0}
+					loading={!isFirstWave ? "lazy" : undefined}
+				/>
+			</div>
 			{photo.title && (
 				<p
 					data-entrance="caption"
@@ -364,7 +365,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 	const duration = config.animation?.timeline?.duration ?? 0.8;
 	const ease = config.animation?.timeline?.ease ?? "power3.out";
 	const stagger = config.animation?.timeline?.stagger ?? 0.12;
-	const triggerStart = config.animation?.scrollTrigger?.start ?? "top 85%";
+	const triggerStart = config.animation?.scrollTrigger?.start ?? "top 60%";
 	const titleClasses = "text-5xl font-light tracking-wide";
 	const bodyClasses = "text-lg text-zinc-600";
 

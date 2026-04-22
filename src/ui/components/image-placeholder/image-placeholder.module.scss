@@ -12,3 +12,8 @@
 .icon {
 	@apply w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 opacity-50;
 }
+
+.shimmer {
+	@apply w-full h-full;
+	@apply bg-zinc-200 animate-pulse;
+}
