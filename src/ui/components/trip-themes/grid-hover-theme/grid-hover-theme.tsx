@@ -63,7 +63,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 					setVisibleRows((prev) => new Set([...prev, ...newlyVisible]));
 				}
 			},
-			{ rootMargin: "200px 0px", threshold: 0 }
+			{ rootMargin: "600px 0px", threshold: 0 }
 		);
 
 		for (let rowIndex = INITIAL_VISIBLE_ROWS; rowIndex < numRows; rowIndex++) {
@@ -170,6 +170,11 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 											sizes="(max-width: 768px) 25vw, 17vw"
 											style={{ objectFit: "cover" }}
 											priority={rowIndex < INITIAL_VISIBLE_ROWS}
+											loading={
+												rowIndex < INITIAL_VISIBLE_ROWS
+													? undefined
+													: "eager"
+											}
 											onLoad={() =>
 												setLoadedImages(
 													(prev) =>
