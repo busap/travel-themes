@@ -126,6 +126,7 @@ function WaveSection({
 	onReady,
 }: WaveSectionProps) {
 	const sectionRef = useRef<HTMLElement>(null);
+	const contentRef = useRef<HTMLDivElement>(null);
 	const hasAnimatedRef = useRef(false);
 
 	// First wave is always mounted; others start unmounted and are controlled
@@ -146,13 +147,16 @@ function WaveSection({
 		return () => observer.disconnect();
 	}, [isFirstWave]);
 
-	// Set up GSAP when images mount. On remount after a virtual unmount,
-	// skip the entrance animation and show photos at their final state.
-	// Cleanup kills the timeline so strict-mode double-invocation works cleanly.
+	// GSAP owns the content wrapper's opacity entirely — no CSS animation
+	// conflict. First mount: wrapper hides, ScrollTrigger fades+slides in.
+	// Remount: photos reset to final state, wrapper fades in directly.
+	// Strict-mode double-invocation is safe: cleanup kills the timeline so the
+	// second run re-executes correctly from scratch.
 	useEffect(() => {
-		if (!isMounted || !sectionRef.current) return;
+		if (!isMounted || !sectionRef.current || !contentRef.current) return;
 
 		const section = sectionRef.current;
+		const content = contentRef.current;
 		const photos = section.querySelectorAll<Element>(
 			'[data-entrance="photo"]'
 		);
@@ -164,27 +168,40 @@ function WaveSection({
 			typeof window !== "undefined" &&
 			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-		if (prefersReduced || hasAnimatedRef.current) {
+		if (prefersReduced) {
+			gsap.set(
+				[content, ...Array.from(photos), ...Array.from(captions)],
+				{ opacity: 1, x: 0, y: 0, scale: 1 }
+			);
+			onReady?.();
+			return;
+		}
+
+		if (hasAnimatedRef.current) {
+			// Remount after virtualisation: reset individual elements to their
+			// final state, then fade the wrapper in smoothly.
 			gsap.set([...Array.from(photos), ...Array.from(captions)], {
 				opacity: 1,
 				x: 0,
 				y: 0,
 				scale: 1,
 			});
+			gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
 			onReady?.();
 			return;
 		}
 
-		// Set initial hidden state so photos are invisible before animation
+		// First mount: hide wrapper, set photo offsets (no per-photo opacity —
+		// the wrapper controls visibility), then drive reveal via ScrollTrigger.
+		gsap.set(content, { opacity: 0 });
 		photos.forEach((photo) => {
 			const dir = (photo.getAttribute("data-direction") ||
 				"bottom") as SlideDirection;
 			const offset = getDirectionOffset(dir);
-			gsap.set(photo, { opacity: 0, x: offset.x, y: offset.y, scale: 0.92 });
+			gsap.set(photo, { x: offset.x, y: offset.y, scale: 0.92 });
 		});
-		gsap.set([...Array.from(captions)], { opacity: 0, y: 10 });
+		gsap.set([...Array.from(captions)], { y: 10 });
 
-		// For wave 0: signal the container to become visible now that photos are hidden
 		onReady?.();
 		hasAnimatedRef.current = true;
 
@@ -197,18 +214,20 @@ function WaveSection({
 			},
 		});
 
+		// Fade in the wrapper first, then slide individual photos into position
+		tl.to(content, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0);
+
 		photos.forEach((photo, i) => {
 			tl.to(
 				photo,
 				{
-					opacity: 1,
 					x: 0,
 					y: 0,
 					scale: 1,
 					duration: animConfig.duration,
 					ease: animConfig.ease,
 				},
-				i * animConfig.stagger
+				i * animConfig.stagger + 0.1
 			);
 		});
 
@@ -216,12 +235,11 @@ function WaveSection({
 			tl.to(
 				caption,
 				{
-					opacity: 1,
 					y: 0,
 					duration: 0.4,
 					ease: "power2.out",
 				},
-				i * animConfig.stagger + 0.3
+				i * animConfig.stagger + 0.4
 			);
 		});
 
@@ -362,12 +380,6 @@ function WaveSection({
 		);
 	};
 
-	// On remount (wave was virtualised then scrolled back to) apply a CSS
-	// fade-in so content doesn't pop in. On first mount GSAP handles opacity.
-	const contentClass = isMounted && hasAnimatedRef.current
-		? styles.waveContentFadeIn
-		: undefined;
-
 	return (
 		<section
 			ref={sectionRef}
@@ -375,7 +387,7 @@ function WaveSection({
 			className={styles.wave}
 		>
 			{isMounted && (
-				<div className={contentClass}>{renderImages()}</div>
+				<div ref={contentRef}>{renderImages()}</div>
 			)}
 		</section>
 	);
