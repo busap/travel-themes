@@ -28,12 +28,15 @@ interface GridHoverThemeProps {
 const GRID_COLS = 6;
 const MIN_ROWS_WHEN_EMPTY = 5;
 const MIN_CELLS_WHEN_EMPTY = GRID_COLS * MIN_ROWS_WHEN_EMPTY;
+const INITIAL_VISIBLE_ROWS = 3;
 
 export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 	const [hoveredCell, setHoveredCell] = useState<number | null>(null);
 	const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
 	const [isHovering, setIsHovering] = useState(false);
-	const [visibleRows, setVisibleRows] = useState<Set<number>>(new Set([0]));
+	const [visibleRows, setVisibleRows] = useState<Set<number>>(
+		new Set(Array.from({ length: INITIAL_VISIBLE_ROWS }, (_, i) => i))
+	);
 	const rowSentinelRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
 	const cellCount =
@@ -62,7 +65,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 			{ rootMargin: "200px 0px", threshold: 0 }
 		);
 
-		for (let rowIndex = 1; rowIndex < numRows; rowIndex++) {
+		for (let rowIndex = INITIAL_VISIBLE_ROWS; rowIndex < numRows; rowIndex++) {
 			const el = rowSentinelRefs.current.get(rowIndex);
 			if (el) observer.observe(el);
 		}
@@ -134,12 +137,12 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 							<div
 								key={cellIndex}
 								ref={
-									isFirstInRow && rowIndex > 0
+									isFirstInRow && rowIndex >= INITIAL_VISIBLE_ROWS
 										? (node) => setSentinelRef(node, rowIndex)
 										: undefined
 								}
 								data-row={
-									isFirstInRow && rowIndex > 0
+									isFirstInRow && rowIndex >= INITIAL_VISIBLE_ROWS
 										? rowIndex
 										: undefined
 								}
@@ -164,7 +167,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 											fill
 											sizes="(max-width: 768px) 25vw, 17vw"
 											style={{ objectFit: "cover" }}
-											priority={rowIndex === 0}
+											priority={rowIndex < INITIAL_VISIBLE_ROWS}
 										/>
 										<div className={styles.photoSheen} />
 									</div>
