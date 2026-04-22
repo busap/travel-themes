@@ -387,7 +387,7 @@ function WaveSection({
 			className={styles.wave}
 		>
 			{isMounted && (
-				<div ref={contentRef}>{renderImages()}</div>
+				<div ref={contentRef} className={styles.waveContent}>{renderImages()}</div>
 			)}
 		</section>
 	);
