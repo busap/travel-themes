@@ -2,7 +2,7 @@ import { Photo } from "@/types/photo";
 
 //LAYOUT
 export const MIN_LAYOUT_SCROLL_HEIGHT = 10000;
-export const MAIN_PHOTO_SECTION_SCROLL_HEIGHT = 2000;
+export const MAIN_PHOTO_SECTION_SCROLL_HEIGHT = 1200;
 
 export function getLayoutScrollHeight(
 	animationItems: PhotoAnimation[]
@@ -35,23 +35,23 @@ const ANIMATION_REVEAL_FROM = [
 ];
 
 const ANIMATION_REVEAL_TO = [
-	"polygon(6% 4%, 94% 2%, 96% 96%, 4% 98%)",
-	"polygon(2% 8%, 98% 2%, 96% 92%, 4% 98%)",
-	"polygon(8% 2%, 92% 8%, 98% 98%, 2% 92%)",
-	"polygon(4% 4%, 96% 4%, 92% 96%, 8% 96%)",
-	"polygon(6% 2%, 94% 6%, 98% 94%, 2% 98%)",
+	"polygon(1% 0%, 100% 0%, 99% 100%, 0% 100%)",
+	"polygon(0% 1%, 100% 0%, 100% 99%, 0% 100%)",
+	"polygon(1% 0%, 99% 1%, 100% 100%, 0% 99%)",
+	"polygon(0% 0%, 100% 1%, 99% 100%, 1% 99%)",
+	"polygon(1% 0%, 100% 1%, 99% 100%, 0% 99%)",
 ];
 
 const ANIMATION_SCHEDULE = [
 	{
-		startRatio: 0.08,
+		startRatio: 0.03,
 		scrollSpan: 1080,
 		entryPortion: 0.34,
 		holdPortion: 0.16,
 		exitPortion: 0.5,
 	},
 	{
-		startRatio: 0.15,
+		startRatio: 0.08,
 		scrollSpan: 1540,
 		entryPortion: 0.32,
 		holdPortion: 0.32,
