@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import gsap from "gsap";
@@ -36,6 +36,18 @@ const DISPLACED: { x: string; y: string }[] = [
 	{ x: "30vw", y: "28vh" },
 ];
 
+// Accurate sizes derived from the CSS grid layout:
+// Desktop cols: 2fr / 1.5fr / 1.3fr (total 4.8fr)
+// Mobile cols: 1fr / 1fr; img2 and img4 hidden
+const HERO_SIZES = [
+	"(max-width: 768px) 50vw, 73vw", // img0: cols 0-1, row 0
+	"(max-width: 768px) 50vw, 42vw", // img1: col 0, rows 1-2
+	"(max-width: 768px) 50vw, 31vw", // img2: col 1, row 1 (hidden mobile)
+	"(max-width: 768px) 50vw, 27vw", // img3: col 2, rows 0-1
+	"(max-width: 768px) 50vw, 31vw", // img4: col 1, row 2 (hidden mobile)
+	"(max-width: 768px) 50vw, 27vw", // img5: col 2, row 2
+] as const;
+
 export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const heroRef = useRef<HTMLDivElement>(null);
@@ -49,6 +61,27 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	const scrollSt = config.animation?.scrollTrigger;
 	const timelineCfg = config.animation?.timeline;
 
+	const [galleryOpen, setGalleryOpen] = useState(false);
+	const [galleryPreloadEnabled, setGalleryPreloadEnabled] = useState(false);
+
+	// Open gallery when it scrolls near the viewport
+	useEffect(() => {
+		if (!galleryRef.current || galleryPhotos.length === 0) return;
+		const el = galleryRef.current;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					setGalleryOpen(true);
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: "200px" }
+		);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [galleryPhotos.length]);
+
+	// Hero animation (pinned scroll + cell displacement)
 	useEffect(() => {
 		if (!gridRef.current) return;
 
@@ -92,155 +125,10 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 				},
 				0
 			);
-
-			if (galleryRef.current) {
-				const grid = galleryRef.current.querySelector<HTMLElement>(
-					"[data-gallery-grid]"
-				);
-				const allItems = Array.from(
-					galleryRef.current.querySelectorAll<HTMLElement>(
-						"[data-gallery-item]"
-					)
-				);
-				if (allItems.length === 0) return;
-
-				const computedColumns = grid
-					? window
-							.getComputedStyle(grid)
-							.gridTemplateColumns.split(" ").length
-					: 3;
-				const columns = Math.max(1, computedColumns);
-				const rowCount = Math.ceil(allItems.length / columns);
-
-				for (let row = 0; row < rowCount; row += 1) {
-					const rowItems = allItems.slice(
-						row * columns,
-						row * columns + columns
-					);
-					if (rowItems.length === 0) continue;
-
-					const rowTl = gsap.timeline({
-						scrollTrigger: {
-							trigger: rowItems[0],
-							start:
-								row === 0
-									? "top 88%"
-									: row === 1
-										? "top 84%"
-										: "top 80%",
-							end:
-								row === 0
-									? "top 34%"
-									: row === 1
-										? "top 28%"
-										: "top 22%",
-							scrub: row === 1 ? 1.1 : row === 2 ? 0.7 : 0.45,
-						},
-					});
-
-					rowItems.forEach((item, col) => {
-						const inner = item.querySelector<HTMLElement>(
-							"[data-gallery-item-inner]"
-						);
-						const image = item.querySelector<HTMLElement>("img");
-						const title = item.querySelector<HTMLElement>(
-							"[data-gallery-title]"
-						);
-						const colDelay = col * 0.09;
-
-						const fromX =
-							row === 0
-								? col === 0
-									? -42
-									: 20
-								: row === 1
-									? col === rowItems.length - 1
-										? 36
-										: -24
-									: col % 2 === 0
-										? -20
-										: 28;
-						const fromY = row === 0 ? 62 : row === 1 ? 52 : 44;
-						const fromRotate =
-							row === 0
-								? col === 1
-									? -3
-									: 4
-								: row === 1
-									? col === 0
-										? -5
-										: 3
-									: col === 2
-										? -4
-										: 2;
-
-						rowTl.fromTo(
-							item,
-							{ autoAlpha: 0, y: fromY, x: fromX },
-							{
-								autoAlpha: 1,
-								y: 0,
-								x: 0,
-								duration: 0.9,
-								ease: "power3.out",
-							},
-							colDelay
-						);
-
-						if (inner) {
-							rowTl.fromTo(
-								inner,
-								{
-									scale: row === 1 ? 0.9 : 0.94,
-									rotate: fromRotate,
-									clipPath:
-										"inset(16% 14% 20% 14% round 18px)",
-								},
-								{
-									scale: 1,
-									rotate: 0,
-									clipPath: "inset(0% 0% 0% 0% round 2px)",
-									duration: 1.0,
-									ease: "power4.out",
-								},
-								colDelay + 0.03
-							);
-						}
-
-						if (image) {
-							rowTl.fromTo(
-								image,
-								{ scale: row === 2 ? 1.12 : 1.18 },
-								{
-									scale: 1,
-									duration: 1.06,
-									ease: "power3.out",
-								},
-								colDelay
-							);
-						}
-
-						if (title) {
-							rowTl.fromTo(
-								title,
-								{ autoAlpha: 0, y: 12 },
-								{
-									autoAlpha: 1,
-									y: 0,
-									duration: 0.45,
-									ease: "power2.out",
-								},
-								colDelay + 0.44
-							);
-						}
-					});
-				}
-			}
 		}, containerRef);
 
 		return () => ctx.revert();
 	}, [
-		trip.photos.length,
 		scrollSt?.start,
 		scrollSt?.end,
 		scrollSt?.scrub,
@@ -249,6 +137,157 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 		timelineCfg?.duration,
 		timelineCfg?.ease,
 	]);
+
+	// Gallery scroll-reveal animations — runs once after gallery images are mounted
+	useEffect(() => {
+		if (!galleryOpen || !galleryRef.current) return;
+
+		const ctx = gsap.context(() => {
+			const grid = galleryRef.current!.querySelector<HTMLElement>(
+				"[data-gallery-grid]"
+			);
+			const allItems = Array.from(
+				galleryRef.current!.querySelectorAll<HTMLElement>(
+					"[data-gallery-item]"
+				)
+			);
+			if (allItems.length === 0) return;
+
+			const computedColumns = grid
+				? window
+						.getComputedStyle(grid)
+						.gridTemplateColumns.split(" ").length
+				: 3;
+			const columns = Math.max(1, computedColumns);
+			const rowCount = Math.ceil(allItems.length / columns);
+
+			for (let row = 0; row < rowCount; row += 1) {
+				const rowItems = allItems.slice(
+					row * columns,
+					row * columns + columns
+				);
+				if (rowItems.length === 0) continue;
+
+				const rowTl = gsap.timeline({
+					scrollTrigger: {
+						trigger: rowItems[0],
+						start:
+							row === 0
+								? "top 88%"
+								: row === 1
+									? "top 84%"
+									: "top 80%",
+						end:
+							row === 0
+								? "top 34%"
+								: row === 1
+									? "top 28%"
+									: "top 22%",
+						scrub: row === 1 ? 1.1 : row === 2 ? 0.7 : 0.45,
+					},
+				});
+
+				rowItems.forEach((item, col) => {
+					const inner = item.querySelector<HTMLElement>(
+						"[data-gallery-item-inner]"
+					);
+					const image = item.querySelector<HTMLElement>("img");
+					const title = item.querySelector<HTMLElement>(
+						"[data-gallery-title]"
+					);
+					const colDelay = col * 0.09;
+
+					const fromX =
+						row === 0
+							? col === 0
+								? -42
+								: 20
+							: row === 1
+								? col === rowItems.length - 1
+									? 36
+									: -24
+								: col % 2 === 0
+									? -20
+									: 28;
+					const fromY = row === 0 ? 62 : row === 1 ? 52 : 44;
+					const fromRotate =
+						row === 0
+							? col === 1
+								? -3
+								: 4
+							: row === 1
+								? col === 0
+									? -5
+									: 3
+								: col === 2
+									? -4
+									: 2;
+
+					rowTl.fromTo(
+						item,
+						{ autoAlpha: 0, y: fromY, x: fromX },
+						{
+							autoAlpha: 1,
+							y: 0,
+							x: 0,
+							duration: 0.9,
+							ease: "power3.out",
+						},
+						colDelay
+					);
+
+					if (inner) {
+						rowTl.fromTo(
+							inner,
+							{
+								scale: row === 1 ? 0.9 : 0.94,
+								rotate: fromRotate,
+								clipPath:
+									"inset(16% 14% 20% 14% round 18px)",
+							},
+							{
+								scale: 1,
+								rotate: 0,
+								clipPath: "inset(0% 0% 0% 0% round 2px)",
+								duration: 1.0,
+								ease: "power4.out",
+							},
+							colDelay + 0.03
+						);
+					}
+
+					if (image) {
+						rowTl.fromTo(
+							image,
+							{ scale: row === 2 ? 1.12 : 1.18 },
+							{
+								scale: 1,
+								duration: 1.06,
+								ease: "power3.out",
+							},
+							colDelay
+						);
+					}
+
+					if (title) {
+						rowTl.fromTo(
+							title,
+							{ autoAlpha: 0, y: 12 },
+							{
+								autoAlpha: 1,
+								y: 0,
+								duration: 0.45,
+								ease: "power2.out",
+							},
+							colDelay + 0.44
+						);
+					}
+				});
+			}
+		}, containerRef);
+
+		return () => ctx.revert();
+	}, [galleryOpen]);
 
 	const renderHeroText = () => (
 		<div className={styles.heroText} ref={heroTextRef}>
@@ -264,7 +303,11 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	);
 
 	const renderGrid = () => (
-		<div className={styles.heroGrid} ref={gridRef}>
+		<div
+			className={styles.heroGrid}
+			ref={gridRef}
+			onMouseEnter={() => setGalleryPreloadEnabled(true)}
+		>
 			{heroPhotos.slice(0, 6).map((photo, index) => (
 				<div
 					key={index}
@@ -280,8 +323,10 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 						src={photo.src}
 						alt={photo.title || `${trip.name} – photo ${index + 1}`}
 						fill
-						sizes="(max-width: 768px) 60vw, 40vw"
+						sizes={HERO_SIZES[index]}
 						style={{ objectFit: "cover" }}
+						priority={index === 0}
+						loading={index >= 3 ? "lazy" : undefined}
 					/>
 					{photo.title && (
 						<div className={styles.cellOverlay}>
@@ -310,6 +355,7 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 
 	const renderGallery = () => {
 		if (galleryPhotos.length === 0) return null;
+		const showImages = galleryOpen || galleryPreloadEnabled;
 		return (
 			<section className={styles.gallery} ref={galleryRef}>
 				<div className={styles.galleryHeader}>
@@ -327,25 +373,29 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 								className={styles.galleryItemInner}
 								data-gallery-item-inner
 							>
-								<Image
-									src={photo.src}
-									alt={
-										photo.title ||
-										`${trip.name} – photo ${index + 7}`
-									}
-									fill
-									sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-									style={{ objectFit: "cover" }}
-								/>
-								{photo.title && (
-									<div className={styles.galleryOverlay}>
-										<span
-											className={styles.galleryItemTitle}
-											data-gallery-title
-										>
-											{photo.title}
-										</span>
-									</div>
+								{showImages && (
+									<>
+										<Image
+											src={photo.src}
+											alt={
+												photo.title ||
+												`${trip.name} – photo ${index + 7}`
+											}
+											fill
+											sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+											style={{ objectFit: "cover" }}
+										/>
+										{photo.title && (
+											<div className={styles.galleryOverlay}>
+												<span
+													className={styles.galleryItemTitle}
+													data-gallery-title
+												>
+													{photo.title}
+												</span>
+											</div>
+										)}
+									</>
 								)}
 							</div>
 						</div>
