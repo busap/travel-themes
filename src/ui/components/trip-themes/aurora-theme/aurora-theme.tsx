@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
@@ -59,16 +59,25 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 	const MOUNT_AHEAD = 2;
 
 	const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+	const [mountedPhotos, setMountedPhotos] = useState<Set<number>>(() => {
+		const end = Math.min(validatedPhotos.length - 1, MOUNT_AHEAD);
+		const initialSet = new Set<number>();
+		for (let i = 0; i <= end; i++) initialSet.add(i);
+		return initialSet;
+	});
 
-	const mountedPhotos = useMemo(() => {
+	useEffect(() => {
 		const start = Math.max(0, activeSectionIndex - MOUNT_BEHIND);
 		const end = Math.min(
 			validatedPhotos.length - 1,
 			activeSectionIndex + MOUNT_AHEAD
 		);
-		const set = new Set<number>();
-		for (let i = start; i <= end; i++) set.add(i);
-		return set;
+
+		setMountedPhotos((previous) => {
+			const next = new Set(previous);
+			for (let i = start; i <= end; i++) next.add(i);
+			return next.size === previous.size ? previous : next;
+		});
 	}, [activeSectionIndex, validatedPhotos.length]);
 
 	useScrollPinnedReveal({
