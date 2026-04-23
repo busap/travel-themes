@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
@@ -55,10 +55,21 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 		[scrollTriggerConfig?.scrub, config.animation?.timeline?.ease]
 	);
 
-	const preloadImage = (src: string) => {
-		const img = new window.Image();
-		img.src = src;
-	};
+	const MOUNT_BEHIND = 1;
+	const MOUNT_AHEAD = 2;
+
+	const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+
+	const mountedPhotos = useMemo(() => {
+		const start = Math.max(0, activeSectionIndex - MOUNT_BEHIND);
+		const end = Math.min(
+			validatedPhotos.length - 1,
+			activeSectionIndex + MOUNT_AHEAD
+		);
+		const set = new Set<number>();
+		for (let i = start; i <= end; i++) set.add(i);
+		return set;
+	}, [activeSectionIndex, validatedPhotos.length]);
 
 	useScrollPinnedReveal({
 		containerRef,
@@ -66,11 +77,8 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 		itemCount: validatedPhotos.length,
 		pinDuration,
 		config: scrollConfig,
-		onSectionEnter: (index) => {
-			[validatedPhotos[index + 1], validatedPhotos[index + 2]].forEach(
-				(photo) => { if (photo) preloadImage(photo.src); }
-			);
-		},
+		onSectionEnter: setActiveSectionIndex,
+		onSectionEnterBack: setActiveSectionIndex,
 	});
 
 	const renderBackground = () => <AuroraBackground ref={svgRef} />;
@@ -137,16 +145,23 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 							}}
 						>
 							<div className={photoClass}>
-								<Image
-									src={photo.src}
-									alt={photo.title || `Photo ${index + 1}`}
-									className={styles.photoImage}
-									width={800}
-									height={600}
-									sizes="(max-width: 768px) 90vw, 900px"
-									priority={index === 0}
-									loading={index === 0 ? undefined : "lazy"}
-								/>
+								{mountedPhotos.has(index) ? (
+									<Image
+										src={photo.src}
+										alt={photo.title || `Photo ${index + 1}`}
+										className={styles.photoImage}
+										width={800}
+										height={600}
+										sizes="(max-width: 768px) 90vw, 900px"
+										priority={index === 0}
+										loading={index === 0 ? undefined : "eager"}
+									/>
+								) : (
+									<div
+										className={styles.photoPlaceholder}
+										aria-hidden
+									/>
+								)}
 								<p
 									className={`${styles.photoCaption} ${crimson.className}`}
 								>

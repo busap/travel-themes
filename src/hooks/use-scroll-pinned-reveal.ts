@@ -12,6 +12,7 @@ interface UseScrollPinnedRevealOptions {
 		ease?: string;
 	};
 	onSectionEnter?: (index: number) => void;
+	onSectionEnterBack?: (index: number) => void;
 }
 
 export function useScrollPinnedReveal({
@@ -21,6 +22,7 @@ export function useScrollPinnedReveal({
 	pinDuration = "+=200%",
 	config = {},
 	onSectionEnter,
+	onSectionEnterBack,
 }: UseScrollPinnedRevealOptions) {
 	useEffect(() => {
 		if (!enabled || !containerRef.current) return;
@@ -75,6 +77,7 @@ export function useScrollPinnedReveal({
 						ease: "power2.out",
 						overwrite: true,
 					});
+					onSectionEnterBack?.(index);
 				},
 				onLeaveBack: () => {
 					gsap.to(section, {
@@ -93,5 +96,5 @@ export function useScrollPinnedReveal({
 		return () => {
 			triggers.forEach((trigger) => trigger?.kill());
 		};
-	}, [containerRef, enabled, itemCount, pinDuration, config, onSectionEnter]);
+	}, [containerRef, enabled, itemCount, pinDuration, config, onSectionEnter, onSectionEnterBack]);
 }
