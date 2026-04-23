@@ -130,9 +130,6 @@ function WaveSection({
 	const hasAnimatedRef = useRef(false);
 	const [placeholderHeight, setPlaceholderHeight] = useState(0);
 
-	// First wave is always mounted; others start unmounted and are controlled
-	// by a bidirectional IntersectionObserver with a generous rootMargin so
-	// the DOM window around the visible area stays small on long trips.
 	const [isMounted, setIsMounted] = useState(isFirstWave);
 
 	useEffect(() => {
@@ -148,18 +145,11 @@ function WaveSection({
 		return () => observer.disconnect();
 	}, [isFirstWave]);
 
-	// Capture section height while content is in the DOM so we can hold the
-	// space when the wave unmounts (prevents layout jump during virtualisation).
 	useLayoutEffect(() => {
 		if (isFirstWave || !isMounted || !sectionRef.current) return;
 		setPlaceholderHeight(sectionRef.current.offsetHeight);
 	}, [isMounted, isFirstWave]);
 
-	// GSAP owns the content wrapper's opacity entirely — no CSS animation
-	// conflict. First mount: wrapper hides, ScrollTrigger fades+slides in.
-	// Remount: photos reset to final state, wrapper fades in directly.
-	// Strict-mode double-invocation is safe: cleanup kills the timeline so the
-	// second run re-executes correctly from scratch.
 	useEffect(() => {
 		if (!isMounted || !sectionRef.current || !contentRef.current) return;
 
@@ -186,8 +176,6 @@ function WaveSection({
 		}
 
 		if (hasAnimatedRef.current) {
-			// Remount after virtualisation: reset individual elements to their
-			// final state, then fade the wrapper in smoothly.
 			gsap.set([...Array.from(photos), ...Array.from(captions)], {
 				opacity: 1,
 				x: 0,
@@ -199,8 +187,6 @@ function WaveSection({
 			return;
 		}
 
-		// First mount: hide wrapper, set photo offsets (no per-photo opacity —
-		// the wrapper controls visibility), then drive reveal via ScrollTrigger.
 		gsap.set(content, { opacity: 0 });
 		photos.forEach((photo) => {
 			const dir = (photo.getAttribute("data-direction") ||
@@ -222,7 +208,6 @@ function WaveSection({
 			},
 		});
 
-		// Fade in the wrapper first, then slide individual photos into position
 		tl.to(content, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0);
 
 		photos.forEach((photo, i) => {
@@ -499,14 +484,12 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 		return result;
 	}, [trip.photos, idSeed]);
 
-	// Reveal container once first wave has hidden its photos via GSAP
 	const showContainer = useCallback(() => {
 		if (containerRef.current) {
 			containerRef.current.style.visibility = "visible";
 		}
 	}, []);
 
-	// Animate header; show container immediately for edge cases (no waves / reduced motion)
 	useEffect(() => {
 		if (!containerRef.current) return;
 		const container = containerRef.current;
@@ -545,7 +528,6 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 				}
 			);
 		}
-		// Container is revealed by the first WaveSection via onReady / showContainer
 	}, [waves.length]);
 
 	const renderHeader = () => (

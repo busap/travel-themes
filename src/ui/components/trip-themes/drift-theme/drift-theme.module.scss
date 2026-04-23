@@ -27,8 +27,6 @@
 	}
 }
 
-// --- Wave sections ---
-
 .wave {
 	@apply relative w-full flex items-center justify-center px-8;
 	min-height: 75vh;
@@ -40,8 +38,6 @@
 		min-height: 60vh;
 	}
 }
-
-// --- Photo element ---
 
 .photo {
 	@apply rounded-lg overflow-hidden;
@@ -75,8 +71,6 @@
 .caption {
 	@apply mt-2 px-3 pb-2 text-sm text-zinc-600 italic;
 }
-
-// --- 1-photo compositions ---
 
 .singleLeft {
 	@apply flex justify-start w-full;
@@ -113,8 +107,6 @@
 		}
 	}
 }
-
-// --- 2-photo compositions ---
 
 .duoStaggered {
 	@apply flex gap-6 w-full items-start;
@@ -205,8 +197,6 @@
 	}
 }
 
-// --- 3-photo compositions ---
-
 .trioOneTwo {
 	@apply flex flex-col items-center gap-6 w-full;
 
@@ -218,7 +208,6 @@
 		}
 	}
 
-	// Bottom row
 	.trioBottomRow {
 		@apply flex gap-6 w-full justify-center;
 	}
@@ -236,7 +225,6 @@
 .trioTwoOne {
 	@apply flex flex-col items-center gap-6 w-full;
 
-	// Top row
 	.trioTopRow {
 		@apply flex gap-6 w-full justify-center;
 	}
