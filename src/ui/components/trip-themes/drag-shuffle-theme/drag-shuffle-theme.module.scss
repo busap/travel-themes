@@ -190,7 +190,12 @@
 
 @keyframes swipeLeft {
 	0% {
-		transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+		transform: translate3d(
+				var(--swipe-start-x, 0px),
+				var(--swipe-start-y, 0px),
+				0
+			)
+			rotate(var(--swipe-start-rotate, 0deg)) scale(1);
 		opacity: 1;
 		filter: saturate(1);
 	}
@@ -203,7 +208,12 @@
 
 @keyframes swipeRight {
 	0% {
-		transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+		transform: translate3d(
+				var(--swipe-start-x, 0px),
+				var(--swipe-start-y, 0px),
+				0
+			)
+			rotate(var(--swipe-start-rotate, 0deg)) scale(1);
 		opacity: 1;
 		filter: saturate(1);
 	}
