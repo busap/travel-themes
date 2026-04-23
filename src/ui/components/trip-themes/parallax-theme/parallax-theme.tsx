@@ -1,9 +1,10 @@
 "use client";
 
-import { CSSProperties, useEffect, useRef, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useRef, useMemo, useState, RefObject } from "react";
 import Image from "next/image";
 import { DM_Serif_Display } from "next/font/google";
 import { Trip } from "@/types/trip";
+import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { seededRandom } from "@/utils/random";
 import { getCountryNames } from "@/utils/country";
@@ -74,6 +75,171 @@ function buildStripAnim(photoIdx: number, stripIdx: number): StripAnim {
 	};
 }
 
+interface PhotoLayerProps {
+	photo: Photo;
+	photoIndex: number;
+	isFirst: boolean;
+	isMounted: boolean;
+	containerRef: RefObject<HTMLDivElement>;
+	stripAnims: StripAnim[];
+	scrub: number;
+	tripName: string;
+}
+
+function PhotoLayer({
+	photo,
+	photoIndex,
+	isFirst,
+	isMounted,
+	containerRef,
+	stripAnims,
+	scrub,
+	tripName,
+}: PhotoLayerProps) {
+	const layerRef = useRef<HTMLDivElement>(null);
+	const hasEntryPlayedRef = useRef(false);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		const layer = layerRef.current;
+		if (!container || !layer || !isMounted) return;
+
+		const prefersReduced = window.matchMedia(
+			"(prefers-reduced-motion: reduce)"
+		).matches;
+
+		if (isFirst) {
+			const ctx = gsap.context(() => {
+				const strips = Array.from(
+					layer.querySelectorAll<HTMLElement>("[data-strip]")
+				);
+				if (prefersReduced || hasEntryPlayedRef.current) {
+					gsap.set(layer, { autoAlpha: 1 });
+					gsap.set(strips, { xPercent: 0, y: 0, autoAlpha: 1 });
+					return;
+				}
+				hasEntryPlayedRef.current = true;
+				gsap.set(layer, { autoAlpha: 1 });
+				gsap.fromTo(
+					strips,
+					{
+						xPercent: (i: number) => (i % 2 === 0 ? -108 : 108),
+						autoAlpha: 1,
+					},
+					{
+						xPercent: 0,
+						autoAlpha: 1,
+						duration: 0.65,
+						ease: "power3.out",
+						stagger: { each: 0.07, from: "center" },
+					}
+				);
+			}, layer);
+			return () => ctx.revert();
+		}
+
+		if (prefersReduced) return;
+
+		const sectionStart = (photoIndex - 1) * SECTION_STRIDE_PX;
+		const layerRevealStart = Math.round(
+			sectionStart + TRANSITION_DELAY_FRAC * SECTION_PX
+		);
+		const scrollOffset = window.scrollY - container.offsetTop;
+
+		const ctx = gsap.context(() => {
+			const strips = Array.from(
+				layer.querySelectorAll<HTMLElement>("[data-strip]")
+			);
+
+			gsap.set(layer, {
+				autoAlpha: scrollOffset >= layerRevealStart ? 1 : 0,
+			});
+
+			ScrollTrigger.create({
+				trigger: container,
+				start: `top+=${layerRevealStart} top`,
+				onEnter: () => gsap.set(layer, { autoAlpha: 1 }),
+				onEnterBack: () => gsap.set(layer, { autoAlpha: 1 }),
+				onLeaveBack: () => gsap.set(layer, { autoAlpha: 0 }),
+			});
+
+			strips.forEach((strip, s) => {
+				const anim = stripAnims[s];
+				if (!anim) return;
+
+				gsap.set(strip, { xPercent: anim.entryDir, y: anim.entryY });
+				gsap.to(strip, {
+					xPercent: 0,
+					y: 0,
+					ease: anim.ease,
+					immediateRender: false,
+					scrollTrigger: {
+						trigger: container,
+						start: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX)} top`,
+						end: `top+=${Math.round(sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX)} top`,
+						scrub,
+					},
+				});
+			});
+		}, layer);
+
+		return () => ctx.revert();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isMounted, scrub]);
+
+	return (
+		<div
+			ref={layerRef}
+			className={styles.photoLayer}
+			data-photo-layer
+			data-photo-index={photoIndex}
+			style={
+				{
+					zIndex: photoIndex,
+					opacity: isFirst ? 1 : 0,
+					visibility: isFirst ? "visible" : "hidden",
+				} as CSSProperties
+			}
+		>
+			{isMounted && (
+				<Image
+					src={photo.src}
+					alt={photo.title || `${tripName} — photo ${photoIndex + 1}`}
+					fill
+					className={styles.photoImageSingle}
+					sizes="(max-width: 768px) 100vw, 68vw"
+					priority={photoIndex < 2}
+					loading={photoIndex < 2 ? undefined : "lazy"}
+				/>
+			)}
+			{isMounted &&
+				Array.from({ length: STRIP_COUNT }, (_, s) => (
+					<div
+						key={s}
+						className={styles.stripPhoto}
+						data-strip={s}
+						style={
+							{
+								top: `${(s / STRIP_COUNT) * 100}%`,
+								height: `${100 / STRIP_COUNT}%`,
+							} as CSSProperties
+						}
+					>
+						<div
+							className={styles.stripPhotoImage}
+							style={
+								{
+									top: `${-(s / STRIP_COUNT) * 100}vh`,
+									backgroundImage: `url(${photo.src})`,
+								} as CSSProperties
+							}
+						/>
+					</div>
+				))}
+		</div>
+	);
+}
+
 export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const counterRef = useRef<HTMLSpanElement>(null);
@@ -139,6 +305,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 			),
 		[photos]
 	);
+
 	const mountedRangeStart = Math.max(
 		0,
 		activePhotoRange.start - PHOTO_MOUNT_BUFFER_BEHIND
@@ -157,19 +324,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 		).matches;
 
 		const ctx = gsap.context(() => {
-			const photoLayers = Array.from(
-				container.querySelectorAll<HTMLElement>("[data-photo-layer]")
-			);
-
-			if (prefersReduced) {
-				photoLayers.forEach((layer) => {
-					const photoIndex = Number(layer.dataset.photoIndex ?? "0");
-					gsap.set(layer, {
-						autoAlpha: photoIndex === 0 ? 1 : 0,
-					});
-				});
-				return;
-			}
+			if (prefersReduced) return;
 
 			if (counterRef.current) {
 				counterRef.current.textContent = "01";
@@ -190,33 +345,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 					},
 				});
 			}
-
-			photoLayers.forEach((layer) => {
-				const photoIndex = Number(layer.dataset.photoIndex ?? "0");
-				if (photoIndex !== 0) {
-					gsap.set(layer, { autoAlpha: 0 });
-					return;
-				}
-
-				const strips = Array.from(
-					layer.querySelectorAll<HTMLElement>("[data-strip]")
-				);
-				gsap.set(layer, { autoAlpha: 1 });
-				gsap.fromTo(
-					strips,
-					{
-						xPercent: (i) => (i % 2 === 0 ? -108 : 108),
-						autoAlpha: 1,
-					},
-					{
-						xPercent: 0,
-						autoAlpha: 1,
-						duration: 0.65,
-						ease: "power3.out",
-						stagger: { each: 0.07, from: "center" },
-					}
-				);
-			});
 
 			const titleEl =
 				container.querySelector<HTMLElement>("[data-title]");
@@ -277,77 +405,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 		return () => ctx.revert();
 	}, [count, totalScrollHeight]);
 
-	useEffect(() => {
-		if (!containerRef.current || count === 0) return;
-
-		const container = containerRef.current;
-		const prefersReduced = window.matchMedia(
-			"(prefers-reduced-motion: reduce)"
-		).matches;
-		if (prefersReduced) return;
-
-		const ctx = gsap.context(() => {
-			const photoLayers = Array.from(
-				container.querySelectorAll<HTMLElement>("[data-photo-layer]")
-			);
-
-			photoLayers.forEach((layer) => {
-				const photoIndex = Number(layer.dataset.photoIndex ?? "0");
-				if (photoIndex === 0) return;
-
-				const strips = Array.from(
-					layer.querySelectorAll<HTMLElement>("[data-strip]")
-				);
-				if (strips.length === 0) return;
-
-				const sectionStart = (photoIndex - 1) * SECTION_STRIDE_PX;
-				const layerRevealStart = Math.round(
-					sectionStart + TRANSITION_DELAY_FRAC * SECTION_PX
-				);
-
-				gsap.set(layer, { autoAlpha: 0 });
-				ScrollTrigger.create({
-					trigger: container,
-					start: `top+=${layerRevealStart} top`,
-					onEnter: () => {
-						gsap.set(layer, { autoAlpha: 1 });
-					},
-					onEnterBack: () => {
-						gsap.set(layer, { autoAlpha: 1 });
-					},
-					onLeaveBack: () => {
-						gsap.set(layer, { autoAlpha: 0 });
-					},
-				});
-
-				strips.forEach((strip, s) => {
-					const anim = allStripAnims[photoIndex]?.[s];
-					if (!anim) return;
-
-					gsap.set(strip, {
-						xPercent: anim.entryDir,
-						y: anim.entryY,
-					});
-
-					gsap.to(strip, {
-						xPercent: 0,
-						y: 0,
-						ease: anim.ease,
-						immediateRender: false,
-						scrollTrigger: {
-							trigger: container,
-							start: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.startRatio) * SECTION_PX} top`,
-							end: `top+=${sectionStart + (TRANSITION_DELAY_FRAC + anim.endRatio) * SECTION_PX} top`,
-							scrub,
-						},
-					});
-				});
-			});
-		}, container);
-
-		return () => ctx.revert();
-	}, [count, scrub, allStripAnims]);
-
 	if (count === 0) return null;
 
 	return (
@@ -366,72 +423,21 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						className={styles.photosWrapper}
 						aria-label="Trip photo gallery"
 					>
-						{photos.map((photo, p) => {
-							const isPhotoMounted =
-								p >= mountedRangeStart && p <= mountedRangeEnd;
-
-							return (
-								<div
-									key={`${photo.src}-${p}`}
-									className={styles.photoLayer}
-									data-photo-layer
-									data-photo-index={p}
-									style={
-										{
-											zIndex: p,
-											opacity: 0,
-											visibility: "hidden",
-										} as CSSProperties
-									}
-								>
-									{isPhotoMounted && (
-										<Image
-											src={photo.src}
-											alt={
-												photo.title ||
-												`${trip.name} — photo ${p + 1}`
-											}
-											fill
-											className={styles.photoImageSingle}
-											sizes="(max-width: 768px) 100vw, 68vw"
-											priority={p < 2}
-											loading={p < 2 ? undefined : "lazy"}
-										/>
-									)}
-									{Array.from(
-										{ length: STRIP_COUNT },
-										(_, s) => (
-											<div
-												key={s}
-												className={styles.stripPhoto}
-												data-strip={s}
-												style={
-													{
-														top: `${(s / STRIP_COUNT) * 100}%`,
-														height: `${100 / STRIP_COUNT}%`,
-													} as CSSProperties
-												}
-											>
-												<div
-													className={
-														styles.stripPhotoImage
-													}
-													style={
-														{
-															top: `${-(s / STRIP_COUNT) * 100}vh`,
-															backgroundImage:
-																isPhotoMounted
-																	? `url(${photo.src})`
-																	: undefined,
-														} as CSSProperties
-													}
-												/>
-											</div>
-										)
-									)}
-								</div>
-							);
-						})}
+						{photos.map((photo, p) => (
+							<PhotoLayer
+								key={`${photo.src}-${p}`}
+								photo={photo}
+								photoIndex={p}
+								isFirst={p === 0}
+								isMounted={
+									p >= mountedRangeStart && p <= mountedRangeEnd
+								}
+								containerRef={containerRef}
+								stripAnims={allStripAnims[p]}
+								scrub={scrub}
+								tripName={trip.name}
+							/>
+						))}
 					</div>
 
 					<div className={styles.separators} aria-hidden>
