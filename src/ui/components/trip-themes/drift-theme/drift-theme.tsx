@@ -4,7 +4,7 @@ import { Trip } from "@/types/trip";
 import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryNames } from "@/utils/country";
-import { useRef, useMemo, useEffect, useCallback, useState } from "react";
+import { useRef, useMemo, useEffect, useLayoutEffect, useCallback, useState } from "react";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
 import { seededRandom } from "@/utils/random";
@@ -128,6 +128,7 @@ function WaveSection({
 	const sectionRef = useRef<HTMLElement>(null);
 	const contentRef = useRef<HTMLDivElement>(null);
 	const hasAnimatedRef = useRef(false);
+	const [placeholderHeight, setPlaceholderHeight] = useState(0);
 
 	// First wave is always mounted; others start unmounted and are controlled
 	// by a bidirectional IntersectionObserver with a generous rootMargin so
@@ -146,6 +147,13 @@ function WaveSection({
 		observer.observe(section);
 		return () => observer.disconnect();
 	}, [isFirstWave]);
+
+	// Capture section height while content is in the DOM so we can hold the
+	// space when the wave unmounts (prevents layout jump during virtualisation).
+	useLayoutEffect(() => {
+		if (isFirstWave || !isMounted || !sectionRef.current) return;
+		setPlaceholderHeight(sectionRef.current.offsetHeight);
+	}, [isMounted, isFirstWave]);
 
 	// GSAP owns the content wrapper's opacity entirely — no CSS animation
 	// conflict. First mount: wrapper hides, ScrollTrigger fades+slides in.
@@ -244,6 +252,7 @@ function WaveSection({
 		});
 
 		return () => {
+			hasAnimatedRef.current = false;
 			tl.scrollTrigger?.kill();
 			tl.kill();
 		};
@@ -385,6 +394,7 @@ function WaveSection({
 			ref={sectionRef}
 			data-wave={waveIndex}
 			className={styles.wave}
+			style={!isMounted && placeholderHeight > 0 ? { minHeight: placeholderHeight } : undefined}
 		>
 			{isMounted && (
 				<div ref={contentRef} className={styles.waveContent}>{renderImages()}</div>
