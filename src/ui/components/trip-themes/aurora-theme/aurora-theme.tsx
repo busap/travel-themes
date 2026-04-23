@@ -67,8 +67,9 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 		pinDuration,
 		config: scrollConfig,
 		onSectionEnter: (index) => {
-			const next = validatedPhotos[index + 1];
-			if (next) preloadImage(next.src);
+			[validatedPhotos[index + 1], validatedPhotos[index + 2]].forEach(
+				(photo) => { if (photo) preloadImage(photo.src); }
+			);
 		},
 	});
 
