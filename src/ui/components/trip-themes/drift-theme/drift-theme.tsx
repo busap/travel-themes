@@ -182,9 +182,9 @@ function WaveSection({
 				y: 0,
 				scale: 1,
 			});
-			gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
+			const tween = gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
 			onReady?.();
-			return;
+			return () => tween.kill();
 		}
 
 		gsap.set(content, { opacity: 0 });
@@ -193,6 +193,7 @@ function WaveSection({
 				"bottom") as SlideDirection;
 			const offset = getDirectionOffset(dir);
 			gsap.set(photo, { x: offset.x, y: offset.y, scale: 0.92 });
+			(photo as HTMLElement).style.willChange = "transform";
 		});
 		gsap.set([...Array.from(captions)], { y: 10 });
 
@@ -205,6 +206,11 @@ function WaveSection({
 				start: animConfig.triggerStart,
 				toggleActions: "play none none none",
 				once: true,
+			},
+			onComplete: () => {
+				photos.forEach((photo) => {
+					(photo as HTMLElement).style.willChange = "auto";
+				});
 			},
 		});
 
