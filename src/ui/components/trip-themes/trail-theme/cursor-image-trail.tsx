@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./cursor-image-trail.module.scss";
 
+const PRELOAD_BUFFER = 3;
+
 interface CursorImageTrailProps {
 	images: string[];
 	spawnThreshold?: number;
@@ -35,6 +37,14 @@ export function CursorImageTrail({
 	const rafRef = useRef<number | null>(null);
 	const imageIndexRef = useRef(0);
 	const itemsRef = useRef<HTMLDivElement[]>([]);
+
+	useEffect(() => {
+		if (typeof window === "undefined" || images.length === 0) return;
+		images.slice(0, PRELOAD_BUFFER).forEach((src) => {
+			const img = new window.Image();
+			img.src = src;
+		});
+	}, [images]);
 
 	useEffect(() => {
 		if (!containerRef.current || images.length === 0) return;
@@ -78,6 +88,11 @@ export function CursorImageTrail({
 			const src = images[imageIndexRef.current % images.length];
 			imageIndexRef.current += 1;
 			el.style.backgroundImage = `url(${src})`;
+
+			const preloadSrc =
+				images[(imageIndexRef.current + PRELOAD_BUFFER - 1) % images.length];
+			const preloadImg = new window.Image();
+			preloadImg.src = preloadSrc;
 
 			const randomness = (min: number, max: number) =>
 				min + Math.random() * (max - min);
