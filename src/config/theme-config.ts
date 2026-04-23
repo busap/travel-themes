@@ -61,7 +61,7 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 		component: "drift-theme",
 		animation: {
 			scrollTrigger: {
-				start: "top 85%",
+				start: "top 60%",
 			},
 			timeline: {
 				duration: 0.8,
