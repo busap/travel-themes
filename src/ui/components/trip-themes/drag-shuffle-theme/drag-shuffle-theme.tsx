@@ -217,9 +217,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 				: "transform 240ms cubic-bezier(0.22, 1, 0.36, 1)";
 		}
 
-		const placeName =
-			photo.title?.trim() ||
-			`${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`;
+		const placeName = photo.title?.trim();
 
 		return (
 			<article
@@ -237,7 +235,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			>
 				<Image
 					src={photo.src}
-					alt={placeName}
+					alt={placeName || `${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`}
 					fill
 					priority={isTopCard}
 					loading={isTopCard ? undefined : "eager"}
