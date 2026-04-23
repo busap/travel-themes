@@ -2,7 +2,7 @@ import { Photo } from "@/types/photo";
 
 //LAYOUT
 export const MIN_LAYOUT_SCROLL_HEIGHT = 10000;
-export const MAIN_PHOTO_SECTION_SCROLL_HEIGHT = 2000;
+export const MAIN_PHOTO_SECTION_SCROLL_HEIGHT = 1200;
 
 export function getLayoutScrollHeight(
 	animationItems: PhotoAnimation[]
@@ -44,14 +44,14 @@ const ANIMATION_REVEAL_TO = [
 
 const ANIMATION_SCHEDULE = [
 	{
-		startRatio: 0.08,
+		startRatio: 0.03,
 		scrollSpan: 1080,
 		entryPortion: 0.34,
 		holdPortion: 0.16,
 		exitPortion: 0.5,
 	},
 	{
-		startRatio: 0.15,
+		startRatio: 0.08,
 		scrollSpan: 1540,
 		entryPortion: 0.32,
 		holdPortion: 0.32,
