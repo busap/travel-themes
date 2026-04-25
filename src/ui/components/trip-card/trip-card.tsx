@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Trip } from "@/types/trip";
 import { getTripRoute } from "@/utils/route";
 import { getCountryName } from "@/utils/country";
+import { BLUR_DATA_URL } from "@/utils/blur-placeholder";
 import styles from "./trip-card.module.scss";
 
 interface TripCardProps {
@@ -32,6 +33,8 @@ export function TripCard({
 				alt={trip.name}
 				fill
 				priority={priority}
+				placeholder="blur"
+				blurDataURL={BLUR_DATA_URL}
 				className={styles.image}
 				sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
 			/>

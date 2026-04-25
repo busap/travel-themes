@@ -21,12 +21,14 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 
 	useHorizontalScroll(scrollContainerRef, true);
 
-	const visiblePhotos = useScrollBasedReveal({
-		containerRef: scrollContainerRef,
-		enabled: true,
-		totalItems: trip.photos.length,
-		itemCount: trip.photos.length,
-	});
+	const { visibleItems: visiblePhotos, mountedItems: mountedPhotos } =
+		useScrollBasedReveal({
+			containerRef: scrollContainerRef,
+			enabled: true,
+			totalItems: trip.photos.length,
+			itemCount: trip.photos.length,
+			mountAhead: 6,
+		});
 
 	const spacing = "gap-16";
 	const cardsContainerClass = `${styles.cardsContainer} ${spacing}`.trim();
@@ -83,14 +85,18 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 							data-photo-index={index}
 							className={getCardWrapperClass(isVisible)}
 						>
-							<PolaroidCard
-								imageSrc={photo.src}
-								imageAlt={photo.title || `Photo ${index + 1}`}
-								caption={photo.title}
-								rotation={rotation}
-								verticalOffset={offset.y}
-								aspectRatio="portrait"
-							/>
+							{mountedPhotos.has(index) && (
+								<PolaroidCard
+									imageSrc={photo.src}
+									imageAlt={
+										photo.title || `Photo ${index + 1}`
+									}
+									caption={photo.title}
+									rotation={rotation}
+									verticalOffset={offset.y}
+									aspectRatio="portrait"
+								/>
+							)}
 						</div>
 					);
 				})}

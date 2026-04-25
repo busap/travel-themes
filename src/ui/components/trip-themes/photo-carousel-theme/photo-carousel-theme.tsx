@@ -1,6 +1,13 @@
 "use client";
 
-import { useRef, useMemo, useEffect, CSSProperties, PointerEvent } from "react";
+import {
+	useRef,
+	useMemo,
+	useEffect,
+	useState,
+	CSSProperties,
+	PointerEvent,
+} from "react";
 import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
@@ -25,6 +32,9 @@ interface RowState {
 
 // Speed ratios per row (sign = direction, magnitude = relative speed)
 const ROW_SPEED_RATIOS = [-1.3, 1.0, -1.5] as const;
+const INITIAL_LOAD_PER_ROW = 7;
+const LOAD_CHUNK = 3;
+const LOAD_THRESHOLD_PX = 520;
 
 function makeRowState(): RowState {
 	return {
@@ -65,6 +75,16 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 	const trackRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
 	const wrapperRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
+	const [activeRows, setActiveRows] = useState<boolean[]>([
+		true,
+		false,
+		false,
+	]);
+	const [loadedCounts, setLoadedCounts] = useState<number[]>(() =>
+		rows.map((_, i) => (i === 0 ? INITIAL_LOAD_PER_ROW : 0))
+	);
+	const loadedCountsRef = useRef<number[]>(loadedCounts);
+	const travelSinceLoadRef = useRef<number[]>([0, 0, 0]);
 
 	const rowStates = useRef<RowState[]>([
 		makeRowState(),
@@ -73,6 +93,80 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	]);
 
 	const rafRef = useRef<number>(0);
+
+	useEffect(() => {
+		loadedCountsRef.current = loadedCounts;
+	}, [loadedCounts]);
+
+	useEffect(() => {
+		const resetCounts = rows.map((_, i) =>
+			i === 0 ? INITIAL_LOAD_PER_ROW : 0
+		);
+		loadedCountsRef.current = resetCounts;
+		travelSinceLoadRef.current = [0, 0, 0];
+		const frameId = requestAnimationFrame(() => {
+			setLoadedCounts(resetCounts);
+		});
+		return () => cancelAnimationFrame(frameId);
+	}, [rows]);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				setActiveRows((prev) => {
+					const next = [...prev];
+					let changed = false;
+
+					entries.forEach((entry) => {
+						const rowAttr =
+							entry.target.getAttribute("data-row-index");
+						const rowIndex = rowAttr ? Number(rowAttr) : -1;
+						if (rowIndex < 0 || rowIndex > 2) return;
+						if (next[rowIndex] === entry.isIntersecting) return;
+						next[rowIndex] = entry.isIntersecting;
+						changed = true;
+					});
+
+					return changed ? next : prev;
+				});
+			},
+			{
+				root: null,
+				threshold: 0.05,
+				rootMargin: "120px 0px",
+			}
+		);
+
+		wrapperRefs.current.forEach((el) => {
+			if (el) observer.observe(el);
+		});
+
+		return () => observer.disconnect();
+	}, [rows.length]);
+
+	useEffect(() => {
+		const frameId = requestAnimationFrame(() => {
+			setLoadedCounts((prev) => {
+				const next = [...prev];
+				let changed = false;
+
+				activeRows.forEach((isActive, rowIndex) => {
+					if (!isActive) return;
+					const minNeeded = Math.min(
+						INITIAL_LOAD_PER_ROW,
+						rows[rowIndex].length
+					);
+					if (next[rowIndex] < minNeeded) {
+						next[rowIndex] = minNeeded;
+						changed = true;
+					}
+				});
+
+				return changed ? next : prev;
+			});
+		});
+		return () => cancelAnimationFrame(frameId);
+	}, [activeRows, rows]);
 
 	useEffect(() => {
 		const speeds = ROW_SPEED_RATIOS.map((r) => r * baseSpeed);
@@ -95,6 +189,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 				const halfWidth = el.scrollWidth / 2;
 				if (halfWidth <= 0) return;
+				const before = state.position;
 
 				if (!state.isDragging) {
 					// Apply momentum from drag release
@@ -109,6 +204,21 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 				state.position = clamp(state.position, halfWidth);
 				el.style.transform = `translateX(${state.position}px)`;
+
+				if (activeRows[i]) {
+					const moved = Math.abs(state.position - before);
+					travelSinceLoadRef.current[i] += moved;
+					if (travelSinceLoadRef.current[i] >= LOAD_THRESHOLD_PX) {
+						travelSinceLoadRef.current[i] = 0;
+						setLoadedCounts((prev) => {
+							const rowLimit = rows[i].length;
+							if (prev[i] >= rowLimit) return prev;
+							const next = [...prev];
+							next[i] = Math.min(rowLimit, prev[i] + LOAD_CHUNK);
+							return next;
+						});
+					}
+				}
 			});
 
 			rafRef.current = requestAnimationFrame(tick);
@@ -116,7 +226,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 		rafRef.current = requestAnimationFrame(tick);
 		return () => cancelAnimationFrame(rafRef.current);
-	}, [baseSpeed]);
+	}, [activeRows, baseSpeed, rows]);
 
 	const getPointerHandlers = (rowIndex: number) => ({
 		onPointerDown(e: PointerEvent<HTMLDivElement>) {
@@ -163,8 +273,14 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	});
 
 	const renderRow = (rowPhotos: Photo[], rowIndex: number) => {
+		const isActive = activeRows[rowIndex];
+		const loadedCount = Math.max(
+			0,
+			Math.min(loadedCounts[rowIndex] ?? 0, rowPhotos.length)
+		);
+		const loadedRowPhotos = rowPhotos.slice(0, loadedCount);
 		// Duplicate the photos so the track is seamlessly loopable
-		const items = [...rowPhotos, ...rowPhotos];
+		const items = [...loadedRowPhotos, ...loadedRowPhotos];
 
 		return (
 			<div
@@ -172,6 +288,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 				ref={(el) => {
 					wrapperRefs.current[rowIndex] = el;
 				}}
+				data-row-index={rowIndex}
 				className={styles.rowWrapper}
 				{...getPointerHandlers(rowIndex)}
 			>
@@ -181,21 +298,35 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 					}}
 					className={styles.rowTrack}
 				>
-					{items.map((photo, i) => (
-						<div
-							key={`${photo.src}-${rowIndex}-${i}`}
-							className={styles.imageCard}
-						>
-							<Image
-								src={photo.src}
-								alt={photo.title || `Photo ${i + 1}`}
-								fill
-								draggable={false}
-								className={styles.image}
-								sizes="(max-width: 768px) 180px, 280px"
-							/>
-						</div>
-					))}
+					{items.length > 0
+						? items.map((photo, i) => (
+								<div
+									key={`${photo.src}-${rowIndex}-${i}`}
+									className={styles.imageCard}
+								>
+									<Image
+										src={photo.src}
+										alt={photo.title || `Photo ${i + 1}`}
+										fill
+										draggable={false}
+										className={styles.image}
+										sizes="(max-width: 768px) 180px, 280px"
+									/>
+								</div>
+							))
+						: Array.from(
+								{
+									length: isActive
+										? Math.min(3, rowPhotos.length)
+										: 0,
+								},
+								(_, i) => (
+									<div
+										key={`skeleton-${rowIndex}-${i}`}
+										className={`${styles.imageCard} ${styles.imageSkeleton}`}
+									/>
+								)
+							)}
 				</div>
 			</div>
 		);

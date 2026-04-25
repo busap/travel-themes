@@ -4,7 +4,7 @@ import { Trip } from "@/types/trip";
 import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryNames } from "@/utils/country";
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useLayoutEffect, useCallback, useState } from "react";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
 import { seededRandom } from "@/utils/random";
@@ -54,6 +54,13 @@ interface Wave {
 	rotations: number[];
 }
 
+interface WaveSectionAnimConfig {
+	duration: number;
+	ease: string;
+	stagger: number;
+	triggerStart: string;
+}
+
 const SINGLE_COMPOSITIONS: CompositionKey[] = [
 	"single-left",
 	"single-right",
@@ -101,15 +108,306 @@ function getDirectionOffset(direction: SlideDirection): {
 	}
 }
 
+interface WaveSectionProps {
+	wave: Wave;
+	waveIndex: number;
+	isFirstWave: boolean;
+	animConfig: WaveSectionAnimConfig;
+	crimsonClassName: string;
+	onReady?: () => void;
+}
+
+function WaveSection({
+	wave,
+	waveIndex,
+	isFirstWave,
+	animConfig,
+	crimsonClassName,
+	onReady,
+}: WaveSectionProps) {
+	const sectionRef = useRef<HTMLElement>(null);
+	const contentRef = useRef<HTMLDivElement>(null);
+	const hasAnimatedRef = useRef(false);
+	const [placeholderHeight, setPlaceholderHeight] = useState(0);
+
+	const [isMounted, setIsMounted] = useState(isFirstWave);
+
+	useEffect(() => {
+		if (isFirstWave) return;
+		const section = sectionRef.current;
+		if (!section) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => setIsMounted(entry.isIntersecting),
+			{ rootMargin: "500px 0px" }
+		);
+		observer.observe(section);
+		return () => observer.disconnect();
+	}, [isFirstWave]);
+
+	useLayoutEffect(() => {
+		if (isFirstWave || !isMounted || !sectionRef.current) return;
+		setPlaceholderHeight(sectionRef.current.offsetHeight);
+	}, [isMounted, isFirstWave]);
+
+	useEffect(() => {
+		if (!isMounted || !sectionRef.current || !contentRef.current) return;
+
+		const section = sectionRef.current;
+		const content = contentRef.current;
+		const photos = section.querySelectorAll<Element>(
+			'[data-entrance="photo"]'
+		);
+		const captions = section.querySelectorAll<Element>(
+			'[data-entrance="caption"]'
+		);
+
+		const prefersReduced =
+			typeof window !== "undefined" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		if (prefersReduced) {
+			gsap.set(
+				[content, ...Array.from(photos), ...Array.from(captions)],
+				{ opacity: 1, x: 0, y: 0, scale: 1 }
+			);
+			onReady?.();
+			return;
+		}
+
+		if (hasAnimatedRef.current) {
+			gsap.set([...Array.from(photos), ...Array.from(captions)], {
+				opacity: 1,
+				x: 0,
+				y: 0,
+				scale: 1,
+			});
+			const tween = gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
+			onReady?.();
+			return () => tween.kill();
+		}
+
+		gsap.set(content, { opacity: 0 });
+		photos.forEach((photo) => {
+			const dir = (photo.getAttribute("data-direction") ||
+				"bottom") as SlideDirection;
+			const offset = getDirectionOffset(dir);
+			gsap.set(photo, { x: offset.x, y: offset.y, scale: 0.92 });
+			(photo as HTMLElement).style.willChange = "transform";
+		});
+		gsap.set([...Array.from(captions)], { y: 10 });
+
+		onReady?.();
+		hasAnimatedRef.current = true;
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: section,
+				start: animConfig.triggerStart,
+				toggleActions: "play none none none",
+				once: true,
+			},
+			onComplete: () => {
+				photos.forEach((photo) => {
+					(photo as HTMLElement).style.willChange = "auto";
+				});
+			},
+		});
+
+		tl.to(content, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0);
+
+		photos.forEach((photo, i) => {
+			tl.to(
+				photo,
+				{
+					x: 0,
+					y: 0,
+					scale: 1,
+					duration: animConfig.duration,
+					ease: animConfig.ease,
+				},
+				i * animConfig.stagger + 0.1
+			);
+		});
+
+		captions.forEach((caption, i) => {
+			tl.to(
+				caption,
+				{
+					y: 0,
+					duration: 0.4,
+					ease: "power2.out",
+				},
+				i * animConfig.stagger + 0.4
+			);
+		});
+
+		return () => {
+			hasAnimatedRef.current = false;
+			tl.scrollTrigger?.kill();
+			tl.kill();
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isMounted]);
+
+	const renderPhoto = (
+		photo: Photo,
+		rotation: number,
+		direction: SlideDirection,
+		photoIndex: number
+	) => (
+		<div
+			key={`${photo.src}-${photoIndex}`}
+			data-entrance="photo"
+			data-direction={direction}
+			className={styles.photo}
+			style={{ transform: `rotate(${rotation}deg)` }}
+		>
+			<div className={styles.photoMedia}>
+				<Image
+					src={photo.src}
+					alt={photo.title || `Photo ${photoIndex + 1}`}
+					className={styles.photoImage}
+					fill
+					sizes="(max-width: 768px) 90vw, 550px"
+					priority={isFirstWave && photoIndex === 0}
+					loading={!isFirstWave ? "lazy" : undefined}
+				/>
+			</div>
+			{photo.title && (
+				<p
+					data-entrance="caption"
+					className={`${styles.caption} ${crimsonClassName}`}
+				>
+					{photo.title}
+				</p>
+			)}
+		</div>
+	);
+
+	const compositionClass = COMPOSITION_CLASS_MAP[wave.compositionKey];
+
+	const renderImages = () => {
+		if (!isMounted) return null;
+
+		if (wave.compositionKey === "trio-one-two") {
+			return (
+				<div className={compositionClass}>
+					{renderPhoto(
+						wave.photos[0],
+						wave.rotations[0],
+						wave.directions[0],
+						0
+					)}
+					<div className={styles.trioBottomRow}>
+						{renderPhoto(
+							wave.photos[1],
+							wave.rotations[1],
+							wave.directions[1],
+							1
+						)}
+						{renderPhoto(
+							wave.photos[2],
+							wave.rotations[2],
+							wave.directions[2],
+							2
+						)}
+					</div>
+				</div>
+			);
+		}
+
+		if (wave.compositionKey === "trio-two-one") {
+			return (
+				<div className={compositionClass}>
+					<div className={styles.trioTopRow}>
+						{renderPhoto(
+							wave.photos[0],
+							wave.rotations[0],
+							wave.directions[0],
+							0
+						)}
+						{renderPhoto(
+							wave.photos[1],
+							wave.rotations[1],
+							wave.directions[1],
+							1
+						)}
+					</div>
+					{renderPhoto(
+						wave.photos[2],
+						wave.rotations[2],
+						wave.directions[2],
+						2
+					)}
+				</div>
+			);
+		}
+
+		if (wave.compositionKey === "trio-l-shape") {
+			return (
+				<div className={compositionClass}>
+					{renderPhoto(
+						wave.photos[0],
+						wave.rotations[0],
+						wave.directions[0],
+						0
+					)}
+					<div className={styles.trioRightStack}>
+						{renderPhoto(
+							wave.photos[1],
+							wave.rotations[1],
+							wave.directions[1],
+							1
+						)}
+						{renderPhoto(
+							wave.photos[2],
+							wave.rotations[2],
+							wave.directions[2],
+							2
+						)}
+					</div>
+				</div>
+			);
+		}
+
+		return (
+			<div className={compositionClass}>
+				{wave.photos.map((photo, i) =>
+					renderPhoto(photo, wave.rotations[i], wave.directions[i], i)
+				)}
+			</div>
+		);
+	};
+
+	return (
+		<section
+			ref={sectionRef}
+			data-wave={waveIndex}
+			className={styles.wave}
+			style={!isMounted && placeholderHeight > 0 ? { minHeight: placeholderHeight } : undefined}
+		>
+			{isMounted && (
+				<div ref={contentRef} className={styles.waveContent}>{renderImages()}</div>
+			)}
+		</section>
+	);
+}
+
 export function DriftTheme({ trip, config }: DriftThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const duration = config.animation?.timeline?.duration ?? 0.8;
 	const ease = config.animation?.timeline?.ease ?? "power3.out";
 	const stagger = config.animation?.timeline?.stagger ?? 0.12;
-	const triggerStart = config.animation?.scrollTrigger?.start ?? "top 85%";
+	const triggerStart = config.animation?.scrollTrigger?.start ?? "top 60%";
 	const titleClasses = "text-5xl font-light tracking-wide";
 	const bodyClasses = "text-lg text-zinc-600";
+
+	const animConfig = useMemo<WaveSectionAnimConfig>(
+		() => ({ duration, ease, stagger, triggerStart }),
+		[duration, ease, stagger, triggerStart]
+	);
 
 	const idSeed = useMemo(() => {
 		let hash = 0;
@@ -129,7 +427,6 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 		while (photoIndex < activePhotos.length) {
 			const remaining = activePhotos.length - photoIndex;
 
-			// Determine group size (1-3) via seeded random
 			const groupRand = seededRandom(idSeed + waveIndex * 53.7);
 			let groupSize: number;
 			if (remaining === 1) {
@@ -151,7 +448,6 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 				photoIndex + groupSize
 			);
 
-			// Pick composition
 			const compRand = seededRandom(idSeed + waveIndex * 71.3);
 			let compositionKey: CompositionKey;
 			if (groupSize === 1) {
@@ -171,13 +467,11 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 					];
 			}
 
-			// Assign random direction per photo
 			const directions: SlideDirection[] = wavePhotos.map((_, i) => {
 				const dirRand = seededRandom(idSeed + (photoIndex + i) * 29.3);
 				return DIRECTIONS[Math.floor(dirRand * DIRECTIONS.length)];
 			});
 
-			// Assign slight rotation per photo (-2 to +2 deg)
 			const rotations: number[] = wavePhotos.map((_, i) => {
 				const rotRand = seededRandom(idSeed + (photoIndex + i) * 17.3);
 				return Math.round((rotRand * 4 - 2) * 100) / 100;
@@ -196,10 +490,14 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 		return result;
 	}, [trip.photos, idSeed]);
 
-	// Set up GSAP ScrollTrigger per wave
-	useEffect(() => {
-		if (!containerRef.current || waves.length === 0) return;
+	const showContainer = useCallback(() => {
+		if (containerRef.current) {
+			containerRef.current.style.visibility = "visible";
+		}
+	}, []);
 
+	useEffect(() => {
+		if (!containerRef.current) return;
 		const container = containerRef.current;
 
 		const prefersReduced =
@@ -209,27 +507,13 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 		const header = container.querySelector('[data-entrance="header"]');
 		const subtitle = container.querySelector('[data-entrance="subtitle"]');
 
-		if (prefersReduced) {
-			const allPhotos = container.querySelectorAll(
-				'[data-entrance="photo"]'
-			);
-			const allCaptions = container.querySelectorAll(
-				'[data-entrance="caption"]'
-			);
-			gsap.set(
-				[
-					header,
-					subtitle,
-					...Array.from(allPhotos),
-					...Array.from(allCaptions),
-				].filter(Boolean),
-				{ opacity: 1, x: 0, y: 0, scale: 1 }
-			);
-			containerRef.current!.style.visibility = "visible";
+		if (prefersReduced || waves.length === 0) {
+			if (header) gsap.set(header, { opacity: 1, y: 0 });
+			if (subtitle) gsap.set(subtitle, { opacity: 1, y: 0 });
+			container.style.visibility = "visible";
 			return;
 		}
 
-		// Animate header
 		if (header) {
 			gsap.fromTo(
 				header,
@@ -250,79 +534,7 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 				}
 			);
 		}
-
-		// Set all photos + captions to initial hidden state (fromTo sets "from" immediately)
-		const allPhotos = container.querySelectorAll('[data-entrance="photo"]');
-		allPhotos.forEach((photo) => {
-			const dir = (photo.getAttribute("data-direction") ||
-				"bottom") as SlideDirection;
-			const offset = getDirectionOffset(dir);
-			gsap.set(photo, {
-				opacity: 0,
-				x: offset.x,
-				y: offset.y,
-				scale: 0.92,
-			});
-		});
-
-		const allCaptions = container.querySelectorAll(
-			'[data-entrance="caption"]'
-		);
-		gsap.set(allCaptions, { opacity: 0, y: 10 });
-
-		// Now that hidden states are set, reveal container
-		container.style.visibility = "visible";
-
-		// Animate per wave section — photos stagger in as a group when the wave scrolls into view
-		const waveSections = container.querySelectorAll("[data-wave]");
-		waveSections.forEach((section) => {
-			const photos = section.querySelectorAll('[data-entrance="photo"]');
-			const captions = section.querySelectorAll(
-				'[data-entrance="caption"]'
-			);
-
-			const tl = gsap.timeline({
-				scrollTrigger: {
-					trigger: section,
-					start: triggerStart,
-					toggleActions: "play none none none",
-					once: true,
-				},
-			});
-
-			photos.forEach((photo, i) => {
-				tl.to(
-					photo,
-					{
-						opacity: 1,
-						x: 0,
-						y: 0,
-						scale: 1,
-						duration,
-						ease,
-					},
-					i * stagger
-				);
-			});
-
-			captions.forEach((caption, i) => {
-				tl.to(
-					caption,
-					{
-						opacity: 1,
-						y: 0,
-						duration: 0.4,
-						ease: "power2.out",
-					},
-					i * stagger + 0.3
-				);
-			});
-		});
-
-		return () => {
-			ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-		};
-	}, [waves.length, triggerStart, stagger, duration, ease]);
+	}, [waves.length]);
 
 	const renderHeader = () => (
 		<div className={styles.header}>
@@ -337,168 +549,10 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 				className={`${styles.subtitle} ${bodyClasses} ${crimson.className}`}
 			>
 				{getCountryNames(trip.countries)}
-				{trip.year ? ` \u2022 ${trip.year}` : ""}
+				{trip.year ? ` • ${trip.year}` : ""}
 			</p>
 		</div>
 	);
-
-	const renderPhoto = (
-		photo: Photo,
-		rotation: number,
-		direction: SlideDirection,
-		index: number
-	) => {
-		return (
-			<div
-				key={`${photo.src}-${index}`}
-				data-entrance="photo"
-				data-direction={direction}
-				className={styles.photo}
-				style={{ transform: `rotate(${rotation}deg)` }}
-			>
-				<Image
-					src={photo.src}
-					alt={photo.title || `Photo ${index + 1}`}
-					className={styles.photoImage}
-					width={600}
-					height={450}
-					sizes="(max-width: 768px) 90vw, 550px"
-				/>
-				{photo.title && (
-					<p
-						data-entrance="caption"
-						className={`${styles.caption} ${crimson.className}`}
-					>
-						{photo.title}
-					</p>
-				)}
-			</div>
-		);
-	};
-
-	const renderWave = (wave: Wave, waveIndex: number) => {
-		const compositionClass = COMPOSITION_CLASS_MAP[wave.compositionKey];
-
-		if (wave.compositionKey === "trio-one-two") {
-			return (
-				<section
-					key={waveIndex}
-					data-wave={waveIndex}
-					className={styles.wave}
-				>
-					<div className={compositionClass}>
-						{renderPhoto(
-							wave.photos[0],
-							wave.rotations[0],
-							wave.directions[0],
-							0
-						)}
-						<div className={styles.trioBottomRow}>
-							{renderPhoto(
-								wave.photos[1],
-								wave.rotations[1],
-								wave.directions[1],
-								1
-							)}
-							{renderPhoto(
-								wave.photos[2],
-								wave.rotations[2],
-								wave.directions[2],
-								2
-							)}
-						</div>
-					</div>
-				</section>
-			);
-		}
-
-		if (wave.compositionKey === "trio-two-one") {
-			return (
-				<section
-					key={waveIndex}
-					data-wave={waveIndex}
-					className={styles.wave}
-				>
-					<div className={compositionClass}>
-						<div className={styles.trioTopRow}>
-							{renderPhoto(
-								wave.photos[0],
-								wave.rotations[0],
-								wave.directions[0],
-								0
-							)}
-							{renderPhoto(
-								wave.photos[1],
-								wave.rotations[1],
-								wave.directions[1],
-								1
-							)}
-						</div>
-						{renderPhoto(
-							wave.photos[2],
-							wave.rotations[2],
-							wave.directions[2],
-							2
-						)}
-					</div>
-				</section>
-			);
-		}
-
-		if (wave.compositionKey === "trio-l-shape") {
-			return (
-				<section
-					key={waveIndex}
-					data-wave={waveIndex}
-					className={styles.wave}
-				>
-					<div className={compositionClass}>
-						{renderPhoto(
-							wave.photos[0],
-							wave.rotations[0],
-							wave.directions[0],
-							0
-						)}
-						<div className={styles.trioRightStack}>
-							{renderPhoto(
-								wave.photos[1],
-								wave.rotations[1],
-								wave.directions[1],
-								1
-							)}
-							{renderPhoto(
-								wave.photos[2],
-								wave.rotations[2],
-								wave.directions[2],
-								2
-							)}
-						</div>
-					</div>
-				</section>
-			);
-		}
-
-		return (
-			<section
-				key={waveIndex}
-				data-wave={waveIndex}
-				className={styles.wave}
-			>
-				<div className={compositionClass}>
-					{wave.photos.map((photo, i) =>
-						renderPhoto(
-							photo,
-							wave.rotations[i],
-							wave.directions[i],
-							i
-						)
-					)}
-				</div>
-			</section>
-		);
-	};
-
-	const renderWaves = () => waves.map((wave, i) => renderWave(wave, i));
 
 	return (
 		<div
@@ -507,7 +561,17 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 			style={{ visibility: "hidden" }}
 		>
 			{renderHeader()}
-			{renderWaves()}
+			{waves.map((wave, i) => (
+				<WaveSection
+					key={i}
+					wave={wave}
+					waveIndex={i}
+					isFirstWave={i === 0}
+					animConfig={animConfig}
+					crimsonClassName={crimson.className}
+					onReady={i === 0 ? showContainer : undefined}
+				/>
+			))}
 		</div>
 	);
 }

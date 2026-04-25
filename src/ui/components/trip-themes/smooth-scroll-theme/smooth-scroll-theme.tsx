@@ -37,6 +37,7 @@ interface SmoothScrollThemeProps {
 export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const progressFillRef = useRef<HTMLDivElement>(null);
+	const preloadedRef = useRef<Set<number>>(new Set());
 
 	const scrub = config.animation?.scrollTrigger?.scrub ?? 1;
 
@@ -53,6 +54,7 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 	useEffect(() => {
 		if (!containerRef.current) return;
 
+		preloadedRef.current = new Set();
 		const container = containerRef.current;
 		const mainPhotoMask = container.querySelector("[data-main-photo-mask]");
 		const mainPhoto = container.querySelector("[data-main-photo]");
@@ -75,6 +77,10 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 				});
 			}
 
+			const totalScrollHeight =
+				MAIN_PHOTO_SECTION_SCROLL_HEIGHT + layoutScrollHeight;
+			const PRELOAD_LEAD = 0.1;
+
 			ScrollTrigger.create({
 				trigger: container,
 				start: "top top",
@@ -85,6 +91,26 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 							scaleY: self.progress,
 						});
 					}
+
+					// Imperatively preload lazy panels (index >= 3) before their reveal
+					photoAnimations.forEach((animation, index) => {
+						if (index < 3 || preloadedRef.current.has(index)) return;
+						const revealStart =
+							MAIN_PHOTO_SECTION_SCROLL_HEIGHT +
+							layoutScrollHeight * animation.startRatio;
+						const threshold = Math.max(
+							0,
+							revealStart / totalScrollHeight - PRELOAD_LEAD
+						);
+						if (self.progress >= threshold) {
+							preloadedRef.current.add(index);
+							const link = document.createElement("link");
+							link.rel = "preload";
+							link.as = "image";
+							link.href = animation.photo.src;
+							document.head.appendChild(link);
+						}
+					});
 				},
 			});
 
@@ -263,6 +289,8 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 							className={styles.animatedPhoto}
 							data-animated-photo
 							fill
+							priority={index === 0}
+							loading={index >= 3 ? "lazy" : undefined}
 							sizes="100vw"
 						/>
 					</div>

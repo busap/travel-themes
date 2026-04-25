@@ -103,6 +103,12 @@
 	@apply w-full h-auto object-cover max-h-[75vh];
 }
 
+.photoPlaceholder {
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	max-height: 75vh;
+}
+
 .photoCaption {
 	@apply px-6 py-4 text-white text-center text-lg font-normal h-[3.7rem] leading-normal overflow-hidden;
 	text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
