@@ -1,142 +1,183 @@
+"use client";
+
 import { useEffect, useRef, useState, RefObject } from "react";
-import {
-	VirtualRange,
-	clampProgress,
-	computeVirtualRange,
-	isInRange,
-	progressToIndex,
-} from "@/utils/virtualization";
+import { clampProgress, clampRange, isInRange, progressToIndex, VirtualRange } from "@/utils/virtualization";
 
 export type { VirtualRange };
 
-export interface UseVirtualWindowOptions {
-	/** Total number of items. */
+/**
+ * Scroll-progress mode: derive focus index from global scroll position within a
+ * fixed scroll height (e.g. a sticky-scroll sequence like the Parallax theme).
+ */
+interface ScrollProgressMode {
+	mode: "scroll-progress";
 	count: number;
-	/** Total pixel height of the scroll sequence (used to compute progress). */
 	totalScrollHeight: number;
-	/** Ref to the element whose offsetTop anchors the scroll math. */
+	/** Element whose offsetTop anchors the scroll math. */
 	containerRef: RefObject<HTMLElement | null>;
-	/** Items visible on either side of the focused index (active window). */
-	overscanBehind?: number;
-	overscanAhead?: number;
-	/** Extra items to keep mounted beyond the active window (for preloading). */
-	mountBufferBehind?: number;
-	mountBufferAhead?: number;
-	/** Set to false to disable windowing (all items treated as in range). */
-	enabled?: boolean;
+	before?: number;
+	after?: number;
 }
+
+/**
+ * DOM-visibility mode: query [data-virtual-index] elements inside a scroll
+ * container (or the window) to detect which items are currently in view, then
+ * maintain a sliding mount window around them.
+ */
+interface DomVisibilityMode {
+	mode: "dom-visibility";
+	count: number;
+	/** Scroll container. Omit to use window scroll. */
+	containerRef?: RefObject<HTMLElement | null>;
+	/** Data attribute that holds the item index. Default: "data-virtual-index". */
+	indexAttr?: string;
+	/**
+	 * Expand the detection area by this many pixels (mirrors IntersectionObserver
+	 * rootMargin). Useful for pre-mounting rows before they scroll into view.
+	 */
+	rootMarginPx?: number;
+	/**
+	 * When true the mount window never slides backward — items are never unmounted
+	 * once they've been revealed (monotonic / additive reveal).
+	 */
+	additive?: boolean;
+	before?: number;
+	after?: number;
+}
+
+export type UseVirtualWindowOptions = ScrollProgressMode | DomVisibilityMode;
 
 export interface UseVirtualWindowResult {
 	focusIndex: number;
-	activeRange: VirtualRange;
-	mountedRange: VirtualRange;
-	/** True when index falls within the active (visible) window. */
-	isActive: (index: number) => boolean;
-	/** True when index falls within the mounted (preload) window. */
 	isMounted: (index: number) => boolean;
 }
 
-interface WindowState {
+const DEFAULT_BEFORE = 2;
+const DEFAULT_AFTER = 3;
+
+interface MountState {
 	focusIndex: number;
-	activeRange: VirtualRange;
 	mountedRange: VirtualRange;
 }
 
-function buildState(
-	focusIndex: number,
-	count: number,
-	overscanBehind: number,
-	overscanAhead: number,
-	mountBufferBehind: number,
-	mountBufferAhead: number
-): WindowState {
-	return {
-		focusIndex,
-		activeRange: computeVirtualRange(focusIndex, overscanBehind, overscanAhead, count),
-		mountedRange: computeVirtualRange(
-			focusIndex,
-			overscanBehind + mountBufferBehind,
-			overscanAhead + mountBufferAhead,
-			count
-		),
-	};
-}
+export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindowResult {
+	const { count } = opts;
+	const before = opts.before ?? DEFAULT_BEFORE;
+	const after = opts.after ?? DEFAULT_AFTER;
 
-export function useVirtualWindow({
-	count,
-	totalScrollHeight,
-	containerRef,
-	overscanBehind = 1,
-	overscanAhead = 2,
-	mountBufferBehind = 1,
-	mountBufferAhead = 2,
-	enabled = true,
-}: UseVirtualWindowOptions): UseVirtualWindowResult {
-	const [state, setState] = useState<WindowState>(() =>
-		buildState(0, count, overscanBehind, overscanAhead, mountBufferBehind, mountBufferAhead)
-	);
+	// Flatten discriminated-union fields so they're stable deps without casting at each use.
+	const mode = opts.mode;
+	const containerRef = mode === "scroll-progress"
+		? opts.containerRef
+		: (opts as DomVisibilityMode).containerRef;
+	const totalScrollHeight = mode === "scroll-progress" ? opts.totalScrollHeight : 0;
+	const indexAttr = mode === "dom-visibility"
+		? ((opts as DomVisibilityMode).indexAttr ?? "data-virtual-index")
+		: "data-virtual-index";
+	const rootMarginPx = mode === "dom-visibility"
+		? ((opts as DomVisibilityMode).rootMarginPx ?? 0)
+		: 0;
+	const additive = mode === "dom-visibility"
+		? ((opts as DomVisibilityMode).additive ?? false)
+		: false;
 
-	// Track last state in a ref to skip unnecessary renders.
+	const [state, setState] = useState<MountState>(() => ({
+		focusIndex: 0,
+		mountedRange: clampRange({ start: -before, end: after }, count),
+	}));
+
 	const lastStateRef = useRef(state);
 
 	useEffect(() => {
-		const container = containerRef.current;
-		if (!container || !enabled || count <= 0) return;
+		if (count <= 0) return;
 
-		const update = () => {
-			const scrollRange = Math.max(totalScrollHeight, 1);
-			const rawProgress = (window.scrollY - container.offsetTop) / scrollRange;
-			const focus = progressToIndex(clampProgress(rawProgress), count);
-			const next = buildState(
-				focus,
-				count,
-				overscanBehind,
-				overscanAhead,
-				mountBufferBehind,
-				mountBufferAhead
-			);
-
+		const commit = (next: MountState) => {
 			const prev = lastStateRef.current;
 			if (
 				prev.focusIndex === next.focusIndex &&
-				prev.activeRange.start === next.activeRange.start &&
-				prev.activeRange.end === next.activeRange.end &&
 				prev.mountedRange.start === next.mountedRange.start &&
 				prev.mountedRange.end === next.mountedRange.end
-			) {
-				return;
-			}
-
+			) return;
 			lastStateRef.current = next;
 			setState(next);
 		};
 
-		const onScrollOrResize = () => window.requestAnimationFrame(update);
+		if (mode === "scroll-progress") {
+			const container = containerRef?.current;
+			if (!container) return;
 
-		window.addEventListener("scroll", onScrollOrResize, { passive: true });
-		window.addEventListener("resize", onScrollOrResize);
-		window.requestAnimationFrame(update);
+			const update = () => {
+				const focus = progressToIndex(
+					clampProgress((window.scrollY - container.offsetTop) / Math.max(totalScrollHeight, 1)),
+					count
+				);
+				commit({
+					focusIndex: focus,
+					mountedRange: clampRange({ start: focus - before, end: focus + after }, count),
+				});
+			};
 
-		return () => {
-			window.removeEventListener("scroll", onScrollOrResize);
-			window.removeEventListener("resize", onScrollOrResize);
+			const onEvent = () => window.requestAnimationFrame(update);
+			window.addEventListener("scroll", onEvent, { passive: true });
+			window.addEventListener("resize", onEvent);
+			window.requestAnimationFrame(update);
+			return () => {
+				window.removeEventListener("scroll", onEvent);
+				window.removeEventListener("resize", onEvent);
+			};
+		}
+
+		// dom-visibility mode
+		const container = containerRef?.current ?? null;
+		if (containerRef && !container) return; // Container ref provided but not yet mounted.
+
+		const update = () => {
+			const liveContainer = containerRef?.current ?? null;
+			const elements = liveContainer
+				? liveContainer.querySelectorAll(`[${indexAttr}]`)
+				: document.querySelectorAll(`[${indexAttr}]`);
+
+			const containerRect = liveContainer?.getBoundingClientRect() ?? null;
+			const visible: number[] = [];
+
+			elements.forEach((el) => {
+				const idx = parseInt(el.getAttribute(indexAttr) ?? "0");
+				const rect = el.getBoundingClientRect();
+
+				const inH = containerRect
+					? rect.left < containerRect.right && rect.right > containerRect.left
+					: true;
+				const inV = containerRect
+					? rect.top < containerRect.bottom + rootMarginPx &&
+					  rect.bottom > containerRect.top - rootMarginPx
+					: rect.top < window.innerHeight + rootMarginPx && rect.bottom > -rootMarginPx;
+
+				if (inH && inV) visible.push(idx);
+			});
+
+			if (visible.length === 0) return;
+
+			const minVisible = Math.min(...visible);
+			const maxVisible = Math.max(...visible);
+
+			commit({
+				focusIndex: maxVisible,
+				mountedRange: {
+					start: additive ? 0 : Math.max(0, minVisible - before),
+					end: Math.min(count - 1, maxVisible + after),
+				},
+			});
 		};
-	}, [
-		count,
-		totalScrollHeight,
-		containerRef,
-		overscanBehind,
-		overscanAhead,
-		mountBufferBehind,
-		mountBufferAhead,
-		enabled,
-	]);
+
+		const onEvent = () => window.requestAnimationFrame(update);
+		const scrollTarget: EventTarget = container ?? window;
+		scrollTarget.addEventListener("scroll", onEvent, { passive: true } as AddEventListenerOptions);
+		window.requestAnimationFrame(update);
+		return () => scrollTarget.removeEventListener("scroll", onEvent);
+	}, [count, before, after, mode, containerRef, totalScrollHeight, indexAttr, rootMarginPx, additive]);
 
 	return {
 		focusIndex: state.focusIndex,
-		activeRange: state.activeRange,
-		mountedRange: state.mountedRange,
-		isActive: (index) => isInRange(index, state.activeRange),
 		isMounted: (index) => isInRange(index, state.mountedRange),
 	};
 }

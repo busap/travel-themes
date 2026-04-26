@@ -84,25 +84,55 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 
 ## Virtualization
 
-Themes that render many photos use a shared virtualization layer to avoid mounting off-screen images.
+Themes that render many photos use a shared virtualization layer to avoid mounting off-screen content.
 
-### Utilities
+### Files
 
 | File | Purpose |
 |------|---------|
 | `src/utils/virtualization.ts` | Pure math helpers — `clampRange`, `computeVirtualRange`, `progressToIndex`, `clampProgress`, `isInRange`, `rangeToSet`. No side-effects; unit-tested. |
-| `src/hooks/use-virtual-window.ts` | `useVirtualWindow()` — scroll-progress-based windowing for fullscreen/sticky scroll themes (e.g. Parallax). Tracks focus index from scroll position and exposes `isMounted(i)` / `isActive(i)`. |
-| `src/hooks/use-scroll-based-reveal.ts` | `useScrollBasedReveal()` — container-scroll DOM-query windowing for horizontal feed themes (e.g. Feed). Uses `data-photo-index` attributes to determine visibility. |
+| `src/hooks/use-virtual-window.ts` | `useVirtualWindow()` — unified hook for both virtualization strategies (see below). |
 
-### When to use which
+### Two modes
 
-- **`useVirtualWindow`**: the theme pins the viewport and advances photos via global scroll progress (one "current photo" at a time). Pass `totalScrollHeight`, the container ref, and overscan values.
-- **`useScrollBasedReveal`**: the theme is a scrollable container with `[data-photo-index]` elements laid out in order. Better for horizontal carousels or vertical feeds.
-- **IntersectionObserver directly** (Drift, Grid Hover): per-section lazy mounting where each section is independently observed. Suitable when sections have variable heights or are not index-addressable.
+**`mode: "scroll-progress"`** — for sticky-scroll sequences (e.g. Parallax). Derives a focus index from global scroll progress within a defined `totalScrollHeight`, then keeps `before`/`after` items mounted around it.
+
+```ts
+const { isMounted } = useVirtualWindow({
+  mode: "scroll-progress",
+  count,
+  totalScrollHeight,
+  containerRef,   // element whose offsetTop anchors the math
+  before: 2,
+  after: 4,
+});
+```
+
+**`mode: "dom-visibility"`** — for scrollable lists/grids (e.g. Feed, Grid Hover). Queries `[data-virtual-index]` (or a custom `indexAttr`) elements to detect which items are in the viewport, then maintains a sliding mount window around them.
+
+```ts
+const { isMounted } = useVirtualWindow({
+  mode: "dom-visibility",
+  count,
+  containerRef,    // scroll container; omit to use window scroll
+  indexAttr: "data-virtual-index",
+  rootMarginPx: 0, // expand detection area (like IntersectionObserver rootMargin)
+  additive: false, // set true for monotonic reveal (rows never unmount once shown)
+  before: 2,
+  after: 3,
+});
+```
+
+Both modes return only `{ focusIndex, isMounted(i) }`. Mark items with the chosen data attribute so the hook can find them.
+
+### Additive vs sliding window
+
+- Default (sliding): the mount window tracks the current scroll position. Items far above or below may unmount. Good for long feeds.
+- `additive: true`: the mount window start is pinned at 0 and only the end grows. Items are never unmounted once revealed. Good for grids where re-mounting would cause layout shift.
 
 ### Where not to use
 
-Do not apply index-based virtualization to themes with fewer than ~10 photos — the overhead is not worth it and may cause visible pop-in.
+Do not add virtualization to themes with fewer than ~10 items — the overhead is not worth it and may cause visible pop-in. Drift's per-wave IntersectionObserver is intentionally kept component-local and does not need this hook.
 
 ## Don't
 
