@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Trip } from "@/types/trip";
 import { getTripRoute } from "@/utils/route";
 import { getCountryName } from "@/utils/country";
@@ -21,11 +24,15 @@ export function TripCard({
 	onTripHover,
 	onTripHoverEnd,
 }: TripCardProps) {
+	const router = useRouter();
 	return (
 		<Link
 			href={getTripRoute(trip.id)}
 			className={`${styles.card}${compact ? ` ${styles.compact}` : ""}`}
-			onMouseEnter={() => onTripHover?.(trip.id)}
+			onMouseEnter={() => {
+				router.prefetch(getTripRoute(trip.id));
+				onTripHover?.(trip.id);
+			}}
 			onMouseLeave={() => onTripHoverEnd?.()}
 		>
 			<Image
