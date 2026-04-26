@@ -111,6 +111,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 	const stagger = config.animation?.timeline?.stagger ?? 0.1;
 	const duration = config.animation?.timeline?.duration ?? 0.4;
 	const ease = config.animation?.timeline?.ease ?? "power2.out";
+	const fromScale = config.animation?.timeline?.fromScale ?? 0.9;
 	const scrollTriggerStart =
 		config.animation?.scrollTrigger?.start ?? "top 85%";
 	const scrollTriggerEnd = config.animation?.scrollTrigger?.end ?? "top 60%";
@@ -130,7 +131,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 					item,
 					{
 						opacity: 0,
-						scale: 0.9,
+						scale: fromScale,
 					},
 					{
 						opacity: 1,
@@ -154,6 +155,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 		validatedPhotos.length,
 		duration,
 		ease,
+		fromScale,
 		stagger,
 		scrollTriggerStart,
 		scrollTriggerEnd,
