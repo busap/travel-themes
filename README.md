@@ -126,6 +126,18 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - Removed `TripCardVariant` enum and `variants/` sub-components (ImmersiveCard, PolaroidCard variant) — no longer needed.
 - Pattern: home page globe focus is controlled by `focusTripId` state passed down from `HomeHero`.
 
+### Iteration 13
+
+- Unified the virtualization layer: `useScrollBasedReveal` folded into `useVirtualWindow` as `mode: "dom-visibility"` (alongside `mode: "scroll-progress"`), with `additive` for monotonic-reveal grids.
+- Rolled the hook out to every remaining bespoke virtualization site:
+    - `Trippy`, `Parallax` — `scroll-progress` mode for sticky/pinned-scroll lazy mounting.
+    - `Drift`, `Mosaic`, `Image-Grid-Hero` gallery, `Grid Hover`, `Photo Carousel` — replaced per-section/per-cell `IntersectionObserver` (and Mosaic's `ScrollTrigger.create`) with `dom-visibility` mode. Existing data attributes (`data-photo-index`, `data-row-index`, `data-gallery-index`) are reused via `indexAttr` so click/animation handlers keep working.
+    - `Collage`, `Feed` — container-scroll `dom-visibility`.
+    - `Aurora` — uses the pure utils (`computeVirtualRange` + `rangeToSet`) directly against its `useScrollPinnedReveal` focus index.
+- Convention: when GSAP queries DOM at mount (Trippy, Mosaic), keep the queried element as a permanent wrapper and gate the heavy `<Image>` inside it — never gate the queried element behind `isMounted` itself.
+- Knock-on cleanups: Mosaic's `isInInitialViewport` ref-during-render replaced with a fixed-index priority heuristic; Aurora's set-merge `useEffect` replaced with a `useMemo` window.
+- Trippy specifically: `additive: true` to avoid backward-scroll decode flicker, plus `onLeave`/`onLeaveBack` callbacks on each per-photo `ScrollTrigger` that snap the scrub tween to its terminal state on exit (otherwise fast reverse scroll lets several photos hang mid-fade for `scrub` seconds while flying past).
+
 ## TODO
 
 ### Add unit tests for src/db/ once Prisma client is generated
