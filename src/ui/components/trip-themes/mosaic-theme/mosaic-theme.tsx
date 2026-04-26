@@ -60,6 +60,7 @@ function MosaicCell({
 	isExpanded,
 	onCellClick,
 }: MosaicCellProps) {
+	const cellRef = useRef<HTMLDivElement>(null);
 	const [imageReady, setImageReady] = useState(false);
 	// First 4 cells always cover the initial visual row (worst case: 4× span-3
 	// in a 12-col grid). No DOM measurement needed — avoids ESLint setState-in-effect
@@ -68,6 +69,7 @@ function MosaicCell({
 
 	return (
 		<div
+			ref={cellRef}
 			data-photo-item
 			data-photo-index={index}
 			className={`${styles.photoItem} ${isExpanded ? styles.photoItemExpanded : ""}`}
