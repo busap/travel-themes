@@ -1,12 +1,13 @@
 "use client";
 
-import { CSSProperties, useEffect, useRef, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { DM_Serif_Display } from "next/font/google";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { seededRandom } from "@/utils/random";
 import { getCountryNames } from "@/utils/country";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./parallax-theme.module.scss";
@@ -28,10 +29,8 @@ const SECTION_HOLD_PX = 320;
 const SECTION_STRIDE_PX = SECTION_PX + SECTION_HOLD_PX;
 const TRANSITION_DELAY_FRAC = 0.18;
 const TRANSITION_FRAC = 0.52;
-const PHOTO_WINDOW_BEHIND = 1;
-const PHOTO_WINDOW_AHEAD = 2;
-const PHOTO_MOUNT_BUFFER_BEHIND = 1;
-const PHOTO_MOUNT_BUFFER_AHEAD = 2;
+const PHOTO_MOUNT_BEFORE = 2;
+const PHOTO_MOUNT_AFTER = 4;
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -78,14 +77,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const counterRef = useRef<HTMLSpanElement>(null);
 	const scrub = config.animation?.scrollTrigger?.scrub ?? 1.2;
-	const [activePhotoRange, setActivePhotoRange] = useState<{
-		start: number;
-		end: number;
-	}>(() => ({
-		start: 0,
-		end: Math.min(2, Math.max(0, trip.photos.length - 1)),
-	}));
-	const lastRangeRef = useRef(activePhotoRange);
 	const photos = trip.photos;
 	const count = photos.length;
 	const totalScrollHeight = useMemo(
@@ -93,42 +84,14 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 		[count]
 	);
 
-	useEffect(() => {
-		const container = containerRef.current;
-		if (!container || count <= 0) return;
-
-		const updatePhotoWindow = () => {
-			const start = container.offsetTop;
-			const scrollRange = Math.max(totalScrollHeight, 1);
-			const rawProgress = (window.scrollY - start) / scrollRange;
-			const clampedProgress = Math.min(1, Math.max(0, rawProgress));
-			const focusIndex = Math.round(clampedProgress * (count - 1));
-
-			const nextRange = {
-				start: Math.max(0, focusIndex - PHOTO_WINDOW_BEHIND),
-				end: Math.min(count - 1, focusIndex + PHOTO_WINDOW_AHEAD),
-			};
-			const prev = lastRangeRef.current;
-			if (prev.start === nextRange.start && prev.end === nextRange.end) {
-				return;
-			}
-			lastRangeRef.current = nextRange;
-			setActivePhotoRange(nextRange);
-		};
-
-		const onScrollOrResize = () => {
-			window.requestAnimationFrame(updatePhotoWindow);
-		};
-
-		window.addEventListener("scroll", onScrollOrResize, { passive: true });
-		window.addEventListener("resize", onScrollOrResize);
-		window.requestAnimationFrame(updatePhotoWindow);
-
-		return () => {
-			window.removeEventListener("scroll", onScrollOrResize);
-			window.removeEventListener("resize", onScrollOrResize);
-		};
-	}, [count, totalScrollHeight]);
+	const { isMounted: isPhotoMounted } = useVirtualWindow({
+		mode: "scroll-progress",
+		count,
+		totalScrollHeight,
+		containerRef,
+		before: PHOTO_MOUNT_BEFORE,
+		after: PHOTO_MOUNT_AFTER,
+	});
 
 	const allStripAnims = useMemo<StripAnim[][]>(
 		() =>
@@ -139,15 +102,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 			),
 		[photos]
 	);
-	const mountedRangeStart = Math.max(
-		0,
-		activePhotoRange.start - PHOTO_MOUNT_BUFFER_BEHIND
-	);
-	const mountedRangeEnd = Math.min(
-		count - 1,
-		activePhotoRange.end + PHOTO_MOUNT_BUFFER_AHEAD
-	);
-
 	useEffect(() => {
 		if (!containerRef.current || count === 0) return;
 
@@ -366,72 +320,64 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 						className={styles.photosWrapper}
 						aria-label="Trip photo gallery"
 					>
-						{photos.map((photo, p) => {
-							const isPhotoMounted =
-								p >= mountedRangeStart && p <= mountedRangeEnd;
-
-							return (
-								<div
-									key={`${photo.src}-${p}`}
-									className={styles.photoLayer}
-									data-photo-layer
-									data-photo-index={p}
-									style={
-										{
-											zIndex: p,
-											opacity: 0,
-											visibility: "hidden",
-										} as CSSProperties
-									}
-								>
-									{isPhotoMounted && (
-										<Image
-											src={photo.src}
-											alt={
-												photo.title ||
-												`${trip.name} — photo ${p + 1}`
+						{photos.map((photo, p) => (
+							<div
+								key={`${photo.src}-${p}`}
+								className={styles.photoLayer}
+								data-photo-layer
+								data-photo-index={p}
+								style={
+									{
+										zIndex: p,
+										opacity: 0,
+										visibility: "hidden",
+									} as CSSProperties
+								}
+							>
+								{isPhotoMounted(p) && (
+									<Image
+										src={photo.src}
+										alt={
+											photo.title ||
+											`${trip.name} — photo ${p + 1}`
+										}
+										fill
+										className={styles.photoImageSingle}
+										sizes="(max-width: 768px) 100vw, 68vw"
+										priority={p < 2}
+										loading={p < 2 ? undefined : "lazy"}
+									/>
+								)}
+								{Array.from(
+									{ length: STRIP_COUNT },
+									(_, s) => (
+										<div
+											key={s}
+											className={styles.stripPhoto}
+											data-strip={s}
+											style={
+												{
+													top: `${(s / STRIP_COUNT) * 100}%`,
+													height: `${100 / STRIP_COUNT}%`,
+												} as CSSProperties
 											}
-											fill
-											className={styles.photoImageSingle}
-											sizes="(max-width: 768px) 100vw, 68vw"
-											priority={p < 2}
-											loading={p < 2 ? undefined : "lazy"}
-										/>
-									)}
-									{Array.from(
-										{ length: STRIP_COUNT },
-										(_, s) => (
+										>
 											<div
-												key={s}
-												className={styles.stripPhoto}
-												data-strip={s}
+												className={styles.stripPhotoImage}
 												style={
 													{
-														top: `${(s / STRIP_COUNT) * 100}%`,
-														height: `${100 / STRIP_COUNT}%`,
+														top: `${-(s / STRIP_COUNT) * 100}vh`,
+														backgroundImage: isPhotoMounted(p)
+															? `url(${photo.src})`
+															: undefined,
 													} as CSSProperties
 												}
-											>
-												<div
-													className={
-														styles.stripPhotoImage
-													}
-													style={
-														{
-															top: `${-(s / STRIP_COUNT) * 100}vh`,
-															backgroundImage:
-																isPhotoMounted
-																	? `url(${photo.src})`
-																	: undefined,
-														} as CSSProperties
-													}
-												/>
-											</div>
-										)
-									)}
-								</div>
-							);
-						})}
+											/>
+										</div>
+									)
+								)}
+							</div>
+						))}
 					</div>
 
 					<div className={styles.separators} aria-hidden>

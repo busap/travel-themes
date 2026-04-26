@@ -5,6 +5,7 @@ import { ThemeConfig } from "@/config/theme-config";
 import { useRef, useEffect, useState } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./image-grid-hero-theme.module.scss";
@@ -64,7 +65,17 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 	const [galleryOpen, setGalleryOpen] = useState(false);
 	const [galleryPreloadEnabled, setGalleryPreloadEnabled] = useState(false);
 
-	// Open gallery when it scrolls near the viewport
+	const { isMounted: isGalleryItemMounted } = useVirtualWindow({
+		mode: "dom-visibility",
+		count: galleryPhotos.length,
+		indexAttr: "data-gallery-index",
+		rootMarginPx: 200,
+		additive: true,
+		after: 6,
+	});
+
+	// `useVirtualWindow` initialises with a non-empty mount window, so it
+	// can't double as the GSAP timeline trigger — keep a one-shot IO here.
 	useEffect(() => {
 		if (!galleryRef.current || galleryPhotos.length === 0) return;
 		const el = galleryRef.current;
@@ -154,9 +165,8 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 			if (allItems.length === 0) return;
 
 			const computedColumns = grid
-				? window
-						.getComputedStyle(grid)
-						.gridTemplateColumns.split(" ").length
+				? window.getComputedStyle(grid).gridTemplateColumns.split(" ")
+						.length
 				: 3;
 			const columns = Math.max(1, computedColumns);
 			const rowCount = Math.ceil(allItems.length / columns);
@@ -242,8 +252,7 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 							{
 								scale: row === 1 ? 0.9 : 0.94,
 								rotate: fromRotate,
-								clipPath:
-									"inset(16% 14% 20% 14% round 18px)",
+								clipPath: "inset(16% 14% 20% 14% round 18px)",
 							},
 							{
 								scale: 1,
@@ -355,7 +364,6 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 
 	const renderGallery = () => {
 		if (galleryPhotos.length === 0) return null;
-		const showImages = galleryOpen || galleryPreloadEnabled;
 		return (
 			<section className={styles.gallery} ref={galleryRef}>
 				<div className={styles.galleryHeader}>
@@ -363,43 +371,55 @@ export function ImageGridHeroTheme({ trip, config }: ImageGridHeroThemeProps) {
 					<div className={styles.galleryDivider} />
 				</div>
 				<div className={styles.galleryGrid} data-gallery-grid>
-					{galleryPhotos.map((photo, index) => (
-						<div
-							key={index}
-							className={styles.galleryItem}
-							data-gallery-item
-						>
+					{galleryPhotos.map((photo, index) => {
+						const showImage =
+							galleryPreloadEnabled ||
+							isGalleryItemMounted(index);
+						return (
 							<div
-								className={styles.galleryItemInner}
-								data-gallery-item-inner
+								key={index}
+								className={styles.galleryItem}
+								data-gallery-item
+								data-gallery-index={index}
 							>
-								{showImages && (
-									<>
-										<Image
-											src={photo.src}
-											alt={
-												photo.title ||
-												`${trip.name} – photo ${index + 7}`
-											}
-											fill
-											sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-											style={{ objectFit: "cover" }}
-										/>
-										{photo.title && (
-											<div className={styles.galleryOverlay}>
-												<span
-													className={styles.galleryItemTitle}
-													data-gallery-title
+								<div
+									className={styles.galleryItemInner}
+									data-gallery-item-inner
+								>
+									{showImage && (
+										<>
+											<Image
+												src={photo.src}
+												alt={
+													photo.title ||
+													`${trip.name} – photo ${index + 7}`
+												}
+												fill
+												sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+												style={{ objectFit: "cover" }}
+											/>
+											{photo.title && (
+												<div
+													className={
+														styles.galleryOverlay
+													}
 												>
-													{photo.title}
-												</span>
-											</div>
-										)}
-									</>
-								)}
+													<span
+														className={
+															styles.galleryItemTitle
+														}
+														data-gallery-title
+													>
+														{photo.title}
+													</span>
+												</div>
+											)}
+										</>
+									)}
+								</div>
 							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</section>
 		);

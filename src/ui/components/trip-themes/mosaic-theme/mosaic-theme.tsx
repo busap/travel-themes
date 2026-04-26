@@ -8,7 +8,12 @@ import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Inter, Bebas_Neue } from "next/font/google";
 import { useMousePosition } from "@/hooks/use-mouse-position";
-import { getGridCellSize, GridSize, GridCellAssignment } from "@/utils/mosaic-layout";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
+import {
+	getGridCellSize,
+	GridSize,
+	GridCellAssignment,
+} from "@/utils/mosaic-layout";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./mosaic-theme.module.scss";
@@ -50,40 +55,25 @@ interface MosaicCellProps {
 	index: number;
 	gridSize: GridCellAssignment;
 	isExpanded: boolean;
+	cellLoaded: boolean;
 	onCellClick: (index: number, el: HTMLDivElement | null) => void;
 }
+
+// Approximated rather than measured at render-time so we can keep the
+// `priority` prop stable across mounts.
+const PRIORITY_CELL_LIMIT = 3;
 
 function MosaicCell({
 	photo,
 	index,
 	gridSize,
 	isExpanded,
+	cellLoaded,
 	onCellClick,
 }: MosaicCellProps) {
 	const cellRef = useRef<HTMLDivElement>(null);
-	const [cellLoaded, setCellLoaded] = useState(false);
 	const [imageReady, setImageReady] = useState(false);
-	const isInInitialViewport = useRef(false);
-
-	useEffect(() => {
-		if (!cellRef.current) return;
-		const el = cellRef.current;
-		const rect = el.getBoundingClientRect();
-
-		if (rect.top < window.innerHeight) {
-			isInInitialViewport.current = true;
-			setCellLoaded(true);
-			return;
-		}
-
-		const trigger = ScrollTrigger.create({
-			trigger: el,
-			start: "top 120%",
-			onEnter: () => setCellLoaded(true),
-		});
-
-		return () => trigger.kill();
-	}, []);
+	const isPriority = index < PRIORITY_CELL_LIMIT;
 
 	return (
 		<div
@@ -96,7 +86,9 @@ function MosaicCell({
 				gridRow: gridSize.gridRow,
 				opacity: 0,
 			}}
-			onClick={(e) => onCellClick(index, e.currentTarget as HTMLDivElement)}
+			onClick={(e) =>
+				onCellClick(index, e.currentTarget as HTMLDivElement)
+			}
 		>
 			{cellLoaded && (
 				<Image
@@ -105,8 +97,8 @@ function MosaicCell({
 					className={styles.photoImage}
 					fill
 					sizes={getCellSizes(gridSize.size)}
-					priority={isInInitialViewport.current}
-					loading={isInInitialViewport.current ? undefined : "lazy"}
+					priority={isPriority}
+					loading={isPriority ? undefined : "lazy"}
 					style={{ objectFit: "cover", opacity: imageReady ? 1 : 0 }}
 					onLoad={() => setImageReady(true)}
 				/>
@@ -141,6 +133,17 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 
 	const validatedPhotos = trip.photos;
 	const mousePosition = useMousePosition(gridRef);
+
+	// Reuses the existing [data-photo-index] attribute that the click handler
+	// already targets. `additive` keeps revealed cells mounted to avoid layout
+	// shift if the user scrolls back through the grid.
+	const { isMounted: isCellLoaded } = useVirtualWindow({
+		mode: "dom-visibility",
+		count: validatedPhotos.length,
+		indexAttr: "data-photo-index",
+		rootMarginPx: 600,
+		additive: true,
+	});
 
 	useEffect(() => {
 		if (!gridRef.current) return;
@@ -313,6 +316,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 							index={index}
 							gridSize={gridSize}
 							isExpanded={isExpanded}
+							cellLoaded={isCellLoaded(index)}
 							onCellClick={handlePhotoClick}
 						/>
 					);

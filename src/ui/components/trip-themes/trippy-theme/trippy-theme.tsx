@@ -8,6 +8,7 @@ import { ThemeConfig } from "@/config/theme-config";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getCountryNames } from "@/utils/country";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import styles from "./trippy-theme.module.scss";
 
 if (typeof window !== "undefined") {
@@ -23,6 +24,8 @@ const bebas = Bebas_Neue({
 const PHOTO_SECTION_PX = 1000;
 const ENTRY_RATIO = 0.35;
 const EXIT_START_RATIO = 0.65;
+const PHOTO_MOUNT_BEFORE = 2;
+const PHOTO_MOUNT_AFTER = 4;
 
 interface TrippyThemeProps {
 	trip: Trip;
@@ -37,6 +40,19 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
 		() => trip.photos.length * PHOTO_SECTION_PX,
 		[trip.photos.length]
 	);
+
+	const { isMounted: isPhotoMounted } = useVirtualWindow({
+		mode: "scroll-progress",
+		count: trip.photos.length,
+		totalScrollHeight,
+		containerRef,
+		before: PHOTO_MOUNT_BEFORE,
+		after: PHOTO_MOUNT_AFTER,
+		// Once a photo has been decoded, keep it in the DOM. The GSAP
+		// timeline is the same in both directions, so any unmount during
+		// backward scroll re-triggers the decode-and-fade-in flicker.
+		additive: true,
+	});
 
 	useEffect(() => {
 		if (!containerRef.current || trip.photos.length === 0) return;
@@ -80,6 +96,20 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
 						start: `top+=${sectionStart} top`,
 						end: `top+=${sectionEnd} top`,
 						scrub,
+						// Snap the scrub tween + timeline to its terminal state
+						// the moment the user crosses the section boundary.
+						// Without this, fast reverse scroll lets each photo
+						// linger toward autoAlpha 1 mid-fade for `scrub` seconds
+						// after it should already be hidden, causing several
+						// layers to flash on simultaneously while scrolling up.
+						onLeave: (self) => {
+							self.getTween()?.progress(1);
+							tl.progress(1);
+						},
+						onLeaveBack: (self) => {
+							self.getTween()?.progress(1);
+							tl.progress(0);
+						},
 					},
 				});
 
@@ -198,19 +228,26 @@ export function TrippyTheme({ trip, config }: TrippyThemeProps) {
 						data-photo-layer
 					>
 						<div className={styles.photoFrame} data-photo-frame>
-							<Image
-								src={photo.src}
-								alt={
-									photo.title ||
-									`${trip.name} — photo ${i + 1}`
-								}
+							<div
 								className={styles.photoImg}
 								data-photo-img
-								fill
-								sizes="(max-width: 768px) 95vw, 88vw"
-								priority={i < 2}
-								loading={i < 2 ? undefined : "eager"}
-							/>
+								aria-hidden={!isPhotoMounted(i)}
+							>
+								{isPhotoMounted(i) && (
+									<Image
+										src={photo.src}
+										alt={
+											photo.title ||
+											`${trip.name} — photo ${i + 1}`
+										}
+										fill
+										sizes="(max-width: 768px) 95vw, 88vw"
+										style={{ objectFit: "cover" }}
+										priority={i < 2}
+										loading={i < 2 ? undefined : "lazy"}
+									/>
+								)}
+							</div>
 							<div className={styles.photoChroma} aria-hidden />
 						</div>
 

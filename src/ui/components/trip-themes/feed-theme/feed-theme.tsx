@@ -7,7 +7,7 @@ import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useScrollBasedReveal } from "@/hooks/use-scroll-based-reveal";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import { ImagePlaceholder } from "@/ui/components/image-placeholder/image-placeholder";
 import styles from "./feed-theme.module.scss";
 
@@ -30,11 +30,11 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 
 	const validatedPhotos = trip.photos;
 
-	const { mountedItems: mountedPhotos } = useScrollBasedReveal({
+	const { isMounted } = useVirtualWindow({
+		mode: "dom-visibility",
+		count: validatedPhotos.length,
 		containerRef: viewportRef,
-		enabled: true,
-		totalItems: validatedPhotos.length,
-		mountAhead: 3,
+		after: 3,
 	});
 
 	useEffect(() => {
@@ -96,14 +96,14 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 		index: number
 	) => {
 		const isFirst = index === 0;
-		const shouldLoadImage = mountedPhotos.has(index);
+		const shouldLoadImage = isMounted(index);
 
 		return (
 			<div
 				key={index}
 				className={styles.feedCard}
 				data-feed-card
-				data-photo-index={index}
+				data-virtual-index={index}
 			>
 				<div className={styles.feedCardImage}>
 					<div className={styles.feedCardSkeleton} aria-hidden>

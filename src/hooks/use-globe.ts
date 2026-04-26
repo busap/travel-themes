@@ -225,6 +225,7 @@ export function useGlobe({
 					hoveredIdRef.current = countryId;
 
 					if (trip) {
+						routerRef.current.prefetch(getTripRoute(trip.id));
 						const name =
 							idToNameRef.current.get(countryId) ??
 							idToCountryName[countryId] ??

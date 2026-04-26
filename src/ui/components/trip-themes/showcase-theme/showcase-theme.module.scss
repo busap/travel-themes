@@ -85,7 +85,7 @@
 }
 
 .thumbnail {
-	@apply flex-shrink-0 overflow-hidden cursor-pointer;
+	@apply relative flex-shrink-0 overflow-hidden cursor-pointer;
 	width: 110px;
 	height: 78px;
 	border-radius: 6px;
@@ -93,6 +93,7 @@
 	opacity: 0.5;
 	transition: all 0.3s ease;
 	border: 2px solid transparent;
+	background: #e5e5e0;
 
 	&:hover {
 		opacity: 0.8;
@@ -105,6 +106,22 @@
 	border-color: #333;
 	transform: scale(1.08);
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnailSkeleton {
+	@apply absolute inset-0 animate-pulse;
+	background: linear-gradient(135deg, #e5e5e0 0%, #cfcfc6 100%);
+}
+
+.thumbnailImage {
+	@apply relative w-full h-full;
+	object-fit: cover;
+	opacity: 0;
+	transition: opacity 0.25s ease;
+}
+
+.thumbnailImageReady {
+	opacity: 1;
 }
 
 .arrow {

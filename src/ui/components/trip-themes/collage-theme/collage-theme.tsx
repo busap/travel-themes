@@ -8,7 +8,7 @@ import { PolaroidCard } from "@/ui/components/polaroid-card/polaroid-card";
 import { ScrollHint } from "@/ui/components/scroll-hint/scroll-hint";
 import { getPolaroidTransform } from "@/utils/polaroid-layout";
 import { useHorizontalScroll } from "@/hooks/use-horizontal-scroll";
-import { useScrollBasedReveal } from "@/hooks/use-scroll-based-reveal";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import styles from "./collage-theme.module.scss";
 
 interface CollageThemeProps {
@@ -21,14 +21,12 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 
 	useHorizontalScroll(scrollContainerRef, true);
 
-	const { visibleItems: visiblePhotos, mountedItems: mountedPhotos } =
-		useScrollBasedReveal({
-			containerRef: scrollContainerRef,
-			enabled: true,
-			totalItems: trip.photos.length,
-			itemCount: trip.photos.length,
-			mountAhead: 6,
-		});
+	const { focusIndex, isMounted } = useVirtualWindow({
+		mode: "dom-visibility",
+		count: trip.photos.length,
+		containerRef: scrollContainerRef,
+		after: 6,
+	});
 
 	const spacing = "gap-16";
 	const cardsContainerClass = `${styles.cardsContainer} ${spacing}`.trim();
@@ -77,15 +75,18 @@ export function CollageTheme({ trip }: CollageThemeProps) {
 			<div className={cardsContainerClass}>
 				{trip.photos.map((photo, index) => {
 					const { rotation, offset } = getPolaroidTransform(index);
-					const isVisible = visiblePhotos.has(index);
+					const mounted = isMounted(index);
+					// Look-ahead buffer stays hidden until scroll reaches it
+					// so cards still fade in as they enter view.
+					const isVisible = mounted && index <= focusIndex;
 
 					return (
 						<div
 							key={index}
-							data-photo-index={index}
+							data-virtual-index={index}
 							className={getCardWrapperClass(isVisible)}
 						>
-							{mountedPhotos.has(index) && (
+							{mounted && (
 								<PolaroidCard
 									imageSrc={photo.src}
 									imageAlt={
