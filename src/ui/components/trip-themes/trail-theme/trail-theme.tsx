@@ -44,6 +44,7 @@ export function TrailTheme({ trip }: TrailThemeProps) {
 							className={styles.cardImage}
 							fill
 							sizes="(max-width: 768px) 90vw, 640px"
+							priority
 						/>
 					</div>
 				</div>

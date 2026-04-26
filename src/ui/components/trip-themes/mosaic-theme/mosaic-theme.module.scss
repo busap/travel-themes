@@ -87,9 +87,15 @@
 }
 
 .photoImage {
-	@apply w-full h-full transition-transform duration-500;
+	@apply w-full h-full;
+	transition: transform 0.5s ease, opacity 0.4s ease;
 	user-select: none;
 	-webkit-user-drag: none;
+}
+
+.skeleton {
+	@apply absolute inset-0 animate-pulse;
+	background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
 }
 
 .emptyState {
