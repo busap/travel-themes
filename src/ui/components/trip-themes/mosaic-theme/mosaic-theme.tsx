@@ -61,19 +61,17 @@ function MosaicCell({
 	onCellClick,
 }: MosaicCellProps) {
 	const cellRef = useRef<HTMLDivElement>(null);
-	// First 4 cells cover the worst-case first visual row (12-col grid, min span-3 = 4 cells).
-	// Seed them as loaded immediately so they never go through the observer and
-	// never risk a mid-scroll GSAP ScrollTrigger.refresh() from a late load.
-	const isFirstRow = index < 4;
-	const [cellLoaded, setCellLoaded] = useState(isFirstRow);
+	const [cellLoaded, setCellLoaded] = useState(false);
 	const [imageReady, setImageReady] = useState(false);
+	const isInInitialViewport = useRef(false);
 
 	useEffect(() => {
-		if (isFirstRow || !cellRef.current) return;
+		if (!cellRef.current) return;
 		const el = cellRef.current;
 		const rect = el.getBoundingClientRect();
 
 		if (rect.top < window.innerHeight) {
+			isInInitialViewport.current = true;
 			setCellLoaded(true);
 			return;
 		}
@@ -94,7 +92,7 @@ function MosaicCell({
 
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, [isFirstRow]);
+	}, []);
 
 	return (
 		<div
@@ -116,8 +114,8 @@ function MosaicCell({
 					className={styles.photoImage}
 					fill
 					sizes={getCellSizes(gridSize.size)}
-					priority={isFirstRow}
-					loading={isFirstRow ? undefined : "lazy"}
+					priority={isInInitialViewport.current}
+					loading={isInInitialViewport.current ? undefined : "lazy"}
 					style={{ objectFit: "cover", opacity: imageReady ? 1 : 0 }}
 					onLoad={() => setImageReady(true)}
 				/>
