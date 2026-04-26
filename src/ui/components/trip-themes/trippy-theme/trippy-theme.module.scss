@@ -111,6 +111,8 @@
 }
 
 .photoImg {
+	position: absolute;
+	inset: 0;
 	object-fit: cover;
 	width: 100%;
 	height: 100%;

@@ -17,6 +17,11 @@ interface ScrollProgressMode {
 	containerRef: RefObject<HTMLElement | null>;
 	before?: number;
 	after?: number;
+	/**
+	 * When true the mount window never shrinks — items are never unmounted
+	 * once they've entered it. Trades memory for flicker-free backward scroll.
+	 */
+	additive?: boolean;
 }
 
 /**
@@ -79,7 +84,7 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 		: 0;
 	const additive = mode === "dom-visibility"
 		? ((opts as DomVisibilityMode).additive ?? false)
-		: false;
+		: ((opts as ScrollProgressMode).additive ?? false);
 
 	const [state, setState] = useState<MountState>(() => ({
 		focusIndex: 0,
@@ -111,10 +116,15 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 					clampProgress((window.scrollY - container.offsetTop) / Math.max(totalScrollHeight, 1)),
 					count
 				);
-				commit({
-					focusIndex: focus,
-					mountedRange: clampRange({ start: focus - before, end: focus + after }, count),
-				});
+				const proposed = clampRange({ start: focus - before, end: focus + after }, count);
+				const prevRange = lastStateRef.current.mountedRange;
+				const next = additive
+					? {
+						start: 0,
+						end: Math.max(prevRange.end, proposed.end),
+					}
+					: proposed;
+				commit({ focusIndex: focus, mountedRange: next });
 			};
 
 			const onEvent = () => window.requestAnimationFrame(update);
@@ -160,11 +170,13 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 			const minVisible = Math.min(...visible);
 			const maxVisible = Math.max(...visible);
 
+			const prevRange = lastStateRef.current.mountedRange;
+			const proposedEnd = Math.min(count - 1, maxVisible + after);
 			commit({
 				focusIndex: maxVisible,
 				mountedRange: {
 					start: additive ? 0 : Math.max(0, minVisible - before),
-					end: Math.min(count - 1, maxVisible + after),
+					end: additive ? Math.max(prevRange.end, proposedEnd) : proposedEnd,
 				},
 			});
 		};
