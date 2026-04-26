@@ -17,7 +17,6 @@ export interface ThemeConfig {
 			duration: number;
 			ease: string;
 			stagger?: number;
-			fromScale?: number;
 		};
 	};
 }
@@ -55,7 +54,6 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 				duration: 0.4,
 				ease: "power2.out",
 				stagger: 0.1,
-				fromScale: 0.9,
 			},
 		},
 	},
