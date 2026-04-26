@@ -49,7 +49,7 @@ const themeConfigs: Record<Theme, ThemeConfig> = {
 		component: "mosaic-theme",
 		animation: {
 			scrollTrigger: {
-				start: "top 80%",
+				start: "top 85%",
 				end: "top 60%",
 			},
 			timeline: {

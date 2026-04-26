@@ -130,9 +130,8 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 		const ctx = gsap.context(() => {
 			photoItems.forEach((item, index) => {
 				const el = item as HTMLElement;
-				const rect = el.getBoundingClientRect();
 				const inViewport =
-					rect.top >= 0 && rect.top < window.innerHeight;
+					el.getBoundingClientRect().top < window.innerHeight;
 
 				gsap.fromTo(
 					el,
@@ -152,7 +151,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 								ease,
 								scrollTrigger: {
 									trigger: el,
-									start: scrollTriggerStart,
+									start: `clamp(${scrollTriggerStart})`,
 									end: scrollTriggerEnd,
 									toggleActions: "play none none none",
 									markers: scrollTriggerMarkers,
