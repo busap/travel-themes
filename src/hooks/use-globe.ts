@@ -25,6 +25,15 @@ import {
 import { countryCodeToId, idToCountryName } from "@/utils/globe-country-map";
 import { getCountryName } from "@/utils/country";
 
+// Module-level singletons preserved across navigation so the globe doesn't
+// reload from scratch when the user returns to the home page.
+const _materialCache = new Map<string, MeshPhongMaterial>();
+const _materialTextureSrcCache = new Map<string, string>();
+let _texturesReady = false;
+let _topoDataCache: GeoFeature[] | null = null;
+let _globeCache: GlobeInstance | null = null;
+let _activeContainer: HTMLDivElement | null = null;
+
 const INTRO_CAMERA_ANIMATION_MS = 1500;
 
 function normalizeCountryId(id: string | number): string {
@@ -53,16 +62,18 @@ export function useGlobe({
 }: UseGlobeProps): UseGlobeReturn {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
-	const materialCacheRef = useRef<Map<string, MeshPhongMaterial>>(new Map());
-	const materialTextureSrcRef = useRef<Map<string, string>>(new Map());
+	const materialCacheRef = useRef(_materialCache);
+	const materialTextureSrcRef = useRef(_materialTextureSrcCache);
 	const pendingStyleRefreshRef = useRef(false);
-	const texturesReadyRef = useRef(false);
-	const textureBatchIdRef = useRef(0);
 	const isMobileRef = useRef(isMobile);
 	useEffect(() => {
 		isMobileRef.current = isMobile;
 	}, [isMobile]);
-	const [countries, setCountries] = useState<GeoFeature[]>([]);
+	// Initialize countries from cache so the first render already has data,
+	// preventing a flash of an empty globe on reattach.
+	const [countries, setCountries] = useState<GeoFeature[]>(
+		_topoDataCache ?? []
+	);
 	const [activeCountry, setActiveCountry] = useState<CountryTrip | null>(
 		null
 	);
@@ -86,6 +97,7 @@ export function useGlobe({
 	const introCompleteTimeoutRef = useRef<ReturnType<
 		typeof setTimeout
 	> | null>(null);
+	const textureBatchIdRef = useRef(0);
 
 	const { visitedIds, idToTrip, idToName } = useMemo(() => {
 		const visited = new Set<string>();
@@ -117,6 +129,10 @@ export function useGlobe({
 	}, [visitedIds, idToTrip, idToName, countries]);
 
 	useEffect(() => {
+		if (_topoDataCache) {
+			setCountries(_topoDataCache);
+			return;
+		}
 		fetch(TOPO_JSON_URL)
 			.then((res) => res.json())
 			.then((topoData: Topology) => {
@@ -125,14 +141,16 @@ export function useGlobe({
 					topoData.objects.countries
 				);
 				if ("features" in geoData) {
-					setCountries(geoData.features as unknown as GeoFeature[]);
+					const features = geoData.features as unknown as GeoFeature[];
+					_topoDataCache = features;
+					setCountries(features);
 				}
 			});
 	}, []);
 
 	const getMaterial = useCallback((feat: GeoFeature): Material => {
 		const countryId = normalizeCountryId(feat.id);
-		if (!texturesReadyRef.current || !visitedIdsRef.current.has(countryId))
+		if (!_texturesReady || !visitedIdsRef.current.has(countryId))
 			return defaultMaterial;
 		return materialCacheRef.current.get(countryId) ?? defaultMaterial;
 	}, []);
@@ -147,21 +165,21 @@ export function useGlobe({
 			.polygonCapMaterial((d: object) => getMaterial(d as GeoFeature))
 			.polygonSideColor((d: object) => {
 				const feat = d as GeoFeature;
-				return texturesReadyRef.current &&
+				return _texturesReady &&
 					visitedIdsRef.current.has(normalizeCountryId(feat.id))
 					? "rgba(251, 191, 36, 0.3)"
 					: "rgba(30, 41, 59, 0.02)";
 			})
 			.polygonStrokeColor((d: object) => {
 				const feat = d as GeoFeature;
-				return texturesReadyRef.current &&
+				return _texturesReady &&
 					visitedIdsRef.current.has(normalizeCountryId(feat.id))
 					? "rgba(200, 140, 30, 0.6)"
 					: "rgba(148, 163, 184, 0.35)";
 			})
 			.polygonAltitude((d: object) => {
 				const feat = d as GeoFeature;
-				return texturesReadyRef.current &&
+				return _texturesReady &&
 					visitedIdsRef.current.has(normalizeCountryId(feat.id))
 					? 0.012
 					: 0.001;
@@ -193,7 +211,7 @@ export function useGlobe({
 		let remainingLoads = 0;
 
 		// Phase 1: show default/empty globe while trip textures load.
-		texturesReadyRef.current = false;
+		_texturesReady = false;
 		applyGlobeStyling();
 
 		for (const [id, trip] of idToTrip.entries()) {
@@ -223,7 +241,7 @@ export function useGlobe({
 				remainingLoads -= 1;
 				if (remainingLoads === 0) {
 					// Phase 2: all current trip textures ready; apply once.
-					texturesReadyRef.current = true;
+					_texturesReady = true;
 					if (isIntroCompleteRef.current) {
 						applyPolygonStyleCallbacks();
 						applyCountriesData();
@@ -235,7 +253,7 @@ export function useGlobe({
 		}
 
 		if (remainingLoads === 0) {
-			texturesReadyRef.current = idToTrip.size > 0;
+			_texturesReady = idToTrip.size > 0;
 			if (isIntroCompleteRef.current) {
 				applyPolygonStyleCallbacks();
 				applyCountriesData();
@@ -295,6 +313,38 @@ export function useGlobe({
 	useEffect(() => {
 		if (!containerRef.current) return;
 
+		// REATTACH: Globe was previously initialized — reuse the cached instance.
+		if (_globeCache) {
+			const globe = _globeCache;
+			containerRef.current.appendChild(globe.renderer().domElement);
+			globe
+				.width(containerRef.current.clientWidth)
+				.height(containerRef.current.clientHeight);
+			const controls = globe.controls();
+			if (controls) {
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 0.6;
+			}
+			globeInstanceRef.current = globe;
+			_activeContainer = containerRef.current;
+			hoveredIdRef.current = null;
+			setActiveCountry(null);
+			updateHoverStateRef.current(null);
+			applyGlobeStyling();
+			setIsLoaded(true);
+			setIsIntroComplete(true);
+			isIntroCompleteRef.current = true;
+
+			return () => {
+				_activeContainer = null;
+				if (introCompleteTimeoutRef.current) {
+					clearTimeout(introCompleteTimeoutRef.current);
+					introCompleteTimeoutRef.current = null;
+				}
+			};
+		}
+
+		// FRESH INIT
 		let globe: GlobeInstance | undefined;
 		setIsLoaded(false);
 		setIsIntroComplete(false);
@@ -311,6 +361,7 @@ export function useGlobe({
 			});
 
 			globeInstanceRef.current = globe;
+			_activeContainer = containerRef.current;
 
 			globe
 				.width(containerRef.current.clientWidth)
@@ -355,8 +406,8 @@ export function useGlobe({
 					if (!polygon) {
 						hoveredIdRef.current = null;
 						setActiveCountry(null);
-						if (containerRef.current)
-							containerRef.current.style.cursor = "default";
+						if (_activeContainer)
+							_activeContainer.style.cursor = "default";
 						updateHoverStateRef.current(null);
 						return;
 					}
@@ -376,12 +427,12 @@ export function useGlobe({
 							trip,
 							countryName: name,
 						});
-						if (containerRef.current)
-							containerRef.current.style.cursor = "pointer";
+						if (_activeContainer)
+							_activeContainer.style.cursor = "pointer";
 					} else {
 						setActiveCountry(null);
-						if (containerRef.current)
-							containerRef.current.style.cursor = "default";
+						if (_activeContainer)
+							_activeContainer.style.cursor = "default";
 					}
 
 					updateHoverStateRef.current(countryId);
@@ -453,6 +504,10 @@ export function useGlobe({
 					INTRO_CAMERA_ANIMATION_MS
 				);
 
+				// Cache as soon as the globe is ready so back-navigation is instant
+				// even if the user leaves during the intro camera animation.
+				_globeCache = globe!;
+
 				introCompleteTimeoutRef.current = setTimeout(() => {
 					setIsIntroComplete(true);
 					isIntroCompleteRef.current = true;
@@ -468,11 +523,19 @@ export function useGlobe({
 		initGlobe();
 
 		return () => {
+			_activeContainer = null;
 			if (introCompleteTimeoutRef.current) {
 				clearTimeout(introCompleteTimeoutRef.current);
 				introCompleteTimeoutRef.current = null;
 			}
-			if (globe) globe._destructor();
+			if (_globeCache) {
+				// Globe is preserved in cache — React will detach the canvas
+				// when it removes the container from the DOM. The GlobeInstance
+				// and its WebGL context stay alive for reattachment.
+			} else if (globe) {
+				// Globe never finished initializing — destroy it cleanly.
+				globe._destructor();
+			}
 		};
 	}, [applyGlobeStyling, getMaterial]);
 
