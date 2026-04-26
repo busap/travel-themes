@@ -62,16 +62,10 @@ function MosaicCell({
 }: MosaicCellProps) {
 	const cellRef = useRef<HTMLDivElement>(null);
 	const [imageReady, setImageReady] = useState(false);
-	// State (not ref) so it is safe to read during render.
-	// Determined in an effect — before the effect runs all images get
-	// loading="lazy"; viewport cells upgrade to priority after mount.
-	const [loadEager, setLoadEager] = useState(false);
-
-	useEffect(() => {
-		if (!cellRef.current) return;
-		const { top } = cellRef.current.getBoundingClientRect();
-		if (top < window.innerHeight) setLoadEager(true);
-	}, []);
+	// First 4 cells always cover the initial visual row (worst case: 4× span-3
+	// in a 12-col grid). No DOM measurement needed — avoids ESLint setState-in-effect
+	// and any interaction with GSAP's ScrollTrigger internals.
+	const loadEager = index < 4;
 
 	return (
 		<div
