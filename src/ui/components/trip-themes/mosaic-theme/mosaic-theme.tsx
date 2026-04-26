@@ -61,16 +61,28 @@ function MosaicCell({
 	onCellClick,
 }: MosaicCellProps) {
 	const cellRef = useRef<HTMLDivElement>(null);
+	const [cellLoaded, setCellLoaded] = useState(false);
 	const [imageReady, setImageReady] = useState(false);
-	// State (not ref) so it is safe to read during render.
-	// Determined in an effect — before the effect runs all images get
-	// loading="lazy"; viewport cells upgrade to priority after mount.
-	const [loadEager, setLoadEager] = useState(false);
+	const isInInitialViewport = useRef(false);
 
 	useEffect(() => {
 		if (!cellRef.current) return;
-		const { top } = cellRef.current.getBoundingClientRect();
-		if (top < window.innerHeight) setLoadEager(true);
+		const el = cellRef.current;
+		const rect = el.getBoundingClientRect();
+
+		if (rect.top < window.innerHeight) {
+			isInInitialViewport.current = true;
+			setCellLoaded(true);
+			return;
+		}
+
+		const trigger = ScrollTrigger.create({
+			trigger: el,
+			start: "top 120%",
+			onEnter: () => setCellLoaded(true),
+		});
+
+		return () => trigger.kill();
 	}, []);
 
 	return (
@@ -86,18 +98,22 @@ function MosaicCell({
 			}}
 			onClick={(e) => onCellClick(index, e.currentTarget as HTMLDivElement)}
 		>
-			<Image
-				src={photo.src}
-				alt={photo.title || `Photo ${index + 1}`}
-				className={styles.photoImage}
-				fill
-				sizes={getCellSizes(gridSize.size)}
-				priority={loadEager}
-				loading={loadEager ? undefined : "lazy"}
-				style={{ objectFit: "cover", opacity: imageReady ? 1 : 0 }}
-				onLoad={() => setImageReady(true)}
-			/>
-			{!imageReady && <div className={styles.skeleton} />}
+			{cellLoaded && (
+				<Image
+					src={photo.src}
+					alt={photo.title || `Photo ${index + 1}`}
+					className={styles.photoImage}
+					fill
+					sizes={getCellSizes(gridSize.size)}
+					priority={isInInitialViewport.current}
+					loading={isInInitialViewport.current ? undefined : "lazy"}
+					style={{ objectFit: "cover", opacity: imageReady ? 1 : 0 }}
+					onLoad={() => setImageReady(true)}
+				/>
+			)}
+			{(!cellLoaded || !imageReady) && (
+				<div className={styles.skeleton} />
+			)}
 		</div>
 	);
 }
