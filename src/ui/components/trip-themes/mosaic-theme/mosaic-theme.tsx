@@ -136,27 +136,24 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 				gsap.fromTo(
 					el,
 					{ opacity: 0, scale: fromScale },
-					inViewport
-						? {
-								opacity: 1,
-								scale: 1,
-								duration,
-								ease,
-								delay: (index % 6) * stagger,
-							}
-						: {
-								opacity: 1,
-								scale: 1,
-								duration,
-								ease,
-								scrollTrigger: {
-									trigger: el,
-									start: `clamp(${scrollTriggerStart})`,
-									end: scrollTriggerEnd,
-									toggleActions: "play none none none",
-									markers: scrollTriggerMarkers,
-								},
-							}
+					{
+						opacity: 1,
+						scale: 1,
+						duration,
+						ease,
+						delay: (index % 6) * stagger,
+						// Cells already visible on page load play immediately.
+						// Below-fold cells wait for their scroll position.
+						...(!inViewport && {
+							scrollTrigger: {
+								trigger: el,
+								start: `clamp(${scrollTriggerStart})`,
+								end: scrollTriggerEnd,
+								toggleActions: "play none none none",
+								markers: scrollTriggerMarkers,
+							},
+						}),
+					}
 				);
 			});
 		}, gridEl);
