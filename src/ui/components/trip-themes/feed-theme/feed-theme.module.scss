@@ -73,8 +73,13 @@
 }
 
 .feedCardImage {
-	@apply relative w-full;
+	@apply relative w-full overflow-hidden;
 	aspect-ratio: 4 / 5;
+}
+
+.feedCardSkeleton {
+	@apply absolute inset-0;
+	z-index: 0;
 }
 
 .feedCardFooter {

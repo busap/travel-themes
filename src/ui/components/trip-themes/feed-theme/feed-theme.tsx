@@ -2,11 +2,13 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useScrollBasedReveal } from "@/hooks/use-scroll-based-reveal";
+import { ImagePlaceholder } from "@/ui/components/image-placeholder/image-placeholder";
 import styles from "./feed-theme.module.scss";
 
 if (typeof window !== "undefined") {
@@ -18,20 +20,22 @@ interface FeedThemeProps {
 	config: ThemeConfig;
 }
 
-const INITIAL_LOAD_COUNT = 3;
-
 export function FeedTheme({ trip, config }: FeedThemeProps) {
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const feedRef = useRef<HTMLDivElement>(null);
-	const [loadedIndices, setLoadedIndices] = useState<Set<number>>(
-		() => new Set(Array.from({ length: INITIAL_LOAD_COUNT }, (_, i) => i))
-	);
 
 	const duration = config.animation?.timeline?.duration ?? 0.5;
 	const ease = config.animation?.timeline?.ease ?? "power2.out";
 	const stagger = config.animation?.timeline?.stagger ?? 0.5;
 
 	const validatedPhotos = trip.photos;
+
+	const { mountedItems: mountedPhotos } = useScrollBasedReveal({
+		containerRef: viewportRef,
+		enabled: true,
+		totalItems: validatedPhotos.length,
+		mountAhead: 3,
+	});
 
 	useEffect(() => {
 		if (!feedRef.current || !viewportRef.current) return;
@@ -61,44 +65,6 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 			ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
 		};
 	}, [validatedPhotos.length, duration, ease, stagger]);
-
-	// Progressive image loading via IntersectionObserver within the phone frame
-	useEffect(() => {
-		if (!viewportRef.current || validatedPhotos.length <= INITIAL_LOAD_COUNT) return;
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						const index = Number(
-							(entry.target as HTMLElement).dataset.cardIndex
-						);
-						setLoadedIndices((prev: Set<number>) => {
-							if (prev.has(index)) return prev;
-							const next = new Set(prev);
-							next.add(index);
-							return next;
-						});
-						observer.unobserve(entry.target);
-					}
-				});
-			},
-			{
-				root: viewportRef.current,
-				rootMargin: "100px",
-			}
-		);
-
-		const cards = feedRef.current?.querySelectorAll("[data-card-index]");
-		cards?.forEach((card: Element) => {
-			const index = Number((card as HTMLElement).dataset.cardIndex);
-			if (index >= INITIAL_LOAD_COUNT) {
-				observer.observe(card);
-			}
-		});
-
-		return () => observer.disconnect();
-	}, [validatedPhotos.length]);
 
 	const renderHeader = () => (
 		<div className={styles.tripHeader}>
@@ -130,25 +96,27 @@ export function FeedTheme({ trip, config }: FeedThemeProps) {
 		index: number
 	) => {
 		const isFirst = index === 0;
-		const shouldLoadImage = loadedIndices.has(index);
+		const shouldLoadImage = mountedPhotos.has(index);
 
 		return (
 			<div
 				key={index}
 				className={styles.feedCard}
 				data-feed-card
-				data-card-index={index}
+				data-photo-index={index}
 			>
 				<div className={styles.feedCardImage}>
+					<div className={styles.feedCardSkeleton} aria-hidden>
+						<ImagePlaceholder isLoading />
+					</div>
 					{shouldLoadImage && (
 						<Image
 							src={photo.src}
 							alt={photo.title || `Photo ${index + 1}`}
 							fill
-							sizes="375px"
+							sizes="(max-width: 640px) 100vw, 375px"
 							style={{ objectFit: "cover" }}
 							priority={isFirst}
-							loading={isFirst ? undefined : "eager"}
 						/>
 					)}
 				</div>

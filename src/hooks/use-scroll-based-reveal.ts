@@ -67,10 +67,14 @@ export function useScrollBasedReveal({
 				const rect = item.getBoundingClientRect();
 				const containerRect = container.getBoundingClientRect();
 
-				if (
+				const horizontallyVisible =
 					rect.left < containerRect.right &&
-					rect.right > containerRect.left
-				) {
+					rect.right > containerRect.left;
+				const verticallyVisible =
+					rect.top < containerRect.bottom &&
+					rect.bottom > containerRect.top;
+
+				if (horizontallyVisible && verticallyVisible) {
 					newlyVisible.push(index);
 				}
 			});
