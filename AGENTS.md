@@ -82,6 +82,28 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 - Wire demo data in `src/mocks/trip-themes.ts` and, when needed, add/update trip content in `src/mocks/trips.ts`
 - Create story and extract reusable hooks if applicable
 
+## Virtualization
+
+Themes that render many photos use a shared virtualization layer to avoid mounting off-screen images.
+
+### Utilities
+
+| File | Purpose |
+|------|---------|
+| `src/utils/virtualization.ts` | Pure math helpers — `clampRange`, `computeVirtualRange`, `progressToIndex`, `clampProgress`, `isInRange`, `rangeToSet`. No side-effects; unit-tested. |
+| `src/hooks/use-virtual-window.ts` | `useVirtualWindow()` — scroll-progress-based windowing for fullscreen/sticky scroll themes (e.g. Parallax). Tracks focus index from scroll position and exposes `isMounted(i)` / `isActive(i)`. |
+| `src/hooks/use-scroll-based-reveal.ts` | `useScrollBasedReveal()` — container-scroll DOM-query windowing for horizontal feed themes (e.g. Feed). Uses `data-photo-index` attributes to determine visibility. |
+
+### When to use which
+
+- **`useVirtualWindow`**: the theme pins the viewport and advances photos via global scroll progress (one "current photo" at a time). Pass `totalScrollHeight`, the container ref, and overscan values.
+- **`useScrollBasedReveal`**: the theme is a scrollable container with `[data-photo-index]` elements laid out in order. Better for horizontal carousels or vertical feeds.
+- **IntersectionObserver directly** (Drift, Grid Hover): per-section lazy mounting where each section is independently observed. Suitable when sections have variable heights or are not index-addressable.
+
+### Where not to use
+
+Do not apply index-based virtualization to themes with fewer than ~10 photos — the overhead is not worth it and may cause visible pop-in.
+
 ## Don't
 
 - Don't put helper functions in mock files — use `src/utils/`

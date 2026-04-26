@@ -1,4 +1,5 @@
 import { useEffect, useState, RefObject } from "react";
+import { clampRange, rangeToSet } from "@/utils/virtualization";
 
 interface UseScrollBasedRevealOptions {
 	containerRef: RefObject<HTMLElement | null>;
@@ -42,9 +43,7 @@ export function useScrollBasedReveal({
 		if (!enabled)
 			return new Set(Array.from({ length: count }, (_, i) => i));
 		// Pre-mount the first batch so the initial render is not empty
-		return new Set(
-			Array.from({ length: Math.min(mountAhead + 2, count) }, (_, i) => i)
-		);
+		return rangeToSet(clampRange({ start: 0, end: mountAhead + 1 }, count));
 	};
 
 	const [visibleItems, setVisibleItems] =
@@ -91,24 +90,16 @@ export function useScrollBasedReveal({
 			});
 
 			setMountedItems((prev) => {
-				const windowStart = Math.max(0, minVisible - mountBehind);
-				const windowEnd = Math.min(count - 1, maxVisible + mountAhead);
-
-				const next = new Set<number>();
-				for (let i = windowStart; i <= windowEnd; i++) {
-					next.add(i);
-				}
+				const next = rangeToSet(
+					clampRange(
+						{ start: minVisible - mountBehind, end: maxVisible + mountAhead },
+						count
+					)
+				);
 
 				// Avoid unnecessary state updates when window is unchanged.
-				if (next.size === prev.size) {
-					let same = true;
-					for (const index of next) {
-						if (!prev.has(index)) {
-							same = false;
-							break;
-						}
-					}
-					if (same) return prev;
+				if (next.size === prev.size && [...next].every((i) => prev.has(i))) {
+					return prev;
 				}
 
 				return next;
