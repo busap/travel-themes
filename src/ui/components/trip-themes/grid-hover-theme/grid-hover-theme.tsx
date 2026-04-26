@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Syne, Space_Grotesk } from "next/font/google";
@@ -28,13 +28,59 @@ interface GridHoverThemeProps {
 const GRID_COLS = 6;
 const MIN_ROWS_WHEN_EMPTY = 5;
 const MIN_CELLS_WHEN_EMPTY = GRID_COLS * MIN_ROWS_WHEN_EMPTY;
+const INITIAL_VISIBLE_ROWS = 3;
 
 export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 	const [hoveredCell, setHoveredCell] = useState<number | null>(null);
 	const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
 	const [isHovering, setIsHovering] = useState(false);
+	const [visibleRows, setVisibleRows] = useState<Set<number>>(
+		new Set(Array.from({ length: INITIAL_VISIBLE_ROWS }, (_, i) => i))
+	);
+	const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+	const rowSentinelRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
 	const cellCount =
 		trip.photos.length > 0 ? trip.photos.length : MIN_CELLS_WHEN_EMPTY;
+
+	useEffect(() => {
+		const numRows = Math.ceil(cellCount / GRID_COLS);
+		if (numRows <= 1) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const newlyVisible: number[] = [];
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						const rowIndex = Number(
+							entry.target.getAttribute("data-row")
+						);
+						newlyVisible.push(rowIndex);
+						observer.unobserve(entry.target);
+					}
+				});
+				if (newlyVisible.length > 0) {
+					setVisibleRows((prev) => new Set([...prev, ...newlyVisible]));
+				}
+			},
+			{ rootMargin: "600px 0px", threshold: 0 }
+		);
+
+		for (let rowIndex = INITIAL_VISIBLE_ROWS; rowIndex < numRows; rowIndex++) {
+			const el = rowSentinelRefs.current.get(rowIndex);
+			if (el) observer.observe(el);
+		}
+
+		return () => observer.disconnect();
+	}, [cellCount]);
+
+	const setSentinelRef = useCallback(
+		(node: HTMLDivElement | null, rowIndex: number) => {
+			if (node) rowSentinelRefs.current.set(rowIndex, node);
+			else rowSentinelRefs.current.delete(rowIndex);
+		},
+		[]
+	);
 
 	const handleMouseMove = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
@@ -84,10 +130,24 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 						const photo = trip.photos[cellIndex];
 						const showPhoto = !!photo;
 						const isActive = hoveredCell === cellIndex;
+						const rowIndex = Math.floor(cellIndex / GRID_COLS);
+						const isFirstInRow = cellIndex % GRID_COLS === 0;
+						const isRowVisible = visibleRows.has(rowIndex);
+						const isLoaded = loadedImages.has(cellIndex);
 
 						return (
 							<div
 								key={cellIndex}
+								ref={
+									isFirstInRow && rowIndex >= INITIAL_VISIBLE_ROWS
+										? (node) => setSentinelRef(node, rowIndex)
+										: undefined
+								}
+								data-row={
+									isFirstInRow && rowIndex >= INITIAL_VISIBLE_ROWS
+										? rowIndex
+										: undefined
+								}
 								className={[
 									styles.cell,
 									showPhoto ? styles.hasPhoto : "",
@@ -98,7 +158,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 								}
 								onMouseLeave={() => setHoveredCell(null)}
 							>
-								{showPhoto && (
+								{showPhoto && isRowVisible && (
 									<div className={styles.photoReveal}>
 										<Image
 											src={photo!.src}
@@ -109,7 +169,22 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 											fill
 											sizes="(max-width: 768px) 25vw, 17vw"
 											style={{ objectFit: "cover" }}
+											priority={rowIndex < INITIAL_VISIBLE_ROWS}
+											loading={
+												rowIndex < INITIAL_VISIBLE_ROWS
+													? undefined
+													: "eager"
+											}
+											onLoad={() =>
+												setLoadedImages(
+													(prev) =>
+														new Set([...prev, cellIndex])
+												)
+											}
 										/>
+										{!isLoaded && (
+											<div className={styles.skeleton} />
+										)}
 										<div className={styles.photoSheen} />
 									</div>
 								)}

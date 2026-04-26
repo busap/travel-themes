@@ -1,6 +1,14 @@
 import styles from "./image-placeholder.module.scss";
 
-export function ImagePlaceholder() {
+interface ImagePlaceholderProps {
+	isLoading?: boolean;
+}
+
+export function ImagePlaceholder({ isLoading = false }: ImagePlaceholderProps) {
+	if (isLoading) {
+		return <div className={styles.shimmer} aria-hidden />;
+	}
+
 	return (
 		<div className={styles.imagePlaceholder}>
 			<div className={styles.content}>

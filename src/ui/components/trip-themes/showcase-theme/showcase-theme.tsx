@@ -47,6 +47,11 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 		};
 	}, [updateScrollButtons, displayPhotos.length]);
 
+	const preloadFullSize = useCallback((src: string) => {
+		const img = new window.Image();
+		img.src = src;
+	}, []);
+
 	const handleThumbnailClick = useCallback((index: number) => {
 		setActiveIndex(index);
 
@@ -123,7 +128,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 								src={photo.src}
 								alt={photo.title || `Photo ${index + 1}`}
 								fill
-								sizes="100vw"
+								sizes="(max-width: 768px) 100vw, 80vw"
 								style={{ objectFit: "cover" }}
 								priority={index === 0}
 							/>
@@ -169,12 +174,16 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 							key={photo.src}
 							className={`${styles.thumbnail} ${index === effectiveIndex ? styles.thumbnailActive : ""}`}
 							onClick={() => handleThumbnailClick(index)}
+							onMouseEnter={() => preloadFullSize(photo.src)}
+							onFocus={() => preloadFullSize(photo.src)}
 						>
 							<Image
 								src={photo.src}
 								alt={photo.title || `Thumbnail ${index + 1}`}
 								width={110}
 								height={78}
+								sizes="(max-width: 768px) 80px, 110px"
+								loading={index < 4 ? undefined : "lazy"}
 								style={{
 									objectFit: "cover",
 									width: "100%",

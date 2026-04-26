@@ -27,7 +27,8 @@ interface DragShuffleThemeProps {
 }
 
 const SWIPE_THRESHOLD = 120;
-const MAX_VISIBLE_CARDS = 3;
+const PRELOAD_BUFFER = 2;
+const MAX_VISIBLE_CARDS = 1 + PRELOAD_BUFFER;
 const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
@@ -43,6 +44,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		260,
 		Math.round((config.animation?.timeline?.duration ?? 0.45) * 1000)
 	);
+	const [swipeDurationMs, setSwipeDurationMs] = useState(animationDurationMs);
 	const titleClasses = "text-3xl md:text-4xl font-black";
 	const bodyClasses = "text-sm md:text-base text-white/70";
 
@@ -67,12 +69,21 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	};
 
+	const preloadNextCard = (index: number) => {
+		if (typeof window === "undefined" || deckPhotos.length === 0) return;
+		const photo = deckPhotos[index % deckPhotos.length];
+		if (!photo) return;
+		const img = new window.Image();
+		img.src = photo.src;
+	};
+
 	const clearGestureState = () => {
 		pointerStartRef.current = null;
 		setIsPointerDragging(false);
 		setIsAnimating(false);
 		setSwipeDirection(null);
 		setDragPoint(EMPTY_DRAG_POINT);
+		setSwipeDurationMs(animationDurationMs);
 	};
 
 	const finalizeSwipe = () => {
@@ -93,7 +104,10 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		});
 	};
 
-	const triggerSwipe = (direction: SwipeDirection) => {
+	const triggerSwipe = (
+		direction: SwipeDirection,
+		startPoint?: DragPoint
+	) => {
 		if (!hasCards || isAnimating) return;
 
 		if (prefersReducedMotion()) {
@@ -101,10 +115,22 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			return;
 		}
 
-		setDragPoint({
-			x: direction === "right" ? SWIPE_THRESHOLD : -SWIPE_THRESHOLD,
-			y: 0,
-		});
+		const dragProgress = startPoint
+			? Math.min(Math.abs(startPoint.x) / (SWIPE_THRESHOLD * 2), 1)
+			: 0;
+		const remainingFactor = Math.max(0.35, 1 - dragProgress * 0.6);
+		const nextSwipeDuration = Math.max(
+			140,
+			Math.round(animationDurationMs * remainingFactor)
+		);
+
+		setDragPoint(
+			startPoint ?? {
+				x: direction === "right" ? SWIPE_THRESHOLD : -SWIPE_THRESHOLD,
+				y: 0,
+			}
+		);
+		setSwipeDurationMs(nextSwipeDuration);
 		setSwipeDirection(direction);
 		setIsAnimating(true);
 		setIsPointerDragging(false);
@@ -125,6 +151,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		event.currentTarget.setPointerCapture(event.pointerId);
 		pointerStartRef.current = { x: event.clientX, y: event.clientY };
 		setIsPointerDragging(true);
+		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
 	};
 
 	const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -149,8 +176,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			return;
 		}
 
-		setDragPoint(dragDelta);
-		triggerSwipe(dragDelta.x > 0 ? "right" : "left");
+		triggerSwipe(dragDelta.x > 0 ? "right" : "left", dragDelta);
 	};
 
 	const handleSwipeAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
@@ -200,16 +226,23 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			zIndex: MAX_VISIBLE_CARDS - stackIndex,
 		};
 
+		const swipeStartY = dragPoint.y * 0.24;
+		const swipeStartRotation = dragPoint.x * 0.05;
+		const cardStyleWithMotionVars = cardStyle as CSSProperties &
+			Record<string, string | number>;
+		cardStyleWithMotionVars["--swipe-start-x"] = `${dragPoint.x}px`;
+		cardStyleWithMotionVars["--swipe-start-y"] = `${swipeStartY}px`;
+		cardStyleWithMotionVars["--swipe-start-rotate"] =
+			`${swipeStartRotation}deg`;
+
 		if (isTopCard && !swipeDirection) {
-			cardStyle.transform = `translate3d(${dragPoint.x}px, ${dragPoint.y * 0.24}px, 0) rotate(${dragPoint.x * 0.05}deg)`;
+			cardStyle.transform = `translate3d(${dragPoint.x}px, ${swipeStartY}px, 0) rotate(${swipeStartRotation}deg)`;
 			cardStyle.transition = isPointerDragging
 				? "none"
 				: "transform 240ms cubic-bezier(0.22, 1, 0.36, 1)";
 		}
 
-		const placeName =
-			photo.title?.trim() ||
-			`${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`;
+		const placeName = photo.title?.trim();
 
 		return (
 			<article
@@ -227,9 +260,10 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			>
 				<Image
 					src={photo.src}
-					alt={placeName}
+					alt={placeName || `${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`}
 					fill
 					priority={isTopCard}
+					loading={isTopCard ? undefined : "eager"}
 					className={styles.cardImage}
 					sizes="(max-width: 768px) 78vw, 420px"
 				/>
@@ -246,7 +280,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			className={styles.theme}
 			style={
 				{
-					"--swipe-duration": `${animationDurationMs}ms`,
+					"--swipe-duration": `${swipeDurationMs}ms`,
 				} as CSSProperties
 			}
 		>

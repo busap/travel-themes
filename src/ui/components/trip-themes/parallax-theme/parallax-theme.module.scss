@@ -29,22 +29,37 @@
 	inset: 0;
 }
 
-.stripSlide {
+.photoImageSingle {
+	position: absolute;
+	inset: 0;
+	object-fit: cover;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.stripMask {
+	position: absolute;
+	left: 0;
+	right: 0;
+	background: #0c0c0c;
+}
+
+.stripPhoto {
 	position: absolute;
 	left: 0;
 	right: 0;
 	overflow: hidden;
-	will-change: transform;
 }
 
-.imagePos {
-	position: relative;
+.stripPhotoImage {
+	position: absolute;
+	left: 0;
+	right: 0;
 	height: 100vh;
-	width: 100%;
-}
-
-.image {
-	object-fit: cover;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
 }
 
 .separators {
