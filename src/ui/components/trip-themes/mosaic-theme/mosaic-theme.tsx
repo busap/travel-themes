@@ -129,30 +129,25 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 
 		const ctx = gsap.context(() => {
 			photoItems.forEach((item, index) => {
-				const el = item as HTMLElement;
-				const inViewport =
-					el.getBoundingClientRect().top < window.innerHeight;
-
 				gsap.fromTo(
-					el,
-					{ opacity: 0, scale: fromScale },
+					item,
+					{
+						opacity: 0,
+						scale: fromScale,
+					},
 					{
 						opacity: 1,
 						scale: 1,
 						duration,
 						ease,
+						scrollTrigger: {
+							trigger: item,
+							start: scrollTriggerStart,
+							end: scrollTriggerEnd,
+							toggleActions: "play none none none",
+							markers: scrollTriggerMarkers,
+						},
 						delay: (index % 6) * stagger,
-						// Cells already visible on page load play immediately.
-						// Below-fold cells wait for their scroll position.
-						...(!inViewport && {
-							scrollTrigger: {
-								trigger: el,
-								start: scrollTriggerStart,
-								end: scrollTriggerEnd,
-								toggleActions: "play none none none",
-								markers: scrollTriggerMarkers,
-							},
-						}),
 					}
 				);
 			});
@@ -167,7 +162,6 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 		stagger,
 		scrollTriggerStart,
 		scrollTriggerEnd,
-		scrollTriggerMarkers,
 	]);
 
 	const scrollToKeepPhotoInView = (photoRef: HTMLDivElement) => {
