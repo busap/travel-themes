@@ -32,6 +32,7 @@ const _materialTextureSrcCache = new Map<string, string>();
 let _texturesReady = false;
 let _topoDataCache: GeoFeature[] | null = null;
 let _globeCache: GlobeInstance | null = null;
+let _globeWrapperEl: HTMLElement | null = null;
 let _activeContainer: HTMLDivElement | null = null;
 
 const INTRO_CAMERA_ANIMATION_MS = 1500;
@@ -203,6 +204,87 @@ export function useGlobe({
 		applyCountriesData();
 	}, [applyCountriesData, applyPolygonStyleCallbacks]);
 
+	const bindPolygonInteractions = useCallback(
+		(globe: GlobeInstance) => {
+			globe
+				.onPolygonHover((polygon: object | null) => {
+					if (isMobileRef.current) return;
+
+					if (!polygon) {
+						hoveredIdRef.current = null;
+						setActiveCountry(null);
+						if (_activeContainer)
+							_activeContainer.style.cursor = "default";
+						updateHoverStateRef.current(null);
+						return;
+					}
+
+					const feat = polygon as GeoFeature;
+					const countryId = normalizeCountryId(feat.id);
+					const trip = idToTripRef.current.get(countryId);
+					hoveredIdRef.current = countryId;
+
+					if (trip) {
+						const name =
+							idToNameRef.current.get(countryId) ??
+							idToCountryName[countryId] ??
+							"";
+						setActiveCountry({
+							feature: feat,
+							trip,
+							countryName: name,
+						});
+						if (_activeContainer)
+							_activeContainer.style.cursor = "pointer";
+					} else {
+						setActiveCountry(null);
+						if (_activeContainer)
+							_activeContainer.style.cursor = "default";
+					}
+
+					updateHoverStateRef.current(countryId);
+				})
+				.onPolygonClick((polygon: object) => {
+					const feat = polygon as GeoFeature;
+					const countryId = normalizeCountryId(feat.id);
+					const trip = idToTripRef.current.get(countryId);
+
+					if (!isMobileRef.current) {
+						if (trip) routerRef.current.push(getTripRoute(trip.id));
+						return;
+					}
+
+					if (!trip) {
+						setActiveCountry(null);
+						updateHoverStateRef.current(null);
+						return;
+					}
+
+					const alreadyShowing =
+						normalizeCountryId(
+							activeCountryRef.current?.feature.id ?? ""
+						) === countryId;
+					if (alreadyShowing) {
+						setActiveCountry(null);
+						updateHoverStateRef.current(null);
+						return;
+					}
+
+					const name =
+						idToNameRef.current.get(countryId) ??
+						idToCountryName[countryId] ??
+						"";
+					setActiveCountry({
+						feature: feat,
+						trip,
+						countryName: name,
+					});
+					updateHoverStateRef.current(countryId);
+				});
+		},
+		[]
+	);
+
 	useEffect(() => {
 		const loader = new TextureLoader();
 		const cache = materialCacheRef.current;
@@ -314,9 +396,9 @@ export function useGlobe({
 		if (!containerRef.current) return;
 
 		// REATTACH: Globe was previously initialized — reuse the cached instance.
-		if (_globeCache) {
+		if (_globeCache && _globeWrapperEl) {
 			const globe = _globeCache;
-			containerRef.current.appendChild(globe.renderer().domElement);
+			containerRef.current.appendChild(_globeWrapperEl);
 			globe
 				.width(containerRef.current.clientWidth)
 				.height(containerRef.current.clientHeight);
@@ -329,6 +411,7 @@ export function useGlobe({
 			_activeContainer = containerRef.current;
 			hoveredIdRef.current = null;
 			setActiveCountry(null);
+			bindPolygonInteractions(globe);
 			updateHoverStateRef.current(null);
 			applyGlobeStyling();
 			setIsLoaded(true);
@@ -362,6 +445,9 @@ export function useGlobe({
 
 			globeInstanceRef.current = globe;
 			_activeContainer = containerRef.current;
+			_globeWrapperEl =
+				(containerRef.current.firstElementChild as HTMLElement | null) ??
+				null;
 
 			globe
 				.width(containerRef.current.clientWidth)
@@ -399,81 +485,9 @@ export function useGlobe({
 						? 0.012
 						: 0.001;
 				})
-				.polygonsTransitionDuration(300)
-				.onPolygonHover((polygon: object | null) => {
-					if (isMobileRef.current) return;
+				.polygonsTransitionDuration(300);
 
-					if (!polygon) {
-						hoveredIdRef.current = null;
-						setActiveCountry(null);
-						if (_activeContainer)
-							_activeContainer.style.cursor = "default";
-						updateHoverStateRef.current(null);
-						return;
-					}
-
-					const feat = polygon as GeoFeature;
-					const countryId = normalizeCountryId(feat.id);
-					const trip = idToTripRef.current.get(countryId);
-					hoveredIdRef.current = countryId;
-
-					if (trip) {
-						const name =
-							idToNameRef.current.get(countryId) ??
-							idToCountryName[countryId] ??
-							"";
-						setActiveCountry({
-							feature: feat,
-							trip,
-							countryName: name,
-						});
-						if (_activeContainer)
-							_activeContainer.style.cursor = "pointer";
-					} else {
-						setActiveCountry(null);
-						if (_activeContainer)
-							_activeContainer.style.cursor = "default";
-					}
-
-					updateHoverStateRef.current(countryId);
-				})
-				.onPolygonClick((polygon: object) => {
-					const feat = polygon as GeoFeature;
-					const countryId = normalizeCountryId(feat.id);
-					const trip = idToTripRef.current.get(countryId);
-
-					if (!isMobileRef.current) {
-						if (trip) routerRef.current.push(getTripRoute(trip.id));
-						return;
-					}
-
-					if (!trip) {
-						setActiveCountry(null);
-						updateHoverStateRef.current(null);
-						return;
-					}
-
-					const alreadyShowing =
-						normalizeCountryId(
-							activeCountryRef.current?.feature.id ?? ""
-						) === countryId;
-					if (alreadyShowing) {
-						setActiveCountry(null);
-						updateHoverStateRef.current(null);
-						return;
-					}
-
-					const name =
-						idToNameRef.current.get(countryId) ??
-						idToCountryName[countryId] ??
-						"";
-					setActiveCountry({
-						feature: feat,
-						trip,
-						countryName: name,
-					});
-					updateHoverStateRef.current(countryId);
-				});
+			bindPolygonInteractions(globe);
 
 			if (pendingStyleRefreshRef.current) {
 				applyGlobeStyling();
@@ -537,7 +551,7 @@ export function useGlobe({
 				globe._destructor();
 			}
 		};
-	}, [applyGlobeStyling, getMaterial]);
+	}, [applyGlobeStyling, bindPolygonInteractions, getMaterial]);
 
 	useEffect(() => {
 		if (
