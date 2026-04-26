@@ -147,7 +147,7 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 						...(!inViewport && {
 							scrollTrigger: {
 								trigger: el,
-								start: `clamp(${scrollTriggerStart})`,
+								start: scrollTriggerStart,
 								end: scrollTriggerEnd,
 								toggleActions: "play none none none",
 								markers: scrollTriggerMarkers,
