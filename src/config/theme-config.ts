@@ -12,7 +12,6 @@ export interface ThemeConfig {
 			end?: string;
 			scrub?: number;
 			pin?: boolean;
-			markers?: boolean;
 		};
 		timeline?: {
 			duration: number;

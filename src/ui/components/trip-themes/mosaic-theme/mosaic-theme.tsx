@@ -115,8 +115,6 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 	const scrollTriggerStart =
 		config.animation?.scrollTrigger?.start ?? "top 85%";
 	const scrollTriggerEnd = config.animation?.scrollTrigger?.end ?? "top 60%";
-	const scrollTriggerMarkers =
-		config.animation?.scrollTrigger?.markers ?? false;
 
 	const validatedPhotos = trip.photos;
 	const mousePosition = useMousePosition(gridRef);
@@ -145,7 +143,6 @@ export function MosaicTheme({ trip, config }: MosaicThemeProps) {
 							start: scrollTriggerStart,
 							end: scrollTriggerEnd,
 							toggleActions: "play none none none",
-							markers: scrollTriggerMarkers,
 						},
 						delay: (index % 6) * stagger,
 					}
