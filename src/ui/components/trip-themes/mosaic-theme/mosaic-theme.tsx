@@ -76,22 +76,13 @@ function MosaicCell({
 			return;
 		}
 
-		// Use IntersectionObserver instead of ScrollTrigger to avoid interfering
-		// with GSAP's cached trigger positions for the reveal animations.
-		// rootMargin "100%" below extends the detection zone by one viewport height,
-		// so images start loading ~1 screen before they enter the visible area.
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry.isIntersecting) {
-					setCellLoaded(true);
-					observer.disconnect();
-				}
-			},
-			{ rootMargin: "0px 0px 100% 0px" }
-		);
+		const trigger = ScrollTrigger.create({
+			trigger: el,
+			start: "top 120%",
+			onEnter: () => setCellLoaded(true),
+		});
 
-		observer.observe(el);
-		return () => observer.disconnect();
+		return () => trigger.kill();
 	}, []);
 
 	return (
