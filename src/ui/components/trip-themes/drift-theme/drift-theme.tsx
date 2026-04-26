@@ -4,10 +4,18 @@ import { Trip } from "@/types/trip";
 import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryNames } from "@/utils/country";
-import { useRef, useMemo, useEffect, useLayoutEffect, useCallback, useState } from "react";
+import {
+	useRef,
+	useMemo,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+	useState,
+} from "react";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
 import { seededRandom } from "@/utils/random";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./drift-theme.module.scss";
@@ -112,6 +120,7 @@ interface WaveSectionProps {
 	wave: Wave;
 	waveIndex: number;
 	isFirstWave: boolean;
+	isMounted: boolean;
 	animConfig: WaveSectionAnimConfig;
 	crimsonClassName: string;
 	onReady?: () => void;
@@ -121,6 +130,7 @@ function WaveSection({
 	wave,
 	waveIndex,
 	isFirstWave,
+	isMounted,
 	animConfig,
 	crimsonClassName,
 	onReady,
@@ -129,21 +139,6 @@ function WaveSection({
 	const contentRef = useRef<HTMLDivElement>(null);
 	const hasAnimatedRef = useRef(false);
 	const [placeholderHeight, setPlaceholderHeight] = useState(0);
-
-	const [isMounted, setIsMounted] = useState(isFirstWave);
-
-	useEffect(() => {
-		if (isFirstWave) return;
-		const section = sectionRef.current;
-		if (!section) return;
-
-		const observer = new IntersectionObserver(
-			([entry]) => setIsMounted(entry.isIntersecting),
-			{ rootMargin: "500px 0px" }
-		);
-		observer.observe(section);
-		return () => observer.disconnect();
-	}, [isFirstWave]);
 
 	useLayoutEffect(() => {
 		if (isFirstWave || !isMounted || !sectionRef.current) return;
@@ -182,7 +177,11 @@ function WaveSection({
 				y: 0,
 				scale: 1,
 			});
-			const tween = gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
+			const tween = gsap.fromTo(
+				content,
+				{ opacity: 0 },
+				{ opacity: 1, duration: 0.5, ease: "power2.out" }
+			);
 			onReady?.();
 			return () => tween.kill();
 		}
@@ -384,11 +383,18 @@ function WaveSection({
 		<section
 			ref={sectionRef}
 			data-wave={waveIndex}
+			data-virtual-index={waveIndex}
 			className={styles.wave}
-			style={!isMounted && placeholderHeight > 0 ? { minHeight: placeholderHeight } : undefined}
+			style={
+				!isMounted && placeholderHeight > 0
+					? { minHeight: placeholderHeight }
+					: undefined
+			}
 		>
 			{isMounted && (
-				<div ref={contentRef} className={styles.waveContent}>{renderImages()}</div>
+				<div ref={contentRef} className={styles.waveContent}>
+					{renderImages()}
+				</div>
 			)}
 		</section>
 	);
@@ -490,6 +496,14 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 		return result;
 	}, [trip.photos, idSeed]);
 
+	const { isMounted: isWaveMounted } = useVirtualWindow({
+		mode: "dom-visibility",
+		count: waves.length,
+		rootMarginPx: 500,
+		before: 1,
+		after: 1,
+	});
+
 	const showContainer = useCallback(() => {
 		if (containerRef.current) {
 			containerRef.current.style.visibility = "visible";
@@ -567,6 +581,8 @@ export function DriftTheme({ trip, config }: DriftThemeProps) {
 					wave={wave}
 					waveIndex={i}
 					isFirstWave={i === 0}
+					// Pin the first wave so initial paint never waits on the hook's first measurement.
+					isMounted={i === 0 || isWaveMounted(i)}
 					animConfig={animConfig}
 					crimsonClassName={crimson.className}
 					onReady={i === 0 ? showContainer : undefined}
