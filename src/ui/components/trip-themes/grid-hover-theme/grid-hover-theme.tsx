@@ -108,7 +108,9 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 						return (
 							<div
 								key={cellIndex}
-								data-row-index={isFirstInRow ? rowIndex : undefined}
+								data-row-index={
+									isFirstInRow ? rowIndex : undefined
+								}
 								className={[
 									styles.cell,
 									showPhoto ? styles.hasPhoto : "",
@@ -130,7 +132,9 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 											fill
 											sizes="(max-width: 768px) 25vw, 17vw"
 											style={{ objectFit: "cover" }}
-											priority={rowIndex < INITIAL_VISIBLE_ROWS}
+											priority={
+												rowIndex < INITIAL_VISIBLE_ROWS
+											}
 											loading={
 												rowIndex < INITIAL_VISIBLE_ROWS
 													? undefined
@@ -139,7 +143,10 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 											onLoad={() =>
 												setLoadedImages(
 													(prev) =>
-														new Set([...prev, cellIndex])
+														new Set([
+															...prev,
+															cellIndex,
+														])
 												)
 											}
 										/>

@@ -97,20 +97,20 @@ Both modes accept `additive: true` — the mount window only grows, never unmoun
 
 ### Theme map
 
-| Theme | Mode | Notes |
-|-------|------|-------|
-| Parallax | `scroll-progress` | Photo per pinned section. |
-| Trippy | `scroll-progress`, `additive` | `additive` + per-section `onLeave`/`onLeaveBack` snap the scrub tween to terminal state — needed because `scrub` lag causes reverse-scroll opacity overshoot. |
-| Feed | `dom-visibility` container | Vertical phone-frame. |
-| Collage | `dom-visibility` container | Visible gate derived from `focusIndex`. |
-| Grid Hover | `dom-visibility` window | Per-row, `additive`. |
-| Drift | `dom-visibility` window | Parent passes `isMounted` into each `WaveSection`. |
-| Mosaic | `dom-visibility` window | `additive`; reuses existing `data-photo-index` via `indexAttr`. |
-| Image Grid Hero gallery | `dom-visibility` window | Per-item lazy mount; a separate one-shot IO gates the GSAP timeline (the hook's initial window isn't empty). |
-| Photo Carousel | `dom-visibility` window | `before: 0, after: 0` for strict viewport presence per row. |
-| Aurora | utility-only | `computeVirtualRange` + `rangeToSet` driven by `useScrollPinnedReveal` callbacks. |
+| Theme                   | Mode                          | Notes                                                                                                                                                         |
+| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parallax                | `scroll-progress`             | Photo per pinned section.                                                                                                                                     |
+| Trippy                  | `scroll-progress`, `additive` | `additive` + per-section `onLeave`/`onLeaveBack` snap the scrub tween to terminal state — needed because `scrub` lag causes reverse-scroll opacity overshoot. |
+| Feed                    | `dom-visibility` container    | Vertical phone-frame.                                                                                                                                         |
+| Collage                 | `dom-visibility` container    | Visible gate derived from `focusIndex`.                                                                                                                       |
+| Grid Hover              | `dom-visibility` window       | Per-row, `additive`.                                                                                                                                          |
+| Drift                   | `dom-visibility` window       | Parent passes `isMounted` into each `WaveSection`.                                                                                                            |
+| Mosaic                  | `dom-visibility` window       | `additive`; reuses existing `data-photo-index` via `indexAttr`.                                                                                               |
+| Image Grid Hero gallery | `dom-visibility` window       | Per-item lazy mount; a separate one-shot IO gates the GSAP timeline (the hook's initial window isn't empty).                                                  |
+| Photo Carousel          | `dom-visibility` window       | `before: 0, after: 0` for strict viewport presence per row.                                                                                                   |
+| Aurora                  | utility-only                  | `computeVirtualRange` + `rangeToSet` driven by `useScrollPinnedReveal` callbacks.                                                                             |
 
-**GSAP gotcha:** if a timeline queries DOM at mount (Trippy, Mosaic), keep the queried element (e.g. `<div data-photo-img>`) permanent and render the heavy `<Image>` *inside* it — never gate the queried element itself behind `isMounted`.
+**GSAP gotcha:** if a timeline queries DOM at mount (Trippy, Mosaic), keep the queried element (e.g. `<div data-photo-img>`) permanent and render the heavy `<Image>` _inside_ it — never gate the queried element itself behind `isMounted`.
 
 ## Don't
 

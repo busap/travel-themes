@@ -94,7 +94,8 @@ export function SmoothScrollTheme({ trip, config }: SmoothScrollThemeProps) {
 
 					// Imperatively preload lazy panels (index >= 3) before their reveal
 					photoAnimations.forEach((animation, index) => {
-						if (index < 3 || preloadedRef.current.has(index)) return;
+						if (index < 3 || preloadedRef.current.has(index))
+							return;
 						const revealStart =
 							MAIN_PHOTO_SECTION_SCROLL_HEIGHT +
 							layoutScrollHeight * animation.startRatio;

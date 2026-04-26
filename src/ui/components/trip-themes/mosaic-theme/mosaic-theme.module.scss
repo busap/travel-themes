@@ -88,7 +88,9 @@
 
 .photoImage {
 	@apply w-full h-full;
-	transition: transform 0.5s ease, opacity 0.4s ease;
+	transition:
+		transform 0.5s ease,
+		opacity 0.4s ease;
 	user-select: none;
 	-webkit-user-drag: none;
 }

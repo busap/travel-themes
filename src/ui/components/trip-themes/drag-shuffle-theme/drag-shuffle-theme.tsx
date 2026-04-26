@@ -260,7 +260,10 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			>
 				<Image
 					src={photo.src}
-					alt={placeName || `${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`}
+					alt={
+						placeName ||
+						`${getCountryName(trip.countries[0])} stop ${activeIndex + stackIndex + 1}`
+					}
 					fill
 					priority={isTopCard}
 					loading={isTopCard ? undefined : "eager"}

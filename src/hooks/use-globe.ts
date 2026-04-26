@@ -142,7 +142,8 @@ export function useGlobe({
 					topoData.objects.countries
 				);
 				if ("features" in geoData) {
-					const features = geoData.features as unknown as GeoFeature[];
+					const features =
+						geoData.features as unknown as GeoFeature[];
 					_topoDataCache = features;
 					setCountries(features);
 				}
@@ -204,73 +205,27 @@ export function useGlobe({
 		applyCountriesData();
 	}, [applyCountriesData, applyPolygonStyleCallbacks]);
 
-	const bindPolygonInteractions = useCallback(
-		(globe: GlobeInstance) => {
-			globe
-				.onPolygonHover((polygon: object | null) => {
-					if (isMobileRef.current) return;
+	const bindPolygonInteractions = useCallback((globe: GlobeInstance) => {
+		globe
+			.onPolygonHover((polygon: object | null) => {
+				if (isMobileRef.current) return;
 
-					if (!polygon) {
-						hoveredIdRef.current = null;
-						setActiveCountry(null);
-						if (_activeContainer)
-							_activeContainer.style.cursor = "default";
-						updateHoverStateRef.current(null);
-						return;
-					}
+				if (!polygon) {
+					hoveredIdRef.current = null;
+					setActiveCountry(null);
+					if (_activeContainer)
+						_activeContainer.style.cursor = "default";
+					updateHoverStateRef.current(null);
+					return;
+				}
 
-					const feat = polygon as GeoFeature;
-					const countryId = normalizeCountryId(feat.id);
-					const trip = idToTripRef.current.get(countryId);
-					hoveredIdRef.current = countryId;
+				const feat = polygon as GeoFeature;
+				const countryId = normalizeCountryId(feat.id);
+				const trip = idToTripRef.current.get(countryId);
+				hoveredIdRef.current = countryId;
 
-					if (trip) {
-						routerRef.current.prefetch(getTripRoute(trip.id));
-						const name =
-							idToNameRef.current.get(countryId) ??
-							idToCountryName[countryId] ??
-							"";
-						setActiveCountry({
-							feature: feat,
-							trip,
-							countryName: name,
-						});
-						if (_activeContainer)
-							_activeContainer.style.cursor = "pointer";
-					} else {
-						setActiveCountry(null);
-						if (_activeContainer)
-							_activeContainer.style.cursor = "default";
-					}
-
-					updateHoverStateRef.current(countryId);
-				})
-				.onPolygonClick((polygon: object) => {
-					const feat = polygon as GeoFeature;
-					const countryId = normalizeCountryId(feat.id);
-					const trip = idToTripRef.current.get(countryId);
-
-					if (!isMobileRef.current) {
-						if (trip) routerRef.current.push(getTripRoute(trip.id));
-						return;
-					}
-
-					if (!trip) {
-						setActiveCountry(null);
-						updateHoverStateRef.current(null);
-						return;
-					}
-
-					const alreadyShowing =
-						normalizeCountryId(
-							activeCountryRef.current?.feature.id ?? ""
-						) === countryId;
-					if (alreadyShowing) {
-						setActiveCountry(null);
-						updateHoverStateRef.current(null);
-						return;
-					}
-
+				if (trip) {
+					routerRef.current.prefetch(getTripRoute(trip.id));
 					const name =
 						idToNameRef.current.get(countryId) ??
 						idToCountryName[countryId] ??
@@ -280,11 +235,54 @@ export function useGlobe({
 						trip,
 						countryName: name,
 					});
-					updateHoverStateRef.current(countryId);
+					if (_activeContainer)
+						_activeContainer.style.cursor = "pointer";
+				} else {
+					setActiveCountry(null);
+					if (_activeContainer)
+						_activeContainer.style.cursor = "default";
+				}
+
+				updateHoverStateRef.current(countryId);
+			})
+			.onPolygonClick((polygon: object) => {
+				const feat = polygon as GeoFeature;
+				const countryId = normalizeCountryId(feat.id);
+				const trip = idToTripRef.current.get(countryId);
+
+				if (!isMobileRef.current) {
+					if (trip) routerRef.current.push(getTripRoute(trip.id));
+					return;
+				}
+
+				if (!trip) {
+					setActiveCountry(null);
+					updateHoverStateRef.current(null);
+					return;
+				}
+
+				const alreadyShowing =
+					normalizeCountryId(
+						activeCountryRef.current?.feature.id ?? ""
+					) === countryId;
+				if (alreadyShowing) {
+					setActiveCountry(null);
+					updateHoverStateRef.current(null);
+					return;
+				}
+
+				const name =
+					idToNameRef.current.get(countryId) ??
+					idToCountryName[countryId] ??
+					"";
+				setActiveCountry({
+					feature: feat,
+					trip,
+					countryName: name,
 				});
-		},
-		[]
-	);
+				updateHoverStateRef.current(countryId);
+			});
+	}, []);
 
 	useEffect(() => {
 		const loader = new TextureLoader();
@@ -447,8 +445,8 @@ export function useGlobe({
 			globeInstanceRef.current = globe;
 			_activeContainer = containerRef.current;
 			_globeWrapperEl =
-				(containerRef.current.firstElementChild as HTMLElement | null) ??
-				null;
+				(containerRef.current
+					.firstElementChild as HTMLElement | null) ?? null;
 
 			globe
 				.width(containerRef.current.clientWidth)

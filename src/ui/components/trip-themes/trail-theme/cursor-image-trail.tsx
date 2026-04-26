@@ -90,7 +90,9 @@ export function CursorImageTrail({
 			el.style.backgroundImage = `url(${src})`;
 
 			const preloadSrc =
-				images[(imageIndexRef.current + PRELOAD_BUFFER - 1) % images.length];
+				images[
+					(imageIndexRef.current + PRELOAD_BUFFER - 1) % images.length
+				];
 			const preloadImg = new window.Image();
 			preloadImg.src = preloadSrc;
 

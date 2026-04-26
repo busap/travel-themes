@@ -348,34 +348,32 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 										loading={p < 2 ? undefined : "lazy"}
 									/>
 								)}
-								{Array.from(
-									{ length: STRIP_COUNT },
-									(_, s) => (
+								{Array.from({ length: STRIP_COUNT }, (_, s) => (
+									<div
+										key={s}
+										className={styles.stripPhoto}
+										data-strip={s}
+										style={
+											{
+												top: `${(s / STRIP_COUNT) * 100}%`,
+												height: `${100 / STRIP_COUNT}%`,
+											} as CSSProperties
+										}
+									>
 										<div
-											key={s}
-											className={styles.stripPhoto}
-											data-strip={s}
+											className={styles.stripPhotoImage}
 											style={
 												{
-													top: `${(s / STRIP_COUNT) * 100}%`,
-													height: `${100 / STRIP_COUNT}%`,
-												} as CSSProperties
-											}
-										>
-											<div
-												className={styles.stripPhotoImage}
-												style={
-													{
-														top: `${-(s / STRIP_COUNT) * 100}vh`,
-														backgroundImage: isPhotoMounted(p)
+													top: `${-(s / STRIP_COUNT) * 100}vh`,
+													backgroundImage:
+														isPhotoMounted(p)
 															? `url(${photo.src})`
 															: undefined,
-													} as CSSProperties
-												}
-											/>
-										</div>
-									)
-								)}
+												} as CSSProperties
+											}
+										/>
+									</div>
+								))}
 							</div>
 						))}
 					</div>

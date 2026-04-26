@@ -10,31 +10,52 @@ import {
 
 describe("clampRange", () => {
 	it("passes through a valid range unchanged", () => {
-		expect(clampRange({ start: 2, end: 7 }, 10)).toEqual({ start: 2, end: 7 });
+		expect(clampRange({ start: 2, end: 7 }, 10)).toEqual({
+			start: 2,
+			end: 7,
+		});
 	});
 
 	it("clamps start to 0 when negative", () => {
-		expect(clampRange({ start: -3, end: 2 }, 10)).toEqual({ start: 0, end: 2 });
+		expect(clampRange({ start: -3, end: 2 }, 10)).toEqual({
+			start: 0,
+			end: 2,
+		});
 	});
 
 	it("clamps end to count - 1", () => {
-		expect(clampRange({ start: 0, end: 15 }, 10)).toEqual({ start: 0, end: 9 });
+		expect(clampRange({ start: 0, end: 15 }, 10)).toEqual({
+			start: 0,
+			end: 9,
+		});
 	});
 
 	it("clamps both sides simultaneously", () => {
-		expect(clampRange({ start: -5, end: 50 }, 10)).toEqual({ start: 0, end: 9 });
+		expect(clampRange({ start: -5, end: 50 }, 10)).toEqual({
+			start: 0,
+			end: 9,
+		});
 	});
 
 	it("handles count = 1", () => {
-		expect(clampRange({ start: -1, end: 5 }, 1)).toEqual({ start: 0, end: 0 });
+		expect(clampRange({ start: -1, end: 5 }, 1)).toEqual({
+			start: 0,
+			end: 0,
+		});
 	});
 
 	it("clamps a range starting exactly at 0", () => {
-		expect(clampRange({ start: 0, end: 3 }, 5)).toEqual({ start: 0, end: 3 });
+		expect(clampRange({ start: 0, end: 3 }, 5)).toEqual({
+			start: 0,
+			end: 3,
+		});
 	});
 
 	it("clamps a range ending exactly at count - 1", () => {
-		expect(clampRange({ start: 2, end: 9 }, 10)).toEqual({ start: 2, end: 9 });
+		expect(clampRange({ start: 2, end: 9 }, 10)).toEqual({
+			start: 2,
+			end: 9,
+		});
 	});
 });
 
@@ -52,7 +73,10 @@ describe("computeVirtualRange", () => {
 	});
 
 	it("covers the entire list when overscan exceeds bounds", () => {
-		expect(computeVirtualRange(5, 10, 10, 10)).toEqual({ start: 0, end: 9 });
+		expect(computeVirtualRange(5, 10, 10, 10)).toEqual({
+			start: 0,
+			end: 9,
+		});
 	});
 
 	it("handles a single-item list", () => {
@@ -60,7 +84,10 @@ describe("computeVirtualRange", () => {
 	});
 
 	it("handles a fast index jump to the last item", () => {
-		expect(computeVirtualRange(99, 1, 2, 100)).toEqual({ start: 98, end: 99 });
+		expect(computeVirtualRange(99, 1, 2, 100)).toEqual({
+			start: 98,
+			end: 99,
+		});
 	});
 
 	it("handles a fast index jump to the first item", () => {

@@ -96,5 +96,13 @@ export function useScrollPinnedReveal({
 		return () => {
 			triggers.forEach((trigger) => trigger?.kill());
 		};
-	}, [containerRef, enabled, itemCount, pinDuration, config, onSectionEnter, onSectionEnterBack]);
+	}, [
+		containerRef,
+		enabled,
+		itemCount,
+		pinDuration,
+		config,
+		onSectionEnter,
+		onSectionEnterBack,
+	]);
 }

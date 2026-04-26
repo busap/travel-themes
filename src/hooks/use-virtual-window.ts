@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, RefObject } from "react";
-import { clampProgress, clampRange, isInRange, progressToIndex, VirtualRange } from "@/utils/virtualization";
+import {
+	clampProgress,
+	clampRange,
+	isInRange,
+	progressToIndex,
+	VirtualRange,
+} from "@/utils/virtualization";
 
 export type { VirtualRange };
 
@@ -65,26 +71,33 @@ interface MountState {
 	mountedRange: VirtualRange;
 }
 
-export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindowResult {
+export function useVirtualWindow(
+	opts: UseVirtualWindowOptions
+): UseVirtualWindowResult {
 	const { count } = opts;
 	const before = opts.before ?? DEFAULT_BEFORE;
 	const after = opts.after ?? DEFAULT_AFTER;
 
 	// Flatten discriminated-union fields so they're stable deps without casting at each use.
 	const mode = opts.mode;
-	const containerRef = mode === "scroll-progress"
-		? opts.containerRef
-		: (opts as DomVisibilityMode).containerRef;
-	const totalScrollHeight = mode === "scroll-progress" ? opts.totalScrollHeight : 0;
-	const indexAttr = mode === "dom-visibility"
-		? ((opts as DomVisibilityMode).indexAttr ?? "data-virtual-index")
-		: "data-virtual-index";
-	const rootMarginPx = mode === "dom-visibility"
-		? ((opts as DomVisibilityMode).rootMarginPx ?? 0)
-		: 0;
-	const additive = mode === "dom-visibility"
-		? ((opts as DomVisibilityMode).additive ?? false)
-		: ((opts as ScrollProgressMode).additive ?? false);
+	const containerRef =
+		mode === "scroll-progress"
+			? opts.containerRef
+			: (opts as DomVisibilityMode).containerRef;
+	const totalScrollHeight =
+		mode === "scroll-progress" ? opts.totalScrollHeight : 0;
+	const indexAttr =
+		mode === "dom-visibility"
+			? ((opts as DomVisibilityMode).indexAttr ?? "data-virtual-index")
+			: "data-virtual-index";
+	const rootMarginPx =
+		mode === "dom-visibility"
+			? ((opts as DomVisibilityMode).rootMarginPx ?? 0)
+			: 0;
+	const additive =
+		mode === "dom-visibility"
+			? ((opts as DomVisibilityMode).additive ?? false)
+			: ((opts as ScrollProgressMode).additive ?? false);
 
 	const [state, setState] = useState<MountState>(() => ({
 		focusIndex: 0,
@@ -102,7 +115,8 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 				prev.focusIndex === next.focusIndex &&
 				prev.mountedRange.start === next.mountedRange.start &&
 				prev.mountedRange.end === next.mountedRange.end
-			) return;
+			)
+				return;
 			lastStateRef.current = next;
 			setState(next);
 		};
@@ -113,16 +127,22 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 
 			const update = () => {
 				const focus = progressToIndex(
-					clampProgress((window.scrollY - container.offsetTop) / Math.max(totalScrollHeight, 1)),
+					clampProgress(
+						(window.scrollY - container.offsetTop) /
+							Math.max(totalScrollHeight, 1)
+					),
 					count
 				);
-				const proposed = clampRange({ start: focus - before, end: focus + after }, count);
+				const proposed = clampRange(
+					{ start: focus - before, end: focus + after },
+					count
+				);
 				const prevRange = lastStateRef.current.mountedRange;
 				const next = additive
 					? {
-						start: 0,
-						end: Math.max(prevRange.end, proposed.end),
-					}
+							start: 0,
+							end: Math.max(prevRange.end, proposed.end),
+						}
 					: proposed;
 				commit({ focusIndex: focus, mountedRange: next });
 			};
@@ -147,7 +167,8 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 				? liveContainer.querySelectorAll(`[${indexAttr}]`)
 				: document.querySelectorAll(`[${indexAttr}]`);
 
-			const containerRect = liveContainer?.getBoundingClientRect() ?? null;
+			const containerRect =
+				liveContainer?.getBoundingClientRect() ?? null;
 			const visible: number[] = [];
 
 			elements.forEach((el) => {
@@ -155,12 +176,14 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 				const rect = el.getBoundingClientRect();
 
 				const inH = containerRect
-					? rect.left < containerRect.right && rect.right > containerRect.left
+					? rect.left < containerRect.right &&
+						rect.right > containerRect.left
 					: true;
 				const inV = containerRect
 					? rect.top < containerRect.bottom + rootMarginPx &&
-					  rect.bottom > containerRect.top - rootMarginPx
-					: rect.top < window.innerHeight + rootMarginPx && rect.bottom > -rootMarginPx;
+						rect.bottom > containerRect.top - rootMarginPx
+					: rect.top < window.innerHeight + rootMarginPx &&
+						rect.bottom > -rootMarginPx;
 
 				if (inH && inV) visible.push(idx);
 			});
@@ -176,17 +199,31 @@ export function useVirtualWindow(opts: UseVirtualWindowOptions): UseVirtualWindo
 				focusIndex: maxVisible,
 				mountedRange: {
 					start: additive ? 0 : Math.max(0, minVisible - before),
-					end: additive ? Math.max(prevRange.end, proposedEnd) : proposedEnd,
+					end: additive
+						? Math.max(prevRange.end, proposedEnd)
+						: proposedEnd,
 				},
 			});
 		};
 
 		const onEvent = () => window.requestAnimationFrame(update);
 		const scrollTarget: EventTarget = container ?? window;
-		scrollTarget.addEventListener("scroll", onEvent, { passive: true } as AddEventListenerOptions);
+		scrollTarget.addEventListener("scroll", onEvent, {
+			passive: true,
+		} as AddEventListenerOptions);
 		window.requestAnimationFrame(update);
 		return () => scrollTarget.removeEventListener("scroll", onEvent);
-	}, [count, before, after, mode, containerRef, totalScrollHeight, indexAttr, rootMarginPx, additive]);
+	}, [
+		count,
+		before,
+		after,
+		mode,
+		containerRef,
+		totalScrollHeight,
+		indexAttr,
+		rootMarginPx,
+		additive,
+	]);
 
 	return {
 		focusIndex: state.focusIndex,
