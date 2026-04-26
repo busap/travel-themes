@@ -12,6 +12,7 @@ import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryNames } from "@/utils/country";
+import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import styles from "./photo-carousel-theme.module.scss";
 import { Photo } from "@/types/photo";
 
@@ -75,11 +76,26 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 	const trackRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
 	const wrapperRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
-	const [activeRows, setActiveRows] = useState<boolean[]>([
-		true,
-		false,
-		false,
-	]);
+
+	// `before: 0, after: 0` makes isMounted reflect strict viewport presence
+	// rather than a sliding window — needed because every "active row"
+	// drives an independent rAF animation track.
+	const { isMounted: isRowActive } = useVirtualWindow({
+		mode: "dom-visibility",
+		count: rows.length,
+		rootMarginPx: 120,
+		before: 0,
+		after: 0,
+	});
+
+	const isRow0Active = isRowActive(0);
+	const isRow1Active = isRowActive(1);
+	const isRow2Active = isRowActive(2);
+	const activeRows = useMemo(
+		() => [isRow0Active, isRow1Active, isRow2Active],
+		[isRow0Active, isRow1Active, isRow2Active]
+	);
+
 	const [loadedCounts, setLoadedCounts] = useState<number[]>(() =>
 		rows.map((_, i) => (i === 0 ? INITIAL_LOAD_PER_ROW : 0))
 	);
@@ -109,40 +125,6 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 		});
 		return () => cancelAnimationFrame(frameId);
 	}, [rows]);
-
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				setActiveRows((prev) => {
-					const next = [...prev];
-					let changed = false;
-
-					entries.forEach((entry) => {
-						const rowAttr =
-							entry.target.getAttribute("data-row-index");
-						const rowIndex = rowAttr ? Number(rowAttr) : -1;
-						if (rowIndex < 0 || rowIndex > 2) return;
-						if (next[rowIndex] === entry.isIntersecting) return;
-						next[rowIndex] = entry.isIntersecting;
-						changed = true;
-					});
-
-					return changed ? next : prev;
-				});
-			},
-			{
-				root: null,
-				threshold: 0.05,
-				rootMargin: "120px 0px",
-			}
-		);
-
-		wrapperRefs.current.forEach((el) => {
-			if (el) observer.observe(el);
-		});
-
-		return () => observer.disconnect();
-	}, [rows.length]);
 
 	useEffect(() => {
 		const frameId = requestAnimationFrame(() => {
@@ -289,6 +271,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 					wrapperRefs.current[rowIndex] = el;
 				}}
 				data-row-index={rowIndex}
+				data-virtual-index={rowIndex}
 				className={styles.rowWrapper}
 				{...getPointerHandlers(rowIndex)}
 			>
