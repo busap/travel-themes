@@ -29,10 +29,8 @@ const SECTION_HOLD_PX = 320;
 const SECTION_STRIDE_PX = SECTION_PX + SECTION_HOLD_PX;
 const TRANSITION_DELAY_FRAC = 0.18;
 const TRANSITION_FRAC = 0.52;
-const PHOTO_WINDOW_BEHIND = 1;
-const PHOTO_WINDOW_AHEAD = 2;
-const PHOTO_MOUNT_BUFFER_BEHIND = 1;
-const PHOTO_MOUNT_BUFFER_AHEAD = 2;
+const PHOTO_MOUNT_BEFORE = 2;
+const PHOTO_MOUNT_AFTER = 4;
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -87,13 +85,12 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 	);
 
 	const { isMounted: isPhotoMounted } = useVirtualWindow({
+		mode: "scroll-progress",
 		count,
 		totalScrollHeight,
 		containerRef,
-		overscanBehind: PHOTO_WINDOW_BEHIND,
-		overscanAhead: PHOTO_WINDOW_AHEAD,
-		mountBufferBehind: PHOTO_MOUNT_BUFFER_BEHIND,
-		mountBufferAhead: PHOTO_MOUNT_BUFFER_AHEAD,
+		before: PHOTO_MOUNT_BEFORE,
+		after: PHOTO_MOUNT_AFTER,
 	});
 
 	const allStripAnims = useMemo<StripAnim[][]>(
