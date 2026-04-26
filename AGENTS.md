@@ -84,55 +84,33 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 
 ## Virtualization
 
-Themes that render many photos use a shared virtualization layer to avoid mounting off-screen content.
+Shared layer to avoid mounting off-screen photos. Skip it for themes with <~10 items.
 
-### Files
+- `src/utils/virtualization.ts` — pure helpers (`clampRange`, `computeVirtualRange`, `progressToIndex`, `clampProgress`, `isInRange`, `rangeToSet`).
+- `src/hooks/use-virtual-window.ts` — `useVirtualWindow({ mode, count, before, after, ... })` returning `{ focusIndex, isMounted(i) }`.
 
-| File | Purpose |
-|------|---------|
-| `src/utils/virtualization.ts` | Pure math helpers — `clampRange`, `computeVirtualRange`, `progressToIndex`, `clampProgress`, `isInRange`, `rangeToSet`. No side-effects; unit-tested. |
-| `src/hooks/use-virtual-window.ts` | `useVirtualWindow()` — unified hook for both virtualization strategies (see below). |
+**`mode: "scroll-progress"`** — sticky pinned sequences. Focus index = scroll progress within `totalScrollHeight` anchored to `containerRef.offsetTop`.
 
-### Two modes
+**`mode: "dom-visibility"`** — queries `[data-virtual-index]` (or custom `indexAttr`) under `containerRef` (or window if omitted). `rootMarginPx` expands detection like `IntersectionObserver`'s `rootMargin`.
 
-**`mode: "scroll-progress"`** — for sticky-scroll sequences (e.g. Parallax). Derives a focus index from global scroll progress within a defined `totalScrollHeight`, then keeps `before`/`after` items mounted around it.
+Both modes accept `additive: true` — the mount window only grows, never unmounts on scroll-back. Use it where remounting causes layout shift (grids) or decode flicker (image-heavy scrub timelines like Trippy); default is a sliding window.
 
-```ts
-const { isMounted } = useVirtualWindow({
-  mode: "scroll-progress",
-  count,
-  totalScrollHeight,
-  containerRef,   // element whose offsetTop anchors the math
-  before: 2,
-  after: 4,
-});
-```
+### Theme map
 
-**`mode: "dom-visibility"`** — for scrollable lists/grids (e.g. Feed, Grid Hover). Queries `[data-virtual-index]` (or a custom `indexAttr`) elements to detect which items are in the viewport, then maintains a sliding mount window around them.
+| Theme | Mode | Notes |
+|-------|------|-------|
+| Parallax | `scroll-progress` | Photo per pinned section. |
+| Trippy | `scroll-progress`, `additive` | `additive` + per-section `onLeave`/`onLeaveBack` snap the scrub tween to terminal state — needed because `scrub` lag causes reverse-scroll opacity overshoot. |
+| Feed | `dom-visibility` container | Vertical phone-frame. |
+| Collage | `dom-visibility` container | Visible gate derived from `focusIndex`. |
+| Grid Hover | `dom-visibility` window | Per-row, `additive`. |
+| Drift | `dom-visibility` window | Parent passes `isMounted` into each `WaveSection`. |
+| Mosaic | `dom-visibility` window | `additive`; reuses existing `data-photo-index` via `indexAttr`. |
+| Image Grid Hero gallery | `dom-visibility` window | Per-item lazy mount; a separate one-shot IO gates the GSAP timeline (the hook's initial window isn't empty). |
+| Photo Carousel | `dom-visibility` window | `before: 0, after: 0` for strict viewport presence per row. |
+| Aurora | utility-only | `computeVirtualRange` + `rangeToSet` driven by `useScrollPinnedReveal` callbacks. |
 
-```ts
-const { isMounted } = useVirtualWindow({
-  mode: "dom-visibility",
-  count,
-  containerRef,    // scroll container; omit to use window scroll
-  indexAttr: "data-virtual-index",
-  rootMarginPx: 0, // expand detection area (like IntersectionObserver rootMargin)
-  additive: false, // set true for monotonic reveal (rows never unmount once shown)
-  before: 2,
-  after: 3,
-});
-```
-
-Both modes return only `{ focusIndex, isMounted(i) }`. Mark items with the chosen data attribute so the hook can find them.
-
-### Additive vs sliding window
-
-- Default (sliding): the mount window tracks the current scroll position. Items far above or below may unmount. Good for long feeds.
-- `additive: true`: the mount window start is pinned at 0 and only the end grows. Items are never unmounted once revealed. Good for grids where re-mounting would cause layout shift.
-
-### Where not to use
-
-Do not add virtualization to themes with fewer than ~10 items — the overhead is not worth it and may cause visible pop-in. Drift's per-wave IntersectionObserver is intentionally kept component-local and does not need this hook.
+**GSAP gotcha:** if a timeline queries DOM at mount (Trippy, Mosaic), keep the queried element (e.g. `<div data-photo-img>`) permanent and render the heavy `<Image>` *inside* it — never gate the queried element itself behind `isMounted`.
 
 ## Don't
 
