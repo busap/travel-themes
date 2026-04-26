@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useMemo, useState } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
@@ -10,6 +10,7 @@ import { AuroraBackground } from "./aurora-background";
 import { useAuroraAnimation } from "@/hooks/use-aurora-animation";
 import { useScrollPinnedReveal } from "@/hooks/use-scroll-pinned-reveal";
 import { seededRandom } from "@/utils/random";
+import { computeVirtualRange, rangeToSet } from "@/utils/virtualization";
 import styles from "./aurora-theme.module.scss";
 
 const playfair = Playfair_Display({
@@ -59,26 +60,19 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 	const MOUNT_AHEAD = 2;
 
 	const [activeSectionIndex, setActiveSectionIndex] = useState(0);
-	const [mountedPhotos, setMountedPhotos] = useState<Set<number>>(() => {
-		const end = Math.min(validatedPhotos.length - 1, MOUNT_AHEAD);
-		const initialSet = new Set<number>();
-		for (let i = 0; i <= end; i++) initialSet.add(i);
-		return initialSet;
-	});
 
-	useEffect(() => {
-		const start = Math.max(0, activeSectionIndex - MOUNT_BEHIND);
-		const end = Math.min(
-			validatedPhotos.length - 1,
-			activeSectionIndex + MOUNT_AHEAD
-		);
-
-		setMountedPhotos((previous) => {
-			const next = new Set(previous);
-			for (let i = start; i <= end; i++) next.add(i);
-			return next.size === previous.size ? previous : next;
-		});
-	}, [activeSectionIndex, validatedPhotos.length]);
+	const mountedPhotos = useMemo(
+		() =>
+			rangeToSet(
+				computeVirtualRange(
+					activeSectionIndex,
+					MOUNT_BEHIND,
+					MOUNT_AHEAD,
+					validatedPhotos.length
+				)
+			),
+		[activeSectionIndex, validatedPhotos.length]
+	);
 
 	useScrollPinnedReveal({
 		containerRef,
@@ -157,13 +151,17 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 								{mountedPhotos.has(index) ? (
 									<Image
 										src={photo.src}
-										alt={photo.title || `Photo ${index + 1}`}
+										alt={
+											photo.title || `Photo ${index + 1}`
+										}
 										className={styles.photoImage}
 										width={800}
 										height={600}
 										sizes="(max-width: 768px) 90vw, 900px"
 										priority={index === 0}
-										loading={index === 0 ? undefined : "eager"}
+										loading={
+											index === 0 ? undefined : "eager"
+										}
 									/>
 								) : (
 									<div
