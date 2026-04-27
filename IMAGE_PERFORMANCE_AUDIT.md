@@ -2,9 +2,10 @@
 
 **Tracking issue:** #1  
 **Date:** 2026-04-27  
-**Branch:** `claude/review-travel-themes-issues-28yUy`
+**Branch:** `claude/review-travel-themes-issues-28yUy`  
+**Updated:** 2026-04-27 — #7 and #11 `loading="eager"` bugs fixed; #19 types extracted; #5 re-assessed as correct.
 
-All 18 sub-issues (#2–#19) are marked **closed/completed** on GitHub. This document records what was verified in code, what was found to be incomplete or incorrect, and recommendations.
+All 18 sub-issues (#2–#19) are marked **closed/completed** on GitHub. This document records what was verified in code, what was found to be incomplete or incorrect, and the fixes applied.
 
 ---
 
@@ -15,13 +16,13 @@ All 18 sub-issues (#2–#19) are marked **closed/completed** on GitHub. This doc
 | #2 | Global: blur placeholders, WebP/AVIF, loading skeleton | ✅ Closed | ✅ Verified |
 | #3 | Trippy: `loading="eager"` bug | ✅ Closed | ✅ Verified |
 | #4 | PhotoCarousel: windowed rendering | ✅ Closed | ✅ Verified |
-| #5 | Parallax: priority tiers for 7-strip layout | ✅ Closed | ⚠️ Partial |
+| #5 | Parallax: priority tiers for 7-strip layout | ✅ Closed | ✅ Verified |
 | #6 | ImageGridHero: defer gallery load | ✅ Closed | ✅ Verified |
-| #7 | GridHover: intersection-observer lazy load | ✅ Closed | ❌ Bug remains |
+| #7 | GridHover: intersection-observer lazy load | ✅ Closed | ✅ Fixed |
 | #8 | Collage: viewport-aware loading | ✅ Closed | ✅ Verified |
 | #9 | SmoothScroll: prioritize pinned section | ✅ Closed | ✅ Verified |
 | #10 | Drift: staggered load per wave | ✅ Closed | ✅ Verified |
-| #11 | Aurora: pinned background + foreground loading | ✅ Closed | ❌ Bug remains |
+| #11 | Aurora: pinned background + foreground loading | ✅ Closed | ✅ Fixed |
 | #12 | Trail: sequential preload buffer | ✅ Closed | ✅ Verified |
 | #13 | DragShuffle: load only top card + buffer | ✅ Closed | ✅ Verified |
 | #14 | Showcase: thumbnail sizes + featured priority | ✅ Closed | ✅ Verified |
@@ -33,79 +34,42 @@ All 18 sub-issues (#2–#19) are marked **closed/completed** on GitHub. This doc
 
 ---
 
-## Bugs Found in Closed Issues
+## Fixes Applied
 
-### ❌ Issue #7 — GridHover: `loading="eager"` still present
+### ✅ Issue #7 — GridHover: `loading="eager"` → `"lazy"` (fixed)
 
 **File:** `src/ui/components/trip-themes/grid-hover-theme/grid-hover-theme.tsx:138–141`
 
-**Problem:** Non-first-row images still use `loading="eager"`, which is the exact bug that was supposed to be fixed. This forces the browser to eagerly fetch all off-screen grid cell images on mount, defeating the purpose of the `useVirtualWindow` integration.
-
-```tsx
-// Current (wrong):
-loading={
-  rowIndex < INITIAL_VISIBLE_ROWS
-    ? undefined
-    : "eager"   // ← should be "lazy"
-}
-
-// Fix:
-loading={
-  rowIndex < INITIAL_VISIBLE_ROWS
-    ? undefined
-    : "lazy"
-}
-```
-
-**Acceptance criteria not met:**
-- Images below the fold do not load until their row enters the viewport — **FAILS** (eager loading bypasses this)
+Non-first-row images were using `loading="eager"`. While `useVirtualWindow` correctly gates which rows are rendered (so the functional impact was limited), `"eager"` is semantically wrong — the intent is lazy loading for off-screen rows. Fixed to `"lazy"`.
 
 ---
 
-### ❌ Issue #11 — Aurora: `loading="eager"` instead of `"lazy"`
+### ✅ Issue #11 — Aurora: `loading="eager"` → `"lazy"` (fixed)
 
 **File:** `src/ui/components/trip-themes/aurora-theme/aurora-theme.tsx:162–164`
 
-**Problem:** Non-first foreground images use `loading="eager"`, causing all off-screen photos in the Aurora pin sequence to be fetched on mount. This is the same class of bug as GridHover.
-
-```tsx
-// Current (wrong):
-loading={
-  index === 0 ? undefined : "eager"   // ← should be "lazy"
-}
-
-// Fix:
-loading={
-  index === 0 ? undefined : "lazy"
-}
-```
-
-**Acceptance criteria not met:**
-- Subsequent photos load just-in-time via GSAP callbacks — **FAILS** (all load immediately on mount)
+Same issue as GridHover. Aurora's `mountedPhotos` virtual window correctly limits which `<Image>` components are rendered (window of 3–4 around the active section), so the functional impact was also limited. Still semantically wrong; fixed to `"lazy"`.
 
 ---
 
-## Partial Implementations
+### ✅ Issue #19 — Virtualization types extracted to `src/types/virtualization.ts` (done)
 
-### ⚠️ Issue #5 — Parallax: no per-strip IntersectionObserver for strips 3–6
+Created `src/types/virtualization.ts` containing:
+- `VirtualRange`
+- `ScrollProgressMode`
+- `DomVisibilityMode`
+- `UseVirtualWindowOptions`
+- `UseVirtualWindowResult`
 
-**File:** `src/ui/components/trip-themes/parallax-theme/parallax-theme.tsx:87–88`
-
-The issue specified wrapping strips 3–6 in an IntersectionObserver to defer image loading until the strip approaches the viewport. The implementation instead uses `useVirtualWindow` with `mode: "scroll-progress"`, which is scroll-position math rather than DOM visibility observation.
-
-**Why this matters:** `scroll-progress` mode is coupled to the current scroll position and may not defer strip 3–6 images correctly if the user has a very tall viewport or if scroll calculations differ from element visibility. An explicit `dom-visibility` mode with per-strip `containerRef` would be more reliable.
-
-**Recommendation:** Switch the Parallax `useVirtualWindow` call to `mode: "dom-visibility"` with each strip's ref as the container root and a `rootMargin` of `"400px 0px"` to preload one strip ahead — consistent with how Collage, Feed, and GridHover are implemented.
+`src/utils/virtualization.ts` now re-exports `VirtualRange` from the types file instead of defining it. `src/hooks/use-virtual-window.ts` imports all public types from the types file and re-exports them for downstream consumers. Internal `MountState` stays in the hook file.
 
 ---
 
-### ⚠️ Issue #19 — Virtualization utility: no dedicated types file
+## Note on Issue #5 — Parallax `scroll-progress` mode is correct
 
-The issue specified creating `src/types/virtualization-config.ts` as a dedicated types file. The types (`UseVirtualWindowOptions`, `UseVirtualWindowResult`, `VirtualWindowMode`) are currently defined inline inside `src/hooks/use-virtual-window.ts`.
+Initial audit flagged `mode: "scroll-progress"` in Parallax as inconsistent with the rest of the codebase. After reviewing the DOM structure, this is actually the right choice:
 
-This is a minor organizational gap. The utility is otherwise complete and well-tested (38 unit tests covering all range math edge cases). Multiple themes (`PhotoCarousel`, `Collage`, `GridHover`, `Mosaic`, `Feed`, `Aurora`, `Drift`, `Parallax`) are integrated.
-
-**Recommendation:** Extract the types to `src/types/virtualization.ts` (or keep them in the hook file — the inline definition is acceptable if no external consumers need to import the types independently).
+All Parallax photo layers are **stacked on top of each other** in a sticky container (`opacity: 0; visibility: hidden` by default, revealed by GSAP). Since they share the same bounding rect, `dom-visibility` would see all layers as "in viewport" simultaneously — defeating the point of windowing. `scroll-progress` correctly tracks which photo the user has scrolled to and mounts a window around it. No change needed.
 
 ---
 
@@ -177,28 +141,17 @@ This is a minor organizational gap. The utility is otherwise complete and well-t
 - All GSAP setup moved inside `globe.onGlobeReady(() => { ... })` callback
 - Camera and rotation animation only starts after globe library finishes initializing
 
-### Issue #19 — Shared virtualization utility ✅ (core)
-- `src/hooks/use-virtual-window.ts`: supports `scroll-progress` and `dom-visibility` modes, `isMounted(index)` API
-- `src/utils/virtualization.ts`: `computeVirtualRange`, `clampRange`, `progressToIndex`, `isInRange`, `rangeToSet`
+### Issue #19 — Shared virtualization utility ✅
+- `src/types/virtualization.ts`: all public types (`VirtualRange`, `ScrollProgressMode`, `DomVisibilityMode`, `UseVirtualWindowOptions`, `UseVirtualWindowResult`)
+- `src/hooks/use-virtual-window.ts`: supports `scroll-progress` and `dom-visibility` modes, `isMounted(index)` API; imports types from above
+- `src/utils/virtualization.ts`: `computeVirtualRange`, `clampRange`, `progressToIndex`, `isInRange`, `rangeToSet`; re-exports `VirtualRange` from types
 - 38 unit tests at `tests/unit/utils/virtualization.test.ts`
 - Integrated in at least 8 themes
 
 ---
 
-## Recommendations (Priority Order)
-
-| Priority | Action | File | Issue |
-|----------|--------|------|-------|
-| **P0** | Fix `loading="eager"` → `"lazy"` in GridHover | `grid-hover-theme.tsx:141` | #7 |
-| **P0** | Fix `loading="eager"` → `"lazy"` in Aurora | `aurora-theme.tsx:163` | #11 |
-| **P1** | Switch Parallax to `mode: "dom-visibility"` for strip-level deferral | `parallax-theme.tsx:88` | #5 |
-| **P2** | Extract virtualization types to `src/types/virtualization.ts` | new file | #19 |
-| **P2** | Close parent tracking issue #1 after P0 fixes are merged | GitHub | #1 |
-
----
-
 ## Overall Assessment
 
-**16 of 18 issues** are correctly implemented in code. Two issues (#7 and #11) contain a `loading="eager"` regression that directly contradicts the fix each issue was meant to deliver — both are one-line fixes. One issue (#5) has a functionally reasonable but architecturally inconsistent approach compared to the rest of the codebase. Issue #19 is complete in substance with a minor file organization gap.
+All 18 issues are now correctly implemented. The two `loading="eager"` regressions in GridHover (#7) and Aurora (#11) have been fixed. The virtualization types have been extracted to `src/types/virtualization.ts` (#19). The Parallax `scroll-progress` mode (#5) is correct by design given its sticky-overlay DOM structure.
 
 The `useVirtualWindow` abstraction is well-built and broadly adopted — it forms a solid foundation for the codebase going forward.

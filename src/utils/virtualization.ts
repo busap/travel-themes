@@ -1,7 +1,5 @@
-export interface VirtualRange {
-	start: number;
-	end: number;
-}
+export type { VirtualRange } from "@/types/virtualization";
+import type { VirtualRange } from "@/types/virtualization";
 
 /** Clamp a range so start >= 0 and end <= count - 1. */
 export function clampRange(range: VirtualRange, count: number): VirtualRange {
