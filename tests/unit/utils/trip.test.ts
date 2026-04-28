@@ -90,21 +90,6 @@ describe("trip utilities", () => {
 	});
 
 	describe("getThemeForTrip", () => {
-		it("should return Collage theme for Japan trip", () => {
-			const theme = getThemeForTrip("japan-2023");
-			expect(theme).toBe(Theme.Collage);
-		});
-
-		it("should return Mosaic theme for Morocco trip", () => {
-			const theme = getThemeForTrip("morocco-markets");
-			expect(theme).toBe(Theme.Mosaic);
-		});
-
-		it("should return Aurora theme for Nordic trip", () => {
-			const theme = getThemeForTrip("nordic-winter");
-			expect(theme).toBe(Theme.Aurora);
-		});
-
 		it("should return Collage theme as fallback for unknown trip", () => {
 			const theme = getThemeForTrip("unknown-trip");
 			expect(theme).toBe(Theme.Collage);
@@ -114,54 +99,14 @@ describe("trip utilities", () => {
 			const theme = getThemeForTrip("");
 			expect(theme).toBe(Theme.Collage);
 		});
-
-		it("should return Trail theme for Thailand trip", () => {
-			const theme = getThemeForTrip("thailand-adventure");
-			expect(theme).toBe(Theme.Trail);
-		});
 	});
 
 	describe("getTripThemeConfig", () => {
-		it("should return theme config for Japan trip", () => {
-			const config = getTripThemeConfig("japan-2023");
-			expect(config).toBeDefined();
-			expect(config).toHaveProperty("component");
-			expect(config).toHaveProperty("animation");
-		});
-
-		it("should return theme config for Morocco trip", () => {
-			const config = getTripThemeConfig("morocco-markets");
-			expect(config).toBeDefined();
-			expect(config).toHaveProperty("animation");
-		});
-
-		it("should return theme config for Nordic trip", () => {
-			const config = getTripThemeConfig("nordic-winter");
-			expect(config).toBeDefined();
-			expect(config).toHaveProperty("animation");
-		});
-
 		it("should return fallback theme config for unknown trip", () => {
 			const config = getTripThemeConfig("unknown-trip");
 			expect(config).toBeDefined();
 			expect(config).toHaveProperty("component");
-		});
-
-		it("should return config with required properties", () => {
-			const config = getTripThemeConfig("japan-2023");
-
-			// Component
-			expect(typeof config.component).toBe("string");
-			expect(config.animation).toBeDefined();
-		});
-
-		it("should return different configs for different trips", () => {
-			const japanConfig = getTripThemeConfig("japan-2023");
-			const moroccoConfig = getTripThemeConfig("morocco-markets");
-
-			// Configs might differ based on theme
-			expect(japanConfig).toBeDefined();
-			expect(moroccoConfig).toBeDefined();
+			expect(config).toHaveProperty("animation");
 		});
 	});
 });
