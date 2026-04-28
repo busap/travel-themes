@@ -2,33 +2,37 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 config(); // fallback to .env
 
-import { createClient } from "@supabase/supabase-js";
+import { v2 as cloudinary } from "cloudinary";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { tripsData } from "./trips-data";
 
-const supabase = createClient(
-	process.env.NEXT_PUBLIC_SUPABASE_URL!,
-	process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-);
+cloudinary.config({
+	cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const prisma = new PrismaClient({
 	adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
-const BUCKET = "trip-photos";
+const FOLDER = "trip-photos";
 
 function publicUrl(path: string): string {
-	return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/${FOLDER}/${path}`;
 }
 
 async function listFiles(path: string): Promise<string[]> {
-	const { data, error } = await supabase.storage
-		.from(BUCKET)
-		.list(path, { limit: 1000 });
-	if (error)
-		throw new Error(`Storage list error at "${path}": ${error.message}`);
-	return (data ?? []).map((f) => f.name).filter((n) => !n.startsWith("."));
+	const prefix = `${FOLDER}/${path}/`;
+	const result = await cloudinary.api.resources({
+		type: "upload",
+		prefix,
+		max_results: 500,
+	});
+	return (result.resources as { public_id: string }[])
+		.map((r) => r.public_id.slice(prefix.length))
+		.filter(Boolean);
 }
 
 async function seed() {

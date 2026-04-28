@@ -138,6 +138,14 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - Knock-on cleanups: Mosaic's `isInInitialViewport` ref-during-render replaced with a fixed-index priority heuristic; Aurora's set-merge `useEffect` replaced with a `useMemo` window.
 - Trippy specifically: `additive: true` to avoid backward-scroll decode flicker, plus `onLeave`/`onLeaveBack` callbacks on each per-photo `ScrollTrigger` that snap the scrub tween to its terminal state on exit (otherwise fast reverse scroll lets several photos hang mid-fade for `scrub` seconds while flying past).
 
+### Iteration 14
+
+- Migrated image storage from Supabase to Cloudinary.
+- `next.config.ts`: replaced `*.supabase.co` remote pattern with `res.cloudinary.com`.
+- `prisma/seed.ts`: replaced Supabase storage client with Cloudinary Admin API for listing resources; `publicUrl()` now builds `f_auto,q_auto` Cloudinary CDN URLs — no pre-compression needed.
+- `.env.example`: replaced Supabase storage vars with `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+- Removed unused `src/lib/supabase.ts` singleton (Cloudinary has no equivalent client-side singleton needed).
+
 ## TODO
 
 ### Add unit tests for src/db/ once Prisma client is generated
@@ -187,20 +195,3 @@ and seeded, add a spec file for each theme that covers its specific UI:
 | GridHover     | hover-reactive grid renders                                             |
 | Parallax      | parallax strips render                                                  |
 
-### Switch storage from Supabase to Cloudinary (~20 trips / 1 GB limit)
-
-1. Create a Cloudinary account and get your cloud name
-2. Add env var: `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
-3. Update `next.config.ts` — replace Supabase remote pattern with Cloudinary:
-    ```ts
-    { protocol: "https", hostname: "res.cloudinary.com" }
-    ```
-4. Update `publicUrl()` in `prisma/seed.ts` to build Cloudinary URLs:
-    ```ts
-    function publicUrl(path: string) {
-    	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/trip-photos/${path}`;
-    }
-    ```
-5. Upload all images to Cloudinary (same folder structure: `trip-photos/[id]/cover/`, `trip-photos/[id]/photos/`)
-6. Re-run `npm run db:seed` to update all URLs in the DB
-7. Pre-compressing images before upload is no longer needed — `f_auto,q_auto` in the URL handles it
