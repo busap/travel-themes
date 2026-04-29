@@ -16,7 +16,8 @@ export const tripsData = [
 		name: "Amsterdam, Rotterdam & the South",
 		countries: [Country.NL],
 		year: 2021,
-		description: "Amsterdam, Rotterdam - canals, bikes, and golden hour at the Museumplein",
+		description:
+			"Amsterdam, Rotterdam - canals, bikes, and golden hour at the Museumplein",
 		theme: Theme.PhotoCarousel,
 	},
 	{
@@ -109,7 +110,8 @@ export const tripsData = [
 		name: "Tenerife - around the whole island",
 		countries: [Country.ES],
 		year: 2024,
-		description: "From El Médano and Las Américas in the south, up the west coast to Los Gigantes' cliffs and Masca's nature, north to Garachico, Puerto de la Cruz with Loro Parque, and finally Santa Cruz",
+		description:
+			"From El Médano and Las Américas in the south, up the west coast to Los Gigantes' cliffs and Masca's nature, north to Garachico, Puerto de la Cruz with Loro Parque, and finally Santa Cruz",
 		theme: Theme.Feed,
 	},
 	{
