@@ -160,7 +160,7 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 										sizes="(max-width: 768px) 90vw, 900px"
 										priority={index === 0}
 										loading={
-											index === 0 ? undefined : "eager"
+											index === 0 ? undefined : "lazy"
 										}
 									/>
 								) : (
