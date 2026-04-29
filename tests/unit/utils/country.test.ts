@@ -1,8 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { getCountryName, getCountryNames } from "@/utils/country";
 import { Country } from "@/enums/country";
 
 describe("getCountryName", () => {
+	it("falls back to the raw code when DisplayNames returns undefined", async () => {
+		vi.spyOn(globalThis.Intl, "DisplayNames").mockImplementation(
+			function () {
+				return { of: () => undefined, resolvedOptions: () => ({}) };
+			} as never
+		);
+		vi.resetModules();
+		const { getCountryName: fn } = await import("@/utils/country");
+		expect(fn(Country.US)).toBe(Country.US);
+		vi.restoreAllMocks();
+	});
+
 	it("should return a human-readable name for a country code", () => {
 		expect(getCountryName(Country.DE)).toBe("Germany");
 		expect(getCountryName(Country.TH)).toBe("Thailand");
