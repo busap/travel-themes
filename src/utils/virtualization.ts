@@ -1,5 +1,6 @@
-export type { VirtualRange } from "@/types/virtualization";
 import type { VirtualRange } from "@/types/virtualization";
+
+export type { VirtualRange };
 
 /** Clamp a range so start >= 0 and end <= count - 1. */
 export function clampRange(range: VirtualRange, count: number): VirtualRange {
