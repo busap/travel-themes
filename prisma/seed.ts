@@ -47,9 +47,8 @@ async function seed() {
 	for (const config of tripsData) {
 		const coverFiles = await listFiles(`${config.id}/cover`);
 		if (!coverFiles.length) {
-			console.warn(
-				`⚠️  No cover image found for "${config.id}", skipping`
-			);
+			await prisma.trip.deleteMany({ where: { id: config.id } });
+			console.log(`⏭️  "${config.id}" not on Cloudinary yet — removed from DB`);
 			continue;
 		}
 		const coverPhoto = publicUrl(`${config.id}/cover/${coverFiles[0]}`);
