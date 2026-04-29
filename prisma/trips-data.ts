@@ -9,14 +9,14 @@ export const tripsData = [
 		year: 2021,
 		description:
 			"Cologne's cathedral and quiet roads through the countryside",
-		theme: Theme.GridHover,
+		theme: Theme.DragShuffle,
 	},
 	{
 		id: "2021-netherlands",
-		name: "Amsterdam Getaway",
+		name: "Amsterdam, Rotterdam & the South",
 		countries: [Country.NL],
 		year: 2021,
-		description: "Canals, bikes, and golden hour at the Museumplein",
+		description: "Amsterdam, Rotterdam - canals, bikes, and golden hour at the Museumplein",
 		theme: Theme.PhotoCarousel,
 	},
 	{
@@ -50,7 +50,7 @@ export const tripsData = [
 		year: 2022,
 		description:
 			"Pints of Guinness, Westeros filming locations, and cliffs at the edge of the world",
-		theme: Theme.Parallax,
+		theme: Theme.Feed,
 	},
 	{
 		id: "2023-jordan",
@@ -59,7 +59,7 @@ export const tripsData = [
 		year: 2023,
 		description:
 			"Ancient ruins, Bedouin fires, and the silence of Wadi Rum",
-		theme: Theme.Trail,
+		theme: Theme.ImageGridHero,
 	},
 	{
 		id: "2023-israel",
@@ -67,7 +67,7 @@ export const tripsData = [
 		countries: [Country.IL],
 		year: 2023,
 		description: "Holy cities, hummus, and Mediterranean sunsets",
-		theme: Theme.ImageGridHero,
+		theme: Theme.GridHover,
 	},
 	{
 		id: "2023-rome",
@@ -103,5 +103,103 @@ export const tripsData = [
 		description:
 			"Bangkok chaos, lots of curry, many temples, weeks on the islands and a sawasdee ka at every turn",
 		theme: Theme.Collage,
+	},
+	{
+		id: "2024-tenerife",
+		name: "Tenerife - around the whole island",
+		countries: [Country.ES],
+		year: 2024,
+		description: "From El Médano and Las Américas in the south, up the west coast to Los Gigantes' cliffs and Masca's nature, north to Garachico, Puerto de la Cruz with Loro Parque, and finally Santa Cruz",
+		theme: Theme.Feed,
+	},
+	{
+		id: "2024-budapest",
+		name: "Budapest in the Sun",
+		countries: [Country.HU],
+		year: 2024,
+		description:
+			"Fishermen's Bastion lookouts, Heroes' Square in the heat, and sticker-soaked walls at Szimpla Kert",
+		theme: Theme.Trail,
+	},
+	{
+		id: "2024-sicily",
+		name: "Sicilian Coast & Etna",
+		countries: [Country.IT],
+		year: 2024,
+		description:
+			"Cliffside villages above turquoise water, baroque facades, and the black sand of Mount Etna",
+		theme: Theme.Showcase,
+	},
+	{
+		id: "2024-albania",
+		name: "Albanian Riviera",
+		countries: [Country.AL],
+		year: 2024,
+		description:
+			"Mountain villa above Tirana, Berat hillsides at golden hour, Dajti by horseback, wine tasting, and Durrës Beach",
+		theme: Theme.Collage,
+	},
+	{
+		id: "2024-barcelona",
+		name: "Barcelona Encore",
+		countries: [Country.ES],
+		year: 2024,
+		description:
+			"Back to Sagrada Família, Magic Fountain after dark, lazy brunches and Catalan wine",
+		theme: Theme.Parallax,
+	},
+	{
+		id: "2024-london",
+		name: "London at Christmas",
+		countries: [Country.GB],
+		year: 2024,
+		description:
+			"Crossing from Buckingham to Hyde Park, Westminster, Piccadilly, Soho after dark, butterbeer at the wizarding shops, and Trafalgar's tree under Christmas lights",
+		theme: Theme.Mosaic,
+	},
+	{
+		id: "2024-ireland",
+		name: "A Dublin Christmas",
+		countries: [Country.IE],
+		year: 2024,
+		description:
+			"Temple Bar wrapped in fairy lights, pints poured at the Guinness Storehouse, and the wind on Howth Cliffs over the Irish Sea",
+		theme: Theme.Drift,
+	},
+	{
+		id: "2024-2025-budapest-balaton",
+		name: "Budapest New Year's Eve & New Year on Balaton",
+		countries: [Country.HU],
+		year: 2024,
+		description:
+			"From goulash and pálinka in Budapest to New Year's fireworks over the Danube, and on to quiet days at Lake Balaton",
+		theme: Theme.Trippy,
+	},
+	{
+		id: "2025-budapest",
+		name: "Back to Budapest",
+		countries: [Country.HU],
+		year: 2025,
+		description:
+			"A party at Széchenyi Thermal Baths, a Danube cruise at sunset, and Heroes' Square in summer light",
+		theme: Theme.ImageGridHero,
+	},
+	{
+		id: "2025-greece-athens",
+		name: "Temples of Athens",
+		countries: [Country.GR],
+		year: 2025,
+		description:
+			"Climbing the Acropolis, layers of stone, ancient temples, and toppled ruins",
+		theme: Theme.SmoothScroll,
+	},
+	{
+		id: "2025-greece-rhodes",
+		name: "Across Rhodes",
+		countries: [Country.GR],
+		year: 2025,
+		description:
+			"Knights' walls in the Old Town, Lindos rising white above the cove, and viewpoints all the way around",
+		theme: Theme.Trail,
 	},
 ];
