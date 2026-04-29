@@ -34,7 +34,9 @@ describe("Parallax theme", () => {
 		});
 
 		it("getTripThemeConfig returns the parallax-theme component", () => {
-			expect(getTripThemeConfig(TRIP_ID).component).toBe("parallax-theme");
+			expect(getTripThemeConfig(TRIP_ID).component).toBe(
+				"parallax-theme"
+			);
 		});
 
 		it("getTripThemeConfig returns a valid animation object", () => {

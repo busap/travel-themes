@@ -14,7 +14,9 @@ describe("DragShuffle theme", () => {
 		});
 
 		it("has no scroll trigger (interaction-driven, not scroll-driven)", () => {
-			const { scrollTrigger } = getThemeConfig(Theme.DragShuffle).animation;
+			const { scrollTrigger } = getThemeConfig(
+				Theme.DragShuffle
+			).animation;
 			expect(scrollTrigger).toBeUndefined();
 		});
 

@@ -14,15 +14,17 @@ describe("ImageGridHero theme", () => {
 		});
 
 		it("uses a pinned scroll trigger for the hero animation", () => {
-			const { scrollTrigger } =
-				getThemeConfig(Theme.ImageGridHero).animation;
+			const { scrollTrigger } = getThemeConfig(
+				Theme.ImageGridHero
+			).animation;
 			expect(scrollTrigger?.pin).toBe(true);
 			expect(scrollTrigger?.scrub).toBe(1.2);
 		});
 
 		it("has an extended scroll distance for the reveal", () => {
-			const { scrollTrigger } =
-				getThemeConfig(Theme.ImageGridHero).animation;
+			const { scrollTrigger } = getThemeConfig(
+				Theme.ImageGridHero
+			).animation;
 			expect(scrollTrigger?.start).toBe("top top");
 			expect(scrollTrigger?.end).toBe("+=180%");
 		});

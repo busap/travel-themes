@@ -14,8 +14,9 @@ describe("PhotoCarousel theme", () => {
 		});
 
 		it("has no scroll trigger (swipe/click driven)", () => {
-			const { scrollTrigger } =
-				getThemeConfig(Theme.PhotoCarousel).animation;
+			const { scrollTrigger } = getThemeConfig(
+				Theme.PhotoCarousel
+			).animation;
 			expect(scrollTrigger).toBeUndefined();
 		});
 

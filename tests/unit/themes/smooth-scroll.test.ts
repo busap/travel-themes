@@ -14,12 +14,16 @@ describe("SmoothScroll theme", () => {
 		});
 
 		it("has a high scrub value for slow parallax feel", () => {
-			const { scrollTrigger } = getThemeConfig(Theme.SmoothScroll).animation;
+			const { scrollTrigger } = getThemeConfig(
+				Theme.SmoothScroll
+			).animation;
 			expect(scrollTrigger?.scrub).toBe(5);
 		});
 
 		it("covers the full viewport height", () => {
-			const { scrollTrigger } = getThemeConfig(Theme.SmoothScroll).animation;
+			const { scrollTrigger } = getThemeConfig(
+				Theme.SmoothScroll
+			).animation;
 			expect(scrollTrigger?.start).toBe("top top");
 			expect(scrollTrigger?.end).toBe("bottom top");
 		});

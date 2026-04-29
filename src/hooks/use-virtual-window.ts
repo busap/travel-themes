@@ -15,11 +15,7 @@ import type {
 	DomVisibilityMode,
 } from "@/types/virtualization";
 
-export type {
-	VirtualRange,
-	UseVirtualWindowOptions,
-	UseVirtualWindowResult,
-};
+export type { VirtualRange, UseVirtualWindowOptions, UseVirtualWindowResult };
 
 const DEFAULT_BEFORE = 2;
 const DEFAULT_AFTER = 3;

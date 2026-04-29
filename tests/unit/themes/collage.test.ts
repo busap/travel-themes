@@ -8,7 +8,9 @@ const TRIP_ID = "japan-2023";
 describe("Collage theme", () => {
 	describe("config", () => {
 		it("has the correct component name", () => {
-			expect(getThemeConfig(Theme.Collage).component).toBe("collage-theme");
+			expect(getThemeConfig(Theme.Collage).component).toBe(
+				"collage-theme"
+			);
 		});
 
 		it("has an empty animation config (no scroll trigger or timeline)", () => {

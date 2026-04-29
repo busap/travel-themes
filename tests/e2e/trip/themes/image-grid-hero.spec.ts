@@ -22,7 +22,9 @@ test.describe("ImageGridHero Theme", () => {
 		).toBeVisible();
 	});
 
-	test("renders gallery items when photos are available", async ({ page }) => {
+	test("renders gallery items when photos are available", async ({
+		page,
+	}) => {
 		const response = await page.goto(getTripRoute(TRIP_ID));
 		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
 

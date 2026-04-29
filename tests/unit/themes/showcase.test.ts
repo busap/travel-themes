@@ -31,7 +31,9 @@ describe("Showcase theme", () => {
 		});
 
 		it("getTripThemeConfig returns the showcase-theme component", () => {
-			expect(getTripThemeConfig(TRIP_ID).component).toBe("showcase-theme");
+			expect(getTripThemeConfig(TRIP_ID).component).toBe(
+				"showcase-theme"
+			);
 		});
 
 		it("getTripThemeConfig returns a valid animation object", () => {

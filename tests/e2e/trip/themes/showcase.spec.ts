@@ -22,13 +22,17 @@ test.describe("Showcase Theme", () => {
 		).toBeVisible();
 	});
 
-	test("renders photo counter when photos are available", async ({ page }) => {
+	test("renders photo counter when photos are available", async ({
+		page,
+	}) => {
 		const response = await page.goto(getTripRoute(TRIP_ID));
 		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
 
 		// Counter text is either "1 / N" or the empty state message
 		await expect(
-			page.getByText(/\d+ \/ \d+/).or(page.getByText("No photos available"))
+			page
+				.getByText(/\d+ \/ \d+/)
+				.or(page.getByText("No photos available"))
 		).toBeVisible();
 	});
 });
