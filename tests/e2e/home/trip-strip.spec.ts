@@ -3,10 +3,7 @@ import { getHomeRoute } from "@/utils/route";
 
 async function openTripStrip(page: Page) {
 	await page.getByRole("button", { name: "Open all trips" }).click();
-	// Wait for the strip to fully open (close button becomes visible when open)
-	await expect(
-		page.getByRole("button", { name: "Close trips panel" })
-	).toBeVisible();
+	await page.locator('[data-phase="open"]').waitFor({ state: "attached" });
 }
 
 test.describe("Trip Strip", () => {
@@ -53,7 +50,10 @@ test.describe("Trip Strip", () => {
 		const count = await tripLinks.count();
 		test.skip(count === 0, "No trips seeded in DB yet");
 
+		// Hover first to trigger router.prefetch so dev-mode compilation starts
+		// before the click, preventing a cold-route timeout.
+		await tripLinks.first().hover();
 		await tripLinks.first().click();
-		await expect(page).toHaveURL(/\/trip\/.+/);
+		await expect(page).toHaveURL(/\/trip\/.+/, { timeout: 30000 });
 	});
 });

@@ -150,7 +150,7 @@ export function TripStrip({
 	};
 
 	return (
-		<div className={styles.container}>
+		<div className={styles.container} data-phase={phase}>
 			{renderOpener()}
 			{renderStrip()}
 		</div>
