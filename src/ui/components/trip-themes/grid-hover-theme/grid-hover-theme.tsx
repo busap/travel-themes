@@ -138,7 +138,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 											loading={
 												rowIndex < INITIAL_VISIBLE_ROWS
 													? undefined
-													: "eager"
+													: "lazy"
 											}
 											onLoad={() =>
 												setLoadedImages(
