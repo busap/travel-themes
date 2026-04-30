@@ -19,8 +19,8 @@ const prisma = new PrismaClient({
 
 const FOLDER = "trip-photos";
 
-function publicUrl(path: string): string {
-	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/${FOLDER}/${path}`;
+function publicUrl(publicId: string): string {
+	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/${publicId}`;
 }
 
 async function listFiles(path: string): Promise<string[]> {
@@ -56,7 +56,7 @@ async function seed() {
 			console.log(`⏭️  "${config.id}" not on Cloudinary yet — removed from DB`);
 			continue;
 		}
-		const coverPhoto = publicUrl(`${config.id}/cover/${coverFiles[0]}`);
+		const coverPhoto = publicUrl(coverFiles[0]);
 		const photoFiles = await listFiles(`${config.id}/photos`);
 
 		await prisma.trip.upsert({
@@ -82,7 +82,7 @@ async function seed() {
 		await prisma.photo.createMany({
 			data: photoFiles.map((file, index) => ({
 				tripId: config.id,
-				src: publicUrl(`${config.id}/photos/${file}`),
+				src: publicUrl(file),
 				order: index,
 			})),
 		});
