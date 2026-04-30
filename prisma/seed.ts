@@ -24,13 +24,20 @@ function publicUrl(path: string): string {
 }
 
 async function listFiles(path: string): Promise<string[]> {
-	const result = await cloudinary.api.resources_by_asset_folder(
-		`${FOLDER}/${path}`,
-		{ max_results: 500 }
-	);
-	return (result.resources as { public_id: string }[])
-		.map((r) => r.public_id)
-		.filter(Boolean);
+	try {
+		const result = await cloudinary.api.resources_by_asset_folder(
+			`${FOLDER}/${path}`,
+			{ max_results: 500 }
+		);
+		return (result.resources as { public_id: string }[])
+			.map((r) => r.public_id)
+			.filter(Boolean);
+	} catch (e: unknown) {
+		if ((e as { error?: { http_code?: number } })?.error?.http_code === 404) {
+			return [];
+		}
+		throw e;
+	}
 }
 
 async function seed() {
