@@ -33,7 +33,9 @@ async function listFiles(path: string): Promise<string[]> {
 			.map((r) => r.public_id)
 			.filter(Boolean);
 	} catch (e: unknown) {
-		if ((e as { error?: { http_code?: number } })?.error?.http_code === 404) {
+		if (
+			(e as { error?: { http_code?: number } })?.error?.http_code === 404
+		) {
 			return [];
 		}
 		throw e;
@@ -53,7 +55,9 @@ async function seed() {
 		const coverFiles = await listFiles(`${config.id}/cover`);
 		if (!coverFiles.length) {
 			await prisma.trip.deleteMany({ where: { id: config.id } });
-			console.log(`⏭️  "${config.id}" not on Cloudinary yet — removed from DB`);
+			console.log(
+				`⏭️  "${config.id}" not on Cloudinary yet — removed from DB`
+			);
 			continue;
 		}
 		const coverPhoto = publicUrl(coverFiles[0]);

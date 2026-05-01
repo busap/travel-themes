@@ -194,4 +194,3 @@ and seeded, add a spec file for each theme that covers its specific UI:
 | ImageGridHero | pinned grid assembly renders                                            |
 | GridHover     | hover-reactive grid renders                                             |
 | Parallax      | parallax strips render                                                  |
-
