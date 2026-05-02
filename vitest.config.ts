@@ -9,17 +9,14 @@ export default defineConfig({
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "json", "html"],
-			// Only measure the pure-logic layer — the parts unit tests
-			// are responsible for. React components, hooks, the DB layer,
-			// and infrastructure setup are covered by E2E / Storybook and
-			// cannot be run in the node environment without jsdom setup.
+			// Measure the pure-logic layer and DB query layer. React
+			// components and hooks are covered by E2E / Storybook instead.
 			include: [
 				"src/utils/**/*.ts",
 				"src/config/**/*.ts",
 				"src/enums/**/*.ts",
 				"src/mocks/**/*.ts",
-				// src/db/** omitted — requires generated Prisma client;
-				// tested end-to-end once the DB is seeded
+				"src/db/**/*.ts",
 			],
 			exclude: [
 				"node_modules/",

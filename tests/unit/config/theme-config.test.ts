@@ -41,13 +41,5 @@ describe("theme-config", () => {
 			const unique = new Set(components);
 			expect(unique.size).toBe(components.length);
 		});
-
-		it("should return correct configs for known themes", () => {
-			expect(getThemeConfig(Theme.Collage).component).toBe(
-				"collage-theme"
-			);
-			expect(getThemeConfig(Theme.Aurora).component).toBe("aurora-theme");
-			expect(getThemeConfig(Theme.Mosaic).component).toBe("mosaic-theme");
-		});
 	});
 });

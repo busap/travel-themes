@@ -138,69 +138,11 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - Knock-on cleanups: Mosaic's `isInInitialViewport` ref-during-render replaced with a fixed-index priority heuristic; Aurora's set-merge `useEffect` replaced with a `useMemo` window.
 - Trippy specifically: `additive: true` to avoid backward-scroll decode flicker, plus `onLeave`/`onLeaveBack` callbacks on each per-photo `ScrollTrigger` that snap the scrub tween to its terminal state on exit (otherwise fast reverse scroll lets several photos hang mid-fade for `scrub` seconds while flying past).
 
-## TODO
+### Iteration 14
 
-### Add unit tests for src/db/ once Prisma client is generated
+- Migrated image storage from Supabase to Cloudinary.
+- `next.config.ts`: replaced `*.supabase.co` remote pattern with `res.cloudinary.com`.
+- `prisma/seed.ts`: replaced Supabase storage client with Cloudinary Admin API for listing resources; `publicUrl()` now builds `f_auto,q_auto` Cloudinary CDN URLs — no pre-compression needed.
+- `.env.example`: replaced Supabase storage vars with `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+- Removed unused `src/lib/supabase.ts` singleton (Cloudinary has no equivalent client-side singleton needed).
 
-`src/db/**` is excluded from the Vitest coverage scope because the
-generated client (`src/generated/prisma/`) does not exist yet. Once
-it is generated (`npm run db:generate`), re-include it in the coverage
-config and add `tests/unit/db/trips.test.ts` that mocks `@/lib/prisma`
-and covers:
-
-- `getTripById` — found / not found, country mapping, photo sort order, null→undefined coercion, invalid country throws
-- `getAllTrips` — empty result, multiple trips mapped correctly
-- `getThemeForTrip` — known theme, null falls back to `Theme.Collage`, unknown string falls back to `Theme.Collage`
-
-### Add globe tooltip e2e test once DB is seeded
-
-`tests/e2e/home/globe.spec.ts` defers the tooltip interaction test because:
-
-1. The globe auto-rotates, making country polygon positions non-deterministic
-2. Visited countries only exist once trips are seeded
-
-When ready: disable auto-rotation (`controls.autoRotate = false`) via a
-test-only hook or `page.evaluate`, then hover the known centroid of a seeded
-country and assert that `GlobeTooltipCard` renders the trip name and country
-name. Also test the mobile variant (portal-rendered `<Link>`) using a mobile
-viewport.
-
-### Add e2e theme tests as trips are seeded
-
-`tests/e2e/themes/` has one file per theme. Currently only `mosaic.spec.ts`
-exists (for `barcelona-2021`). As new trips are added to `prisma/trips-data.ts`
-and seeded, add a spec file for each theme that covers its specific UI:
-
-| Theme         | Test ideas                                                              |
-| ------------- | ----------------------------------------------------------------------- |
-| Collage       | back button (`aria-label="Go back"`), horizontal scroll, polaroid cards |
-| Aurora        | gradient background renders, scroll reveal triggers                     |
-| Drift         | editorial sections visible                                              |
-| Feed          | vertical card flow renders                                              |
-| Trail         | cursor trail canvas present                                             |
-| SmoothScroll  | smooth scroll container renders                                         |
-| DragShuffle   | draggable stack renders                                                 |
-| Showcase      | spotlight panel renders                                                 |
-| PhotoCarousel | carousel navigation (prev/next)                                         |
-| Trippy        | layered scroll elements present                                         |
-| ImageGridHero | pinned grid assembly renders                                            |
-| GridHover     | hover-reactive grid renders                                             |
-| Parallax      | parallax strips render                                                  |
-
-### Switch storage from Supabase to Cloudinary (~20 trips / 1 GB limit)
-
-1. Create a Cloudinary account and get your cloud name
-2. Add env var: `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
-3. Update `next.config.ts` — replace Supabase remote pattern with Cloudinary:
-    ```ts
-    { protocol: "https", hostname: "res.cloudinary.com" }
-    ```
-4. Update `publicUrl()` in `prisma/seed.ts` to build Cloudinary URLs:
-    ```ts
-    function publicUrl(path: string) {
-    	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/trip-photos/${path}`;
-    }
-    ```
-5. Upload all images to Cloudinary (same folder structure: `trip-photos/[id]/cover/`, `trip-photos/[id]/photos/`)
-6. Re-run `npm run db:seed` to update all URLs in the DB
-7. Pre-compressing images before upload is no longer needed — `f_auto,q_auto` in the URL handles it

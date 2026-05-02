@@ -1,67 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState, RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	clampProgress,
 	clampRange,
 	isInRange,
 	progressToIndex,
-	VirtualRange,
 } from "@/utils/virtualization";
+import type {
+	VirtualRange,
+	UseVirtualWindowOptions,
+	UseVirtualWindowResult,
+	ScrollProgressMode,
+	DomVisibilityMode,
+} from "@/types/virtualization";
 
-export type { VirtualRange };
-
-/**
- * Scroll-progress mode: derive focus index from global scroll position within a
- * fixed scroll height (e.g. a sticky-scroll sequence like the Parallax theme).
- */
-interface ScrollProgressMode {
-	mode: "scroll-progress";
-	count: number;
-	totalScrollHeight: number;
-	/** Element whose offsetTop anchors the scroll math. */
-	containerRef: RefObject<HTMLElement | null>;
-	before?: number;
-	after?: number;
-	/**
-	 * When true the mount window never shrinks — items are never unmounted
-	 * once they've entered it. Trades memory for flicker-free backward scroll.
-	 */
-	additive?: boolean;
-}
-
-/**
- * DOM-visibility mode: query [data-virtual-index] elements inside a scroll
- * container (or the window) to detect which items are currently in view, then
- * maintain a sliding mount window around them.
- */
-interface DomVisibilityMode {
-	mode: "dom-visibility";
-	count: number;
-	/** Scroll container. Omit to use window scroll. */
-	containerRef?: RefObject<HTMLElement | null>;
-	/** Data attribute that holds the item index. Default: "data-virtual-index". */
-	indexAttr?: string;
-	/**
-	 * Expand the detection area by this many pixels (mirrors IntersectionObserver
-	 * rootMargin). Useful for pre-mounting rows before they scroll into view.
-	 */
-	rootMarginPx?: number;
-	/**
-	 * When true the mount window never slides backward — items are never unmounted
-	 * once they've been revealed (monotonic / additive reveal).
-	 */
-	additive?: boolean;
-	before?: number;
-	after?: number;
-}
-
-export type UseVirtualWindowOptions = ScrollProgressMode | DomVisibilityMode;
-
-export interface UseVirtualWindowResult {
-	focusIndex: number;
-	isMounted: (index: number) => boolean;
-}
+export type { VirtualRange, UseVirtualWindowOptions, UseVirtualWindowResult };
 
 const DEFAULT_BEFORE = 2;
 const DEFAULT_AFTER = 3;

@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { getTripRoute } from "@/utils/route";
 
-const TRIP_ID = "morocco-markets";
+const TRIP_ID = "swiss-alps";
 
-test.describe("Mosaic Theme", () => {
+test.describe("DragShuffle Theme", () => {
 	test("renders the trip page", async ({ page }) => {
 		const response = await page.goto(getTripRoute(TRIP_ID));
 		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
@@ -11,13 +11,15 @@ test.describe("Mosaic Theme", () => {
 		await expect(page).not.toHaveURL(/error/);
 	});
 
-	test("renders photo grid or shows empty state", async ({ page }) => {
+	test("renders the draggable card stack or shows empty state", async ({
+		page,
+	}) => {
 		const response = await page.goto(getTripRoute(TRIP_ID));
 		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
 
 		await expect(
 			page
-				.locator("[data-photo-item]")
+				.locator("[data-stack-index]")
 				.first()
 				.or(page.getByText("No photos available"))
 		).toBeVisible();
@@ -28,7 +30,7 @@ test.describe("Mosaic Theme", () => {
 		test.skip(response?.status() === 404, "Trip not seeded in DB yet");
 
 		await expect(
-			page.getByRole("heading", { name: /morocco/i })
+			page.getByRole("heading", { name: /swiss/i })
 		).toBeVisible();
 	});
 });
