@@ -24,12 +24,4 @@ test.describe("Globe", () => {
 			timeout: GLOBE_TIMEOUT,
 		});
 	});
-
-	// TODO: add tooltip test once DB is seeded
-	// The tooltip (GlobeTooltipCard) appears when hovering a visited country
-	// polygon. It can't be tested reliably yet because:
-	//   1. The globe auto-rotates, so polygon positions are non-deterministic
-	//   2. Visited countries only exist once trips are seeded
-	// When ready: disable auto-rotation via controls.autoRotate = false in a
-	// test-only hook, then hover the known centroid of a seeded country.
 });
