@@ -42,6 +42,8 @@ test.describe("Trip Strip", () => {
 	});
 
 	test("trip card navigates to trip detail page", async ({ page }) => {
+		test.setTimeout(60_000);
+
 		await page.goto(getHomeRoute());
 
 		await openTripStrip(page);
@@ -53,7 +55,8 @@ test.describe("Trip Strip", () => {
 		// Hover first to trigger router.prefetch so dev-mode compilation starts
 		// before the click, preventing a cold-route timeout.
 		await tripLinks.first().hover();
+		await page.waitForTimeout(3000); // head-start for prefetch compilation
 		await tripLinks.first().click();
-		await expect(page).toHaveURL(/\/trip\/.+/, { timeout: 30000 });
+		await expect(page).toHaveURL(/\/trip\/.+/, { timeout: 50_000 });
 	});
 });
