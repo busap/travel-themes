@@ -32,7 +32,10 @@ const _materialTextureSrcCache = new Map<string, string>();
 let _texturesReady = false;
 let _topoDataCache: GeoFeature[] | null = null;
 let _globeCache: GlobeInstance | null = null;
-let _globeWrapperEl: HTMLElement | null = null;
+// A persistent div that globe.gl is always initialized with, so its internal
+// pointer-event listeners survive React replacing the outer container on
+// back-navigation. We re-parent it into whatever containerRef exists on mount.
+let _persistentContainer: HTMLDivElement | null = null;
 let _activeContainer: HTMLDivElement | null = null;
 
 const INTRO_CAMERA_ANIMATION_MS = 1500;
@@ -458,9 +461,11 @@ export function useGlobe({
 		if (!containerRef.current) return;
 
 		// REATTACH: Globe was previously initialized — reuse the cached instance.
-		if (_globeCache && _globeWrapperEl) {
+		if (_globeCache && _persistentContainer) {
 			const globe = _globeCache;
-			containerRef.current.appendChild(_globeWrapperEl);
+			// Re-parent the persistent container so globe.gl's event listeners
+			// (bound to _persistentContainer) are back in the live DOM.
+			containerRef.current.appendChild(_persistentContainer);
 			globe
 				.width(containerRef.current.clientWidth)
 				.height(containerRef.current.clientHeight);
@@ -502,15 +507,20 @@ export function useGlobe({
 
 			if (!containerRef.current) return;
 
-			globe = new Globe(containerRef.current, {
+			// Create the persistent container that globe.gl will own. Using a
+			// stable element means globe.gl's pointer-event listeners stay live
+			// even when React replaces the outer container div on remount.
+			_persistentContainer = document.createElement("div");
+			_persistentContainer.style.cssText =
+				"position:absolute;inset:0;width:100%;height:100%";
+			containerRef.current.appendChild(_persistentContainer);
+
+			globe = new Globe(_persistentContainer, {
 				rendererConfig: { antialias: true, alpha: true },
 			});
 
 			globeInstanceRef.current = globe;
 			_activeContainer = containerRef.current;
-			_globeWrapperEl =
-				(containerRef.current
-					.firstElementChild as HTMLElement | null) ?? null;
 
 			globe
 				.width(containerRef.current.clientWidth)
@@ -606,9 +616,9 @@ export function useGlobe({
 				introCompleteTimeoutRef.current = null;
 			}
 			if (_globeCache) {
-				// Globe is preserved in cache — React will detach the canvas
-				// when it removes the container from the DOM. The GlobeInstance
-				// and its WebGL context stay alive for reattachment.
+				// Globe and its persistent container are preserved in cache for
+				// reattachment. React removes the outer container from the DOM
+				// but _persistentContainer stays detached, ready to be re-parented.
 			} else if (globe) {
 				// Globe never finished initializing — destroy it cleanly.
 				globe._destructor();
