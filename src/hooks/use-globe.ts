@@ -32,7 +32,10 @@ const _materialTextureSrcCache = new Map<string, string>();
 let _texturesReady = false;
 let _topoDataCache: GeoFeature[] | null = null;
 let _globeCache: GlobeInstance | null = null;
-let _globeWrapperEl: HTMLElement | null = null;
+// A persistent div that globe.gl is always initialized with, so its internal
+// pointer-event listeners survive React replacing the outer container on
+// back-navigation. We re-parent it into whatever containerRef exists on mount.
+let _persistentContainer: HTMLDivElement | null = null;
 let _activeContainer: HTMLDivElement | null = null;
 
 const INTRO_CAMERA_ANIMATION_MS = 1500;
@@ -51,9 +54,11 @@ interface UseGlobeReturn {
 	containerRef: React.RefObject<HTMLDivElement | null>;
 	isLoaded: boolean;
 	activeCountry: CountryTrip | null;
+	expandedCountry: CountryTrip | null;
 	tooltipPos: { x: number; y: number };
 	handleMouseMove: (e: React.MouseEvent) => void;
 	clearActiveCountry: () => void;
+	clearExpandedCountry: () => void;
 }
 
 export function useGlobe({
@@ -82,6 +87,15 @@ export function useGlobe({
 	useEffect(() => {
 		activeCountryRef.current = activeCountry;
 	}, [activeCountry]);
+
+	const [expandedCountry, setExpandedCountry] = useState<CountryTrip | null>(
+		null
+	);
+	const expandedCountryRef = useRef<CountryTrip | null>(null);
+	useEffect(() => {
+		expandedCountryRef.current = expandedCountry;
+	}, [expandedCountry]);
+
 	const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [isIntroComplete, setIsIntroComplete] = useState(false);
@@ -100,9 +114,9 @@ export function useGlobe({
 	> | null>(null);
 	const textureBatchIdRef = useRef(0);
 
-	const { visitedIds, idToTrip, idToName } = useMemo(() => {
+	const { visitedIds, idToTrips, idToName } = useMemo(() => {
 		const visited = new Set<string>();
-		const tripMap = new Map<string, Trip>();
+		const tripsMap = new Map<string, Trip[]>();
 		const nameMap = new Map<string, string>();
 
 		for (const trip of trips) {
@@ -110,24 +124,26 @@ export function useGlobe({
 				const id = countryCodeToId[country];
 				if (id) {
 					visited.add(id);
-					tripMap.set(id, trip);
+					const existing = tripsMap.get(id) ?? [];
+					existing.push(trip);
+					tripsMap.set(id, existing);
 					nameMap.set(id, getCountryName(country));
 				}
 			}
 		}
 
-		return { visitedIds: visited, idToTrip: tripMap, idToName: nameMap };
+		return { visitedIds: visited, idToTrips: tripsMap, idToName: nameMap };
 	}, [trips]);
 	const visitedIdsRef = useRef(visitedIds);
-	const idToTripRef = useRef(idToTrip);
+	const idToTripsRef = useRef(idToTrips);
 	const idToNameRef = useRef(idToName);
 	const countriesRef = useRef(countries);
 	useEffect(() => {
 		visitedIdsRef.current = visitedIds;
-		idToTripRef.current = idToTrip;
+		idToTripsRef.current = idToTrips;
 		idToNameRef.current = idToName;
 		countriesRef.current = countries;
-	}, [visitedIds, idToTrip, idToName, countries]);
+	}, [visitedIds, idToTrips, idToName, countries]);
 
 	useEffect(() => {
 		if (_topoDataCache) {
@@ -221,18 +237,22 @@ export function useGlobe({
 
 				const feat = polygon as GeoFeature;
 				const countryId = normalizeCountryId(feat.id);
-				const trip = idToTripRef.current.get(countryId);
+				const countryTrips = idToTripsRef.current.get(countryId);
 				hoveredIdRef.current = countryId;
 
-				if (trip) {
-					routerRef.current.prefetch(getTripRoute(trip.id));
+				if (countryTrips && countryTrips.length > 0) {
+					if (countryTrips.length === 1) {
+						routerRef.current.prefetch(
+							getTripRoute(countryTrips[0].id)
+						);
+					}
 					const name =
 						idToNameRef.current.get(countryId) ??
 						idToCountryName[countryId] ??
 						"";
 					setActiveCountry({
 						feature: feat,
-						trip,
+						trips: countryTrips,
 						countryName: name,
 					});
 					if (_activeContainer)
@@ -248,19 +268,63 @@ export function useGlobe({
 			.onPolygonClick((polygon: object) => {
 				const feat = polygon as GeoFeature;
 				const countryId = normalizeCountryId(feat.id);
-				const trip = idToTripRef.current.get(countryId);
+				const countryTrips = idToTripsRef.current.get(countryId);
 
 				if (!isMobileRef.current) {
-					if (trip) routerRef.current.push(getTripRoute(trip.id));
+					if (countryTrips && countryTrips.length === 1) {
+						routerRef.current.push(
+							getTripRoute(countryTrips[0].id)
+						);
+					} else if (
+						countryTrips &&
+						countryTrips.length > 1
+					) {
+						const name =
+							idToNameRef.current.get(countryId) ??
+							idToCountryName[countryId] ??
+							"";
+						setActiveCountry(null);
+						setExpandedCountry({
+							feature: feat,
+							trips: countryTrips,
+							countryName: name,
+						});
+					}
 					return;
 				}
 
-				if (!trip) {
+				// Mobile
+				if (!countryTrips || countryTrips.length === 0) {
 					setActiveCountry(null);
+					setExpandedCountry(null);
 					updateHoverStateRef.current(null);
 					return;
 				}
 
+				if (countryTrips.length > 1) {
+					const alreadyExpanded =
+						normalizeCountryId(
+							expandedCountryRef.current?.feature.id ?? ""
+						) === countryId;
+					if (alreadyExpanded) {
+						setExpandedCountry(null);
+						updateHoverStateRef.current(null);
+					} else {
+						const name =
+							idToNameRef.current.get(countryId) ??
+							idToCountryName[countryId] ??
+							"";
+						setExpandedCountry({
+							feature: feat,
+							trips: countryTrips,
+							countryName: name,
+						});
+						updateHoverStateRef.current(countryId);
+					}
+					return;
+				}
+
+				// Single trip on mobile: toggle tooltip
 				const alreadyShowing =
 					normalizeCountryId(
 						activeCountryRef.current?.feature.id ?? ""
@@ -277,7 +341,7 @@ export function useGlobe({
 					"";
 				setActiveCountry({
 					feature: feat,
-					trip,
+					trips: countryTrips,
 					countryName: name,
 				});
 				updateHoverStateRef.current(countryId);
@@ -295,7 +359,9 @@ export function useGlobe({
 		_texturesReady = false;
 		applyGlobeStyling();
 
-		for (const [id, trip] of idToTrip.entries()) {
+		for (const [id, countryTrips] of idToTrips.entries()) {
+			// Use the first trip's cover photo as the country texture.
+			const trip = countryTrips[0];
 			let material = cache.get(id);
 			if (!material) {
 				material = new MeshPhongMaterial({
@@ -334,7 +400,7 @@ export function useGlobe({
 		}
 
 		if (remainingLoads === 0) {
-			_texturesReady = idToTrip.size > 0;
+			_texturesReady = idToTrips.size > 0;
 			if (isIntroCompleteRef.current) {
 				applyPolygonStyleCallbacks();
 				applyCountriesData();
@@ -346,7 +412,7 @@ export function useGlobe({
 		applyCountriesData,
 		applyGlobeStyling,
 		applyPolygonStyleCallbacks,
-		idToTrip,
+		idToTrips,
 	]);
 
 	const updateHoverState = useCallback((hId: string | null) => {
@@ -395,9 +461,11 @@ export function useGlobe({
 		if (!containerRef.current) return;
 
 		// REATTACH: Globe was previously initialized — reuse the cached instance.
-		if (_globeCache && _globeWrapperEl) {
+		if (_globeCache && _persistentContainer) {
 			const globe = _globeCache;
-			containerRef.current.appendChild(_globeWrapperEl);
+			// Re-parent the persistent container so globe.gl's event listeners
+			// (bound to _persistentContainer) are back in the live DOM.
+			containerRef.current.appendChild(_persistentContainer);
 			globe
 				.width(containerRef.current.clientWidth)
 				.height(containerRef.current.clientHeight);
@@ -410,6 +478,7 @@ export function useGlobe({
 			_activeContainer = containerRef.current;
 			hoveredIdRef.current = null;
 			setActiveCountry(null);
+			setExpandedCountry(null);
 			bindPolygonInteractions(globe);
 			updateHoverStateRef.current(null);
 			applyGlobeStyling();
@@ -438,15 +507,20 @@ export function useGlobe({
 
 			if (!containerRef.current) return;
 
-			globe = new Globe(containerRef.current, {
+			// Create the persistent container that globe.gl will own. Using a
+			// stable element means globe.gl's pointer-event listeners stay live
+			// even when React replaces the outer container div on remount.
+			_persistentContainer = document.createElement("div");
+			_persistentContainer.style.cssText =
+				"position:absolute;inset:0;width:100%;height:100%";
+			containerRef.current.appendChild(_persistentContainer);
+
+			globe = new Globe(_persistentContainer, {
 				rendererConfig: { antialias: true, alpha: true },
 			});
 
 			globeInstanceRef.current = globe;
 			_activeContainer = containerRef.current;
-			_globeWrapperEl =
-				(containerRef.current
-					.firstElementChild as HTMLElement | null) ?? null;
 
 			globe
 				.width(containerRef.current.clientWidth)
@@ -542,9 +616,9 @@ export function useGlobe({
 				introCompleteTimeoutRef.current = null;
 			}
 			if (_globeCache) {
-				// Globe is preserved in cache — React will detach the canvas
-				// when it removes the container from the DOM. The GlobeInstance
-				// and its WebGL context stay alive for reattachment.
+				// Globe and its persistent container are preserved in cache for
+				// reattachment. React removes the outer container from the DOM
+				// but _persistentContainer stays detached, ready to be re-parented.
 			} else if (globe) {
 				// Globe never finished initializing — destroy it cleanly.
 				globe._destructor();
@@ -572,8 +646,8 @@ export function useGlobe({
 		}
 
 		let targetCountryId: string | null = null;
-		for (const [id, trip] of idToTripRef.current.entries()) {
-			if (trip.id === focusTripId) {
+		for (const [id, countryTrips] of idToTripsRef.current.entries()) {
+			if (countryTrips.some((t: Trip) => t.id === focusTripId)) {
 				targetCountryId = id;
 				break;
 			}
@@ -597,6 +671,10 @@ export function useGlobe({
 	const clearActiveCountry = useCallback(() => {
 		setActiveCountry(null);
 		updateHoverStateRef.current(null);
+	}, []);
+
+	const clearExpandedCountry = useCallback(() => {
+		setExpandedCountry(null);
 	}, []);
 
 	const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -636,8 +714,10 @@ export function useGlobe({
 		containerRef,
 		isLoaded,
 		activeCountry,
+		expandedCountry,
 		tooltipPos,
 		handleMouseMove,
 		clearActiveCountry,
+		clearExpandedCountry,
 	};
 }

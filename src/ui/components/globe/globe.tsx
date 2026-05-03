@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Trip } from "@/types/trip";
 import { useGlobe } from "@/hooks/use-globe";
 import { GlobeTooltipCard } from "./components/globe-tooltip-card";
+import { CountryTripsOverlay } from "./components/country-trips-overlay";
 import styles from "./globe.module.scss";
 
 interface GlobeVisualizationProps {
@@ -23,19 +24,25 @@ export function GlobeVisualization({
 		containerRef,
 		isLoaded,
 		activeCountry,
+		expandedCountry,
 		tooltipPos,
 		handleMouseMove,
 		clearActiveCountry,
+		clearExpandedCountry,
 	} = useGlobe({ trips, focusTripId, isMobile });
 
 	useEffect(() => {
-		if (isStripOpen) clearActiveCountry();
-	}, [isStripOpen, clearActiveCountry]);
+		if (isStripOpen) {
+			clearActiveCountry();
+			clearExpandedCountry();
+		}
+	}, [isStripOpen, clearActiveCountry, clearExpandedCountry]);
 
 	const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (!isMobile || !activeCountry) return;
+		if (!isMobile || (!activeCountry && !expandedCountry)) return;
 		if (e.target === e.currentTarget) {
 			clearActiveCountry();
+			clearExpandedCountry();
 		}
 	};
 
@@ -49,13 +56,21 @@ export function GlobeVisualization({
 				ref={containerRef}
 				className={`${styles.globe} ${isLoaded ? styles.loaded : ""}`}
 			/>
-			{activeCountry && (
+			{activeCountry && !expandedCountry && (
 				<GlobeTooltipCard
-					trip={activeCountry.trip}
+					trips={activeCountry.trips}
 					countryName={activeCountry.countryName}
 					x={tooltipPos.x}
 					y={tooltipPos.y}
 					mobile={isMobile}
+				/>
+			)}
+			{expandedCountry && (
+				<CountryTripsOverlay
+					trips={expandedCountry.trips}
+					countryName={expandedCountry.countryName}
+					mobile={isMobile}
+					onClose={clearExpandedCountry}
 				/>
 			)}
 		</div>

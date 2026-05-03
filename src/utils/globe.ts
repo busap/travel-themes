@@ -14,7 +14,7 @@ export interface GeoFeature {
 
 export interface CountryTrip {
 	feature: GeoFeature;
-	trip: Trip;
+	trips: Trip[];
 	countryName: string;
 }
 
