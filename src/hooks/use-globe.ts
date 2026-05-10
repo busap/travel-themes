@@ -37,6 +37,7 @@ let _globeCache: GlobeInstance | null = null;
 // back-navigation. We re-parent it into whatever containerRef exists on mount.
 let _persistentContainer: HTMLDivElement | null = null;
 let _activeContainer: HTMLDivElement | null = null;
+let _initInFlight = false;
 
 const INTRO_CAMERA_ANIMATION_MS = 1500;
 
@@ -493,6 +494,11 @@ export function useGlobe({
 		}
 
 		// FRESH INIT
+		if (_initInFlight) {
+			return () => {};
+		}
+		_initInFlight = true;
+
 		let globe: GlobeInstance | undefined;
 		setIsLoaded(false);
 		setIsIntroComplete(false);
@@ -502,7 +508,10 @@ export function useGlobe({
 			const GlobeModule = await import("globe.gl");
 			const Globe = GlobeModule.default;
 
-			if (!containerRef.current) return;
+			if (!containerRef.current) {
+				_initInFlight = false;
+				return;
+			}
 
 			// Create the persistent container that globe.gl will own. Using a
 			// stable element means globe.gl's pointer-event listeners stay live
@@ -591,6 +600,7 @@ export function useGlobe({
 				// Cache as soon as the globe is ready so back-navigation is instant
 				// even if the user leaves during the intro camera animation.
 				_globeCache = globe!;
+				_initInFlight = false;
 
 				introCompleteTimeoutRef.current = setTimeout(() => {
 					setIsIntroComplete(true);
@@ -619,6 +629,7 @@ export function useGlobe({
 			} else if (globe) {
 				// Globe never finished initializing — destroy it cleanly.
 				globe._destructor();
+				_initInFlight = false;
 			}
 		};
 	}, [applyGlobeStyling, bindPolygonInteractions, getMaterial]);
