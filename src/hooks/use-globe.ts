@@ -25,19 +25,7 @@ import {
 import { countryCodeToId, idToCountryName } from "@/utils/globe-country-map";
 import { getCountryName } from "@/utils/country";
 
-// Module-level singletons preserved across navigation so the globe doesn't
-// reload from scratch when the user returns to the home page.
-const _materialCache = new Map<string, MeshPhongMaterial>();
-const _materialTextureSrcCache = new Map<string, string>();
-let _texturesReady = false;
 let _topoDataCache: GeoFeature[] | null = null;
-let _globeCache: GlobeInstance | null = null;
-// A persistent div that globe.gl is always initialized with, so its internal
-// pointer-event listeners survive React replacing the outer container on
-// back-navigation. We re-parent it into whatever containerRef exists on mount.
-let _persistentContainer: HTMLDivElement | null = null;
-let _activeContainer: HTMLDivElement | null = null;
-let _initInFlight = false;
 
 const INTRO_CAMERA_ANIMATION_MS = 1500;
 
@@ -69,15 +57,14 @@ export function useGlobe({
 }: UseGlobeProps): UseGlobeReturn {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
-	const materialCacheRef = useRef(_materialCache);
-	const materialTextureSrcRef = useRef(_materialTextureSrcCache);
+	const materialCacheRef = useRef(new Map<string, MeshPhongMaterial>());
+	const materialTextureSrcRef = useRef(new Map<string, string>());
+	const texturesReadyRef = useRef(false);
 	const pendingStyleRefreshRef = useRef(false);
 	const isMobileRef = useRef(isMobile);
 	useEffect(() => {
 		isMobileRef.current = isMobile;
 	}, [isMobile]);
-	// Initialize countries from cache so the first render already has data,
-	// preventing a flash of an empty globe on reattach.
 	const [countries, setCountries] = useState<GeoFeature[]>(
 		_topoDataCache ?? []
 	);
@@ -169,7 +156,7 @@ export function useGlobe({
 
 	const getMaterial = useCallback((feat: GeoFeature): Material => {
 		const countryId = normalizeCountryId(feat.id);
-		if (!_texturesReady || !visitedIdsRef.current.has(countryId))
+		if (!texturesReadyRef.current || !visitedIdsRef.current.has(countryId))
 			return defaultMaterial;
 		return materialCacheRef.current.get(countryId) ?? defaultMaterial;
 	}, []);
@@ -184,21 +171,21 @@ export function useGlobe({
 			.polygonCapMaterial((d: object) => getMaterial(d as GeoFeature))
 			.polygonSideColor((d: object) => {
 				const feat = d as GeoFeature;
-				return _texturesReady &&
+				return texturesReadyRef.current &&
 					visitedIdsRef.current.has(normalizeCountryId(feat.id))
 					? "rgba(251, 191, 36, 0.3)"
 					: "rgba(30, 41, 59, 0.02)";
 			})
 			.polygonStrokeColor((d: object) => {
 				const feat = d as GeoFeature;
-				return _texturesReady &&
+				return texturesReadyRef.current &&
 					visitedIdsRef.current.has(normalizeCountryId(feat.id))
 					? "rgba(200, 140, 30, 0.6)"
 					: "rgba(148, 163, 184, 0.35)";
 			})
 			.polygonAltitude((d: object) => {
 				const feat = d as GeoFeature;
-				return _texturesReady &&
+				return texturesReadyRef.current &&
 					visitedIdsRef.current.has(normalizeCountryId(feat.id))
 					? 0.012
 					: 0.001;
@@ -230,8 +217,8 @@ export function useGlobe({
 				if (!polygon) {
 					hoveredIdRef.current = null;
 					setActiveCountry(null);
-					if (_activeContainer)
-						_activeContainer.style.cursor = "default";
+					if (containerRef.current)
+						containerRef.current.style.cursor = "default";
 					updateHoverStateRef.current(null);
 					return;
 				}
@@ -256,12 +243,12 @@ export function useGlobe({
 						trips: countryTrips,
 						countryName: name,
 					});
-					if (_activeContainer)
-						_activeContainer.style.cursor = "pointer";
+					if (containerRef.current)
+						containerRef.current.style.cursor = "pointer";
 				} else {
 					setActiveCountry(null);
-					if (_activeContainer)
-						_activeContainer.style.cursor = "default";
+					if (containerRef.current)
+						containerRef.current.style.cursor = "default";
 				}
 
 				updateHoverStateRef.current(countryId);
@@ -291,7 +278,6 @@ export function useGlobe({
 					return;
 				}
 
-				// Mobile
 				if (!countryTrips || countryTrips.length === 0) {
 					setActiveCountry(null);
 					setExpandedCountry(null);
@@ -322,7 +308,6 @@ export function useGlobe({
 					return;
 				}
 
-				// Single trip on mobile: toggle tooltip
 				const alreadyShowing =
 					normalizeCountryId(
 						activeCountryRef.current?.feature.id ?? ""
@@ -353,12 +338,10 @@ export function useGlobe({
 		const currentBatchId = ++textureBatchIdRef.current;
 		let remainingLoads = 0;
 
-		// Phase 1: show default/empty globe while trip textures load.
-		_texturesReady = false;
+		texturesReadyRef.current = false;
 		applyGlobeStyling();
 
 		for (const [id, countryTrips] of idToTrips.entries()) {
-			// Use the first trip's cover photo as the country texture.
 			const trip = countryTrips[0];
 			let material = cache.get(id);
 			if (!material) {
@@ -385,8 +368,7 @@ export function useGlobe({
 				currentMaterial.needsUpdate = true;
 				remainingLoads -= 1;
 				if (remainingLoads === 0) {
-					// Phase 2: all current trip textures ready; apply once.
-					_texturesReady = true;
+					texturesReadyRef.current = true;
 					if (isIntroCompleteRef.current) {
 						applyPolygonStyleCallbacks();
 						applyCountriesData();
@@ -398,7 +380,7 @@ export function useGlobe({
 		}
 
 		if (remainingLoads === 0) {
-			_texturesReady = idToTrips.size > 0;
+			texturesReadyRef.current = idToTrips.size > 0;
 			if (isIntroCompleteRef.current) {
 				applyPolygonStyleCallbacks();
 				applyCountriesData();
@@ -458,75 +440,28 @@ export function useGlobe({
 	useEffect(() => {
 		if (!containerRef.current) return;
 
-		// REATTACH: Globe was previously initialized — reuse the cached instance.
-		if (_globeCache && _persistentContainer) {
-			const globe = _globeCache;
-			// Re-parent the persistent container so globe.gl's event listeners
-			// (bound to _persistentContainer) are back in the live DOM.
-			containerRef.current.appendChild(_persistentContainer);
-			globe
-				.width(containerRef.current.clientWidth)
-				.height(containerRef.current.clientHeight);
-			const controls = globe.controls();
-			if (controls) {
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = 0.6;
-			}
-			globeInstanceRef.current = globe;
-			_activeContainer = containerRef.current;
-			hoveredIdRef.current = null;
-			setActiveCountry(null);
-			setExpandedCountry(null);
-			bindPolygonInteractions(globe);
-			updateHoverStateRef.current(null);
-			applyGlobeStyling();
-			setIsLoaded(true);
-			setIsIntroComplete(true);
-			isIntroCompleteRef.current = true;
-
-			return () => {
-				_activeContainer = null;
-				if (introCompleteTimeoutRef.current) {
-					clearTimeout(introCompleteTimeoutRef.current);
-					introCompleteTimeoutRef.current = null;
-				}
-			};
-		}
-
-		// FRESH INIT
-		if (_initInFlight) {
-			return () => {};
-		}
-		_initInFlight = true;
+		const materialCache = materialCacheRef.current;
+		const materialTextureSrc = materialTextureSrcRef.current;
+		const texturesReady = texturesReadyRef;
 
 		let globe: GlobeInstance | undefined;
+		let cancelled = false;
 		setIsLoaded(false);
 		setIsIntroComplete(false);
 		isIntroCompleteRef.current = false;
+		texturesReady.current = false;
 
 		const initGlobe = async () => {
 			const GlobeModule = await import("globe.gl");
 			const Globe = GlobeModule.default;
 
-			if (!containerRef.current) {
-				_initInFlight = false;
-				return;
-			}
+			if (cancelled || !containerRef.current) return;
 
-			// Create the persistent container that globe.gl will own. Using a
-			// stable element means globe.gl's pointer-event listeners stay live
-			// even when React replaces the outer container div on remount.
-			_persistentContainer = document.createElement("div");
-			_persistentContainer.style.cssText =
-				"position:absolute;inset:0;width:100%;height:100%";
-			containerRef.current.appendChild(_persistentContainer);
-
-			globe = new Globe(_persistentContainer, {
+			globe = new Globe(containerRef.current, {
 				rendererConfig: { antialias: true, alpha: true },
 			});
 
 			globeInstanceRef.current = globe;
-			_activeContainer = containerRef.current;
 
 			globe
 				.width(containerRef.current.clientWidth)
@@ -586,6 +521,7 @@ export function useGlobe({
 			});
 
 			globe.onGlobeReady(() => {
+				if (cancelled) return;
 				setIsLoaded(true);
 				applyGlobeStyling();
 				globe!.pointOfView(
@@ -597,12 +533,8 @@ export function useGlobe({
 					INTRO_CAMERA_ANIMATION_MS
 				);
 
-				// Cache as soon as the globe is ready so back-navigation is instant
-				// even if the user leaves during the intro camera animation.
-				_globeCache = globe!;
-				_initInFlight = false;
-
 				introCompleteTimeoutRef.current = setTimeout(() => {
+					if (cancelled) return;
 					setIsIntroComplete(true);
 					isIntroCompleteRef.current = true;
 					const readyControls = globe!.controls();
@@ -617,20 +549,18 @@ export function useGlobe({
 		initGlobe();
 
 		return () => {
-			_activeContainer = null;
+			cancelled = true;
 			if (introCompleteTimeoutRef.current) {
 				clearTimeout(introCompleteTimeoutRef.current);
 				introCompleteTimeoutRef.current = null;
 			}
-			if (_globeCache) {
-				// Globe and its persistent container are preserved in cache for
-				// reattachment. React removes the outer container from the DOM
-				// but _persistentContainer stays detached, ready to be re-parented.
-			} else if (globe) {
-				// Globe never finished initializing — destroy it cleanly.
+			if (globe) {
 				globe._destructor();
-				_initInFlight = false;
 			}
+			globeInstanceRef.current = null;
+			materialCache.clear();
+			materialTextureSrc.clear();
+			texturesReady.current = false;
 		};
 	}, [applyGlobeStyling, bindPolygonInteractions, getMaterial]);
 
