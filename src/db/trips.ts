@@ -45,34 +45,22 @@ function parseTheme(value: string | null | undefined): Theme {
 }
 
 export async function getAllTrips(): Promise<Trip[]> {
-	try {
-		const rows = await prisma.trip.findMany({
-			include: { photos: true, tripTheme: true },
-			orderBy: [{ year: "desc" }, { createdAt: "desc" }],
-		});
-		return rows.map(mapPrismaTrip);
-	} catch {
-		return [];
-	}
+	const rows = await prisma.trip.findMany({
+		include: { photos: true, tripTheme: true },
+		orderBy: [{ year: "desc" }, { createdAt: "desc" }],
+	});
+	return rows.map(mapPrismaTrip);
 }
 
 export async function getTripById(id: string): Promise<Trip | undefined> {
-	try {
-		const row = await prisma.trip.findUnique({
-			where: { id },
-			include: { photos: true, tripTheme: true },
-		});
-		return row ? mapPrismaTrip(row) : undefined;
-	} catch {
-		return undefined;
-	}
+	const row = await prisma.trip.findUnique({
+		where: { id },
+		include: { photos: true, tripTheme: true },
+	});
+	return row ? mapPrismaTrip(row) : undefined;
 }
 
 export async function getThemeForTrip(tripId: string): Promise<Theme> {
-	try {
-		const row = await prisma.tripTheme.findUnique({ where: { tripId } });
-		return parseTheme(row?.theme);
-	} catch {
-		return Theme.Collage;
-	}
+	const row = await prisma.tripTheme.findUnique({ where: { tripId } });
+	return parseTheme(row?.theme);
 }
