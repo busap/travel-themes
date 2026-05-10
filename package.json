@@ -18,7 +18,8 @@
 		"test:all": "npm run test && npm run test:e2e",
 		"db:migrate": "prisma migrate dev --name migrate",
 		"db:generate": "prisma generate",
-		"db:seed": "prisma db seed"
+		"db:seed": "prisma db seed",
+		"postinstall": "prisma generate"
 	},
 	"dependencies": {
 		"@gsap/react": "^2.1.2",
