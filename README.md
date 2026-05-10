@@ -145,4 +145,3 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - `prisma/seed.ts`: replaced Supabase storage client with Cloudinary Admin API for listing resources; `publicUrl()` now builds `f_auto,q_auto` Cloudinary CDN URLs — no pre-compression needed.
 - `.env.example`: replaced Supabase storage vars with `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 - Removed unused `src/lib/supabase.ts` singleton (Cloudinary has no equivalent client-side singleton needed).
-
