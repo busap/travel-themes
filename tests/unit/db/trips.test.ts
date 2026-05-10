@@ -15,9 +15,8 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 // Dynamic imports after mock is registered
-const { getAllTrips, getTripById, getThemeForTrip } = await import(
-	"@/db/trips"
-);
+const { getAllTrips, getTripById, getThemeForTrip } =
+	await import("@/db/trips");
 const { prisma } = await import("@/lib/prisma");
 
 const mockTripRow = {
@@ -114,25 +113,23 @@ describe("getTripById", () => {
 		expect(trip!.countries).toEqual([Country.ES, Country.FR]);
 	});
 
-	it("returns undefined on invalid country code", async () => {
+	it("throws on invalid country code", async () => {
 		vi.mocked(prisma.trip.findUnique).mockResolvedValueOnce({
 			...mockTripRow,
 			countries: ["XX"],
 		});
 
-		// parseCountry throws, but the try-catch in getTripById swallows it
-		const trip = await getTripById("test-trip");
-		expect(trip).toBeUndefined();
+		await expect(getTripById("test-trip")).rejects.toThrow(
+			"Unknown country code: XX"
+		);
 	});
 
-	it("returns undefined on prisma error", async () => {
+	it("propagates prisma errors", async () => {
 		vi.mocked(prisma.trip.findUnique).mockRejectedValueOnce(
 			new Error("DB error")
 		);
 
-		const trip = await getTripById("test-trip");
-
-		expect(trip).toBeUndefined();
+		await expect(getTripById("test-trip")).rejects.toThrow("DB error");
 	});
 });
 
@@ -165,14 +162,12 @@ describe("getAllTrips", () => {
 		expect(trips[1].countries).toEqual([Country.JP]);
 	});
 
-	it("returns empty array on prisma error", async () => {
+	it("propagates prisma errors", async () => {
 		vi.mocked(prisma.trip.findMany).mockRejectedValueOnce(
 			new Error("DB error")
 		);
 
-		const trips = await getAllTrips();
-
-		expect(trips).toEqual([]);
+		await expect(getAllTrips()).rejects.toThrow("DB error");
 	});
 });
 
@@ -207,14 +202,12 @@ describe("getThemeForTrip", () => {
 		expect(theme).toBe(Theme.Collage);
 	});
 
-	it("falls back to Collage on prisma error", async () => {
+	it("propagates prisma errors", async () => {
 		vi.mocked(prisma.tripTheme.findUnique).mockRejectedValueOnce(
 			new Error("DB error")
 		);
 
-		const theme = await getThemeForTrip("test-trip");
-
-		expect(theme).toBe(Theme.Collage);
+		await expect(getThemeForTrip("test-trip")).rejects.toThrow("DB error");
 	});
 
 	it("recognises all valid Theme enum values", async () => {

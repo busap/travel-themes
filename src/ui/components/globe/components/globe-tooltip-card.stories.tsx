@@ -12,7 +12,7 @@ const meta = {
 	},
 	tags: ["autodocs"],
 	args: {
-		trip: mockTrip,
+		trips: [mockTrip],
 		countryName: "Germany",
 		x: 300,
 		y: 300,

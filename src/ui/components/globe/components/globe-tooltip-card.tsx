@@ -50,9 +50,7 @@ export function GlobeTooltipCard({
 			</div>
 			<div className={styles.content}>
 				<span className={styles.name}>{countryName}</span>
-				<span className={styles.country}>
-					{trips.length} trips
-				</span>
+				<span className={styles.country}>{trips.length} trips</span>
 				<span className={styles.tapHint}>Click to explore all →</span>
 			</div>
 		</>

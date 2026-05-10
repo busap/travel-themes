@@ -275,10 +275,7 @@ export function useGlobe({
 						routerRef.current.push(
 							getTripRoute(countryTrips[0].id)
 						);
-					} else if (
-						countryTrips &&
-						countryTrips.length > 1
-					) {
+					} else if (countryTrips && countryTrips.length > 1) {
 						const name =
 							idToNameRef.current.get(countryId) ??
 							idToCountryName[countryId] ??

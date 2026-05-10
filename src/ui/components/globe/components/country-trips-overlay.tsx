@@ -83,9 +83,7 @@ export function CountryTripsOverlay({
 		<div className={styles.backdrop} onClick={onClose}>
 			<div className={styles.label}>
 				<span className={styles.labelCountry}>{countryName}</span>
-				<span className={styles.labelCount}>
-					{trips.length} trips
-				</span>
+				<span className={styles.labelCount}>{trips.length} trips</span>
 			</div>
 
 			<button
