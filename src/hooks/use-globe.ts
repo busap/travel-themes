@@ -636,6 +636,9 @@ export function useGlobe({
 	}, []);
 
 	useEffect(() => {
+		const container = containerRef.current;
+		if (!container) return;
+
 		const handleResize = () => {
 			if (globeInstanceRef.current && containerRef.current) {
 				globeInstanceRef.current
@@ -644,8 +647,9 @@ export function useGlobe({
 			}
 		};
 
-		window.addEventListener("resize", handleResize);
-		return () => window.removeEventListener("resize", handleResize);
+		const observer = new ResizeObserver(handleResize);
+		observer.observe(container);
+		return () => observer.disconnect();
 	}, []);
 
 	return {
