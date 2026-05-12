@@ -26,7 +26,7 @@ function getSnapshot() {
 
 export function HomeHero({ trips }: { trips: Trip[] }) {
 	const [focusTripId, setFocusTripId] = useState<string | null>(null);
-	const [isStripOpen, setIsStripOpen] = useState(false);
+	const [isStripOpen, setIsStripOpen] = useState(true);
 	const isMobile = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
 	return (

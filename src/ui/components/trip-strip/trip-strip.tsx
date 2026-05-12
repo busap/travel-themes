@@ -44,7 +44,7 @@ export function TripStrip({
 	onTripHover,
 	onIsOpenChange,
 }: TripStripProps) {
-	const [phase, setPhase] = useState<AnimPhase>("closed");
+	const [phase, setPhase] = useState<AnimPhase>("open");
 
 	const handleOpen = useCallback(() => {
 		setPhase("opening");
@@ -135,14 +135,17 @@ export function TripStrip({
 	const renderStrip = () => {
 		return (
 			<aside className={stripClass} aria-hidden={!isStripInteractive}>
-				<button
-					className={styles.closeBtn}
-					onClick={handleClose}
-					aria-label="Close trips panel"
-					tabIndex={isStripInteractive ? 0 : -1}
-				>
-					<CloseIcon />
-				</button>
+				<div className={styles.header}>
+					<span className={styles.headerLabel}>All Trips</span>
+					<button
+						className={styles.closeBtn}
+						onClick={handleClose}
+						aria-label="Close trips panel"
+						tabIndex={isStripInteractive ? 0 : -1}
+					>
+						<CloseIcon />
+					</button>
+				</div>
 
 				{renderList()}
 			</aside>
