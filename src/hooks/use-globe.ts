@@ -578,7 +578,7 @@ export function useGlobe({
 			if (controls) controls.autoRotate = true;
 			globeInstanceRef.current.pointOfView(
 				{ altitude: isMobileRef.current ? 1.6 : 2.2 },
-				800
+				1000
 			);
 			return;
 		}
