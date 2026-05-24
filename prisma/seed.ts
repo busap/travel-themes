@@ -20,7 +20,7 @@ const prisma = new PrismaClient({
 const FOLDER = "trip-photos";
 
 function publicUrl(publicId: string): string {
-	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${publicId}?v=2`;
+	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${publicId}`;
 }
 
 async function listFiles(path: string): Promise<string[]> {
