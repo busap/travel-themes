@@ -60,7 +60,7 @@ export const tripsData = [
 		year: 2023,
 		description:
 			"Ancient ruins, Bedouin fires, and the silence of Wadi Rum",
-		theme: Theme.ImageGridHero,
+		theme: Theme.PhotoCarousel,
 	},
 	{
 		id: "2023-israel",
@@ -76,7 +76,7 @@ export const tripsData = [
 		countries: [Country.IT],
 		year: 2023,
 		description: "Pizza, espresso, Vatican, and years of history",
-		theme: Theme.SmoothScroll,
+		theme: Theme.DragShuffle,
 	},
 	{
 		id: "2023-andalucia",
@@ -193,7 +193,7 @@ export const tripsData = [
 		year: 2025,
 		description:
 			"Climbing the Acropolis, layers of stone, ancient temples, and toppled ruins",
-		theme: Theme.SmoothScroll,
+		theme: Theme.Collage,
 	},
 	{
 		id: "2025-greece-rhodes",
@@ -202,6 +202,6 @@ export const tripsData = [
 		year: 2025,
 		description:
 			"Knights' walls in the Old Town, Lindos rising white above the cove, and viewpoints all the way around",
-		theme: Theme.Trail,
+		theme: Theme.Drift,
 	},
 ];
