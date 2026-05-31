@@ -53,7 +53,7 @@ async function main() {
 
 	const all = jobs;
 	console.log(
-		`Warming ${all.length} jobs (${sources.size} images × ${WIDTHS.length} widths × ${ACCEPT_PROFILES.length} formats) across ${trips.length} trips...`,
+		`Warming ${all.length} jobs (${sources.size} images × ${WIDTHS.length} widths × ${ACCEPT_PROFILES.length} formats) across ${trips.length} trips...`
 	);
 
 	let done = 0;
@@ -89,7 +89,7 @@ async function main() {
 	}
 
 	await Promise.all(
-		Array.from({ length: Math.min(CONCURRENCY, all.length) }, worker),
+		Array.from({ length: Math.min(CONCURRENCY, all.length) }, worker)
 	);
 
 	console.log(`Done. ${all.length - failed} warmed, ${failed} failed.`);
