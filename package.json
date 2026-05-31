@@ -19,6 +19,7 @@
 		"db:migrate": "prisma migrate dev --name migrate",
 		"db:generate": "prisma generate",
 		"db:seed": "prisma db seed",
+		"warm:images": "tsx ./scripts/warm-cloudinary.ts",
 		"postinstall": "prisma generate"
 	},
 	"dependencies": {
