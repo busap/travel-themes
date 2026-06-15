@@ -4,19 +4,20 @@ Photo-centric travel website where trips are displayed through themed visual pre
 
 ## Tech Stack
 
-| Technology   | Purpose                                  |
-| ------------ | ---------------------------------------- |
-| Next.js      | Framework (App Router)                   |
-| React        | UI library                               |
-| TypeScript   | Type safety                              |
-| Tailwind CSS | Styling (with @apply in SCSS modules)    |
-| SCSS         | CSS preprocessor (module-based)          |
-| Node.js      | Runtime                                  |
-| Storybook    | Component development                    |
-| Vitest       | Unit testing framework                   |
-| Playwright   | E2E and visual testing                   |
-| Cloudinary   | Image optimization (via next-cloudinary) |
-| GSAP         | Animations, ScrollTrigger, timelines     |
+| Technology    | Purpose                                       |
+| ------------- | --------------------------------------------- |
+| Next.js       | Framework (App Router)                        |
+| React         | UI library                                    |
+| TypeScript    | Type safety                                   |
+| Tailwind CSS  | Styling (with @apply in SCSS modules)         |
+| SCSS          | CSS preprocessor (module-based)               |
+| Node.js       | Runtime                                       |
+| Storybook     | Component development                         |
+| Vitest        | Unit testing framework                        |
+| Playwright    | E2E and visual testing                        |
+| Cloudflare R2 | Image storage & delivery (pre-generated AVIF) |
+| sharp         | Build-time image resizing/AVIF encoding       |
+| GSAP          | Animations, ScrollTrigger, timelines          |
 
 ## Iteration Log
 
@@ -145,3 +146,14 @@ Photo-centric travel website where trips are displayed through themed visual pre
 - `prisma/seed.ts`: replaced Supabase storage client with Cloudinary Admin API for listing resources; `publicUrl()` now builds `f_auto,q_auto` Cloudinary CDN URLs — no pre-compression needed.
 - `.env.example`: replaced Supabase storage vars with `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 - Removed unused `src/lib/supabase.ts` singleton (Cloudinary has no equivalent client-side singleton needed).
+
+### Iteration 15
+
+- Migrated image storage from Cloudinary to **Cloudflare R2** (10 GB free, zero egress) with **pre-generated static AVIF** — replacing Cloudinary's on-the-fly transforms, so there are no per-request transformation quotas to hit.
+- `src/config/image-widths.ts`: single source of truth for responsive widths (`DEVICE_SIZES`, `IMAGE_SIZES`, `ALL_WIDTHS`), imported by both `next.config.ts` and the image pipeline so they can't drift.
+- `src/utils/cloudinary-loader.ts` → `src/utils/r2-loader.ts`: the DB stores a base URL (no width/extension); the loader appends `/{width}.avif`. `quality` is ignored (baked in at generation time). Non-R2 URLs pass through untouched.
+- `scripts/warm-cloudinary.ts` → `scripts/process-images.ts` (`npm run images:process`): walks a local `trip-photos/{tripId}/{cover|photos}/*` source tree, encodes each image to AVIF at every width with `sharp`, and uploads to R2 via the S3-compatible API. `withoutEnlargement` mirrors Cloudinary's `c_limit`.
+- `prisma/seed.ts`: lists base keys from R2 (`ListObjectsV2`, stripping the `/{width}.avif` suffix) instead of querying the Cloudinary Admin API.
+- `.env.example`: replaced `CLOUDINARY_*` with `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `NEXT_PUBLIC_R2_PUBLIC_URL`, and optional `IMAGE_SOURCE_DIR`.
+- Dependencies: removed `cloudinary` + `next-cloudinary` (the latter was unused); added `@aws-sdk/client-s3` + `sharp`.
+- Delivery is **AVIF-only** (universal in current browsers; Safari < 16.4 excluded) — a static-file CDN can't content-negotiate format the way Cloudinary's `f_auto` did. Add a Cloudflare Worker in front of R2 later if a WebP fallback is ever needed.

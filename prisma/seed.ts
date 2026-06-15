@@ -2,44 +2,61 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 config(); // fallback to .env
 
-import { v2 as cloudinary } from "cloudinary";
+import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { tripsData } from "./trips-data";
 
-cloudinary.config({
-	cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
+function requireEnv(name: string): string {
+	const value = process.env[name];
+	if (!value) throw new Error(`Missing required env var: ${name}`);
+	return value;
+}
+
+const BUCKET = requireEnv("R2_BUCKET");
+const PUBLIC_URL = requireEnv("NEXT_PUBLIC_R2_PUBLIC_URL").replace(/\/$/, "");
+
+const s3 = new S3Client({
+	region: "auto",
+	endpoint: `https://${requireEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
+	credentials: {
+		accessKeyId: requireEnv("R2_ACCESS_KEY_ID"),
+		secretAccessKey: requireEnv("R2_SECRET_ACCESS_KEY"),
+	},
 });
 
 const prisma = new PrismaClient({
 	adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
-const FOLDER = "trip-photos";
-
-function publicUrl(publicId: string): string {
-	return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${publicId}`;
+// The DB stores the base URL (no width, no extension); the image loader appends
+// `/{width}.avif` at request time.
+function publicUrl(baseKey: string): string {
+	return `${PUBLIC_URL}/${baseKey}`;
 }
 
-async function listFiles(path: string): Promise<string[]> {
-	try {
-		const result = await cloudinary.api.resources_by_asset_folder(
-			`${FOLDER}/${path}`,
-			{ max_results: 500 }
+// Lists the distinct image base keys under a prefix. The bucket holds one AVIF
+// file per width (`{baseKey}/{width}.avif`), so we strip the `/{width}.avif`
+// suffix and dedupe — yielding exactly one base key per source image.
+async function listBaseKeys(prefix: string): Promise<string[]> {
+	const baseKeys = new Set<string>();
+	let token: string | undefined;
+	do {
+		const res = await s3.send(
+			new ListObjectsV2Command({
+				Bucket: BUCKET,
+				Prefix: prefix,
+				ContinuationToken: token,
+			})
 		);
-		return (result.resources as { public_id: string }[])
-			.map((r) => r.public_id)
-			.filter(Boolean);
-	} catch (e: unknown) {
-		if (
-			(e as { error?: { http_code?: number } })?.error?.http_code === 404
-		) {
-			return [];
+		for (const obj of res.Contents ?? []) {
+			if (!obj.Key) continue;
+			const baseKey = obj.Key.replace(/\/\d+\.avif$/, "");
+			if (baseKey !== obj.Key) baseKeys.add(baseKey);
 		}
-		throw e;
-	}
+		token = res.IsTruncated ? res.NextContinuationToken : undefined;
+	} while (token);
+	return [...baseKeys].sort();
 }
 
 async function seed() {
@@ -51,53 +68,51 @@ async function seed() {
 		console.log(`🗑️  Deleted ${deleted.count} stale trip(s)`);
 	}
 
-	for (const config of tripsData) {
-		const coverFiles = await listFiles(`${config.id}/cover`);
-		if (!coverFiles.length) {
-			await prisma.trip.deleteMany({ where: { id: config.id } });
-			console.log(
-				`⏭️  "${config.id}" not on Cloudinary yet — removed from DB`
-			);
+	for (const trip of tripsData) {
+		const coverKeys = await listBaseKeys(`trip-photos/${trip.id}/cover/`);
+		if (!coverKeys.length) {
+			await prisma.trip.deleteMany({ where: { id: trip.id } });
+			console.log(`⏭️  "${trip.id}" not in R2 yet — removed from DB`);
 			continue;
 		}
-		const coverPhoto = publicUrl(coverFiles[0]);
-		const photoFiles = await listFiles(`${config.id}/photos`);
+		const coverPhoto = publicUrl(coverKeys[0]);
+		const photoKeys = await listBaseKeys(`trip-photos/${trip.id}/photos/`);
 
 		await prisma.trip.upsert({
-			where: { id: config.id },
+			where: { id: trip.id },
 			update: {
-				name: config.name,
-				countries: config.countries,
-				year: config.year,
-				description: config.description,
+				name: trip.name,
+				countries: trip.countries,
+				year: trip.year,
+				description: trip.description,
 				coverPhoto,
 			},
 			create: {
-				id: config.id,
-				name: config.name,
-				countries: config.countries,
-				year: config.year,
-				description: config.description,
+				id: trip.id,
+				name: trip.name,
+				countries: trip.countries,
+				year: trip.year,
+				description: trip.description,
 				coverPhoto,
 			},
 		});
 
-		await prisma.photo.deleteMany({ where: { tripId: config.id } });
+		await prisma.photo.deleteMany({ where: { tripId: trip.id } });
 		await prisma.photo.createMany({
-			data: photoFiles.map((file, index) => ({
-				tripId: config.id,
-				src: publicUrl(file),
+			data: photoKeys.map((key, index) => ({
+				tripId: trip.id,
+				src: publicUrl(key),
 				order: index,
 			})),
 		});
 
 		await prisma.tripTheme.upsert({
-			where: { tripId: config.id },
-			update: { theme: config.theme },
-			create: { tripId: config.id, theme: config.theme },
+			where: { tripId: trip.id },
+			update: { theme: trip.theme },
+			create: { tripId: trip.id, theme: trip.theme },
 		});
 
-		console.log(`✓ ${config.name} (${photoFiles.length} photos)`);
+		console.log(`✓ ${trip.name} (${photoKeys.length} photos)`);
 	}
 
 	console.log("✅ Seed complete");

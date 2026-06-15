@@ -25,13 +25,13 @@ const mockTripRow = {
 	countries: ["ES"],
 	year: 2021,
 	description: "A test trip",
-	coverPhoto: "https://res.cloudinary.com/test/image/upload/test.jpg",
+	coverPhoto: "https://images.example.com/trip-photos/test-trip/cover/test",
 	createdAt: new Date(),
 	photos: [
 		{
 			id: 2,
 			tripId: "test-trip",
-			src: "https://res.cloudinary.com/test/image/upload/p2.jpg",
+			src: "https://images.example.com/trip-photos/test-trip/photos/p2",
 			title: null,
 			description: null,
 			order: 1,
@@ -39,7 +39,7 @@ const mockTripRow = {
 		{
 			id: 1,
 			tripId: "test-trip",
-			src: "https://res.cloudinary.com/test/image/upload/p1.jpg",
+			src: "https://images.example.com/trip-photos/test-trip/photos/p1",
 			title: "Photo 1",
 			description: "A photo",
 			order: 2,
@@ -78,8 +78,8 @@ describe("getTripById", () => {
 
 		const trip = await getTripById("test-trip");
 
-		expect(trip!.photos[0].src).toContain("p2.jpg");
-		expect(trip!.photos[1].src).toContain("p1.jpg");
+		expect(trip!.photos[0].src).toContain("/p2");
+		expect(trip!.photos[1].src).toContain("/p1");
 	});
 
 	it("coerces null photo title and description to undefined", async () => {
