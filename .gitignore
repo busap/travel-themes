@@ -60,3 +60,6 @@ storybook-static
 .worktrees/
 
 /src/generated/prisma
+
+# local source images for the R2 pipeline (npm run images:process)
+/source-images
