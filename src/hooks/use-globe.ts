@@ -5,7 +5,6 @@ import type { Topology } from "topojson-specification";
 import {
 	TextureLoader,
 	MeshPhongMaterial,
-	SRGBColorSpace,
 	Vector2,
 	Vector3,
 	type Material,
@@ -389,13 +388,9 @@ export function useGlobe({
 					if (currentBatchId !== textureBatchIdRef.current) return;
 					const currentMaterial = cache.get(id);
 					if (currentMaterial) {
-						texture.colorSpace = SRGBColorSpace;
 						currentMaterial.map = texture;
 						currentMaterial.color.set(0xffffff);
-						// emissive keeps photo brightness true regardless of the globe's directional light
-						currentMaterial.emissive.set(0xffffff);
-						currentMaterial.emissiveMap = texture;
-						currentMaterial.opacity = 0.9;
+						currentMaterial.opacity = 0.45;
 						currentMaterial.needsUpdate = true;
 					}
 					finalize();
@@ -428,7 +423,7 @@ export function useGlobe({
 		if (!globeInstanceRef.current) return;
 
 		for (const [id, mat] of materialCacheRef.current.entries()) {
-			mat.opacity = id === hId ? 1.0 : 0.9;
+			mat.opacity = id === hId ? 0.85 : 0.45;
 			mat.needsUpdate = true;
 		}
 
