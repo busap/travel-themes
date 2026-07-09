@@ -372,7 +372,16 @@ export function useGlobe({
 			textureSrcMap.set(id, trip.coverPhoto);
 			remainingLoads += 1;
 
-			const textureUrl = r2Loader({ src: trip.coverPhoto, width: 640 });
+			const baseTextureUrl = r2Loader({
+				src: trip.coverPhoto,
+				width: 640,
+			});
+			// separate cache key from the cards' non-CORS <img> for the same cover, so the
+			// globe's crossOrigin texture request never reuses a header-less cached response
+			const textureUrl =
+				baseTextureUrl +
+				(baseTextureUrl.includes("?") ? "&" : "?") +
+				"webgl";
 			loader.load(
 				textureUrl,
 				(texture) => {
