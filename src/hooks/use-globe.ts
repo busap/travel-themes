@@ -24,6 +24,7 @@ import {
 } from "@/utils/globe";
 import { countryCodeToId, idToCountryName } from "@/utils/globe-country-map";
 import { getCountryName } from "@/utils/country";
+import r2Loader from "@/utils/r2-loader";
 
 let _topoDataCache: GeoFeature[] | null = null;
 
@@ -341,6 +342,19 @@ export function useGlobe({
 		texturesReadyRef.current = false;
 		applyGlobeStyling();
 
+		function finalize() {
+			remainingLoads -= 1;
+			if (remainingLoads === 0) {
+				texturesReadyRef.current = true;
+				if (isIntroCompleteRef.current) {
+					applyPolygonStyleCallbacks();
+					applyCountriesData();
+				} else {
+					pendingStyleRefreshRef.current = true;
+				}
+			}
+		}
+
 		for (const [id, countryTrips] of idToTrips.entries()) {
 			const trip = countryTrips[0];
 			let material = cache.get(id);
@@ -358,25 +372,26 @@ export function useGlobe({
 			textureSrcMap.set(id, trip.coverPhoto);
 			remainingLoads += 1;
 
-			loader.load(trip.coverPhoto, (texture) => {
-				if (currentBatchId !== textureBatchIdRef.current) return;
-				const currentMaterial = cache.get(id);
-				if (!currentMaterial) return;
-				currentMaterial.map = texture;
-				currentMaterial.color.set(0xffffff);
-				currentMaterial.opacity = 0.45;
-				currentMaterial.needsUpdate = true;
-				remainingLoads -= 1;
-				if (remainingLoads === 0) {
-					texturesReadyRef.current = true;
-					if (isIntroCompleteRef.current) {
-						applyPolygonStyleCallbacks();
-						applyCountriesData();
-					} else {
-						pendingStyleRefreshRef.current = true;
+			const textureUrl = r2Loader({ src: trip.coverPhoto, width: 640 });
+			loader.load(
+				textureUrl,
+				(texture) => {
+					if (currentBatchId !== textureBatchIdRef.current) return;
+					const currentMaterial = cache.get(id);
+					if (currentMaterial) {
+						currentMaterial.map = texture;
+						currentMaterial.color.set(0xffffff);
+						currentMaterial.opacity = 0.45;
+						currentMaterial.needsUpdate = true;
 					}
+					finalize();
+				},
+				undefined,
+				() => {
+					if (currentBatchId !== textureBatchIdRef.current) return;
+					finalize();
 				}
-			});
+			);
 		}
 
 		if (remainingLoads === 0) {
