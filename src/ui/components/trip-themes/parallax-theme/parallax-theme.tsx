@@ -1,12 +1,12 @@
 "use client";
 
 import { CSSProperties, useEffect, useRef, useMemo } from "react";
-import Image from "next/image";
 import { DM_Serif_Display } from "next/font/google";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { seededRandom } from "@/utils/random";
 import { getCountryNames } from "@/utils/country";
+import { resolveImageUrl } from "@/utils/image-url";
 import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -31,6 +31,8 @@ const TRANSITION_DELAY_FRAC = 0.18;
 const TRANSITION_FRAC = 0.52;
 const PHOTO_MOUNT_BEFORE = 2;
 const PHOTO_MOUNT_AFTER = 4;
+// Strips are full-viewport-width background slices; request a large derivative.
+const STRIP_IMAGE_WIDTH = 1920;
 const EASES = [
 	"power1.out",
 	"power2.out",
@@ -334,20 +336,6 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 									} as CSSProperties
 								}
 							>
-								{isPhotoMounted(p) && (
-									<Image
-										src={photo.src}
-										alt={
-											photo.title ||
-											`${trip.name} — photo ${p + 1}`
-										}
-										fill
-										className={styles.photoImageSingle}
-										sizes="(max-width: 768px) 100vw, 68vw"
-										priority={p < 2}
-										loading={p < 2 ? undefined : "lazy"}
-									/>
-								)}
 								{Array.from({ length: STRIP_COUNT }, (_, s) => (
 									<div
 										key={s}
@@ -367,7 +355,7 @@ export function ParallaxTheme({ trip, config }: ParallaxThemeProps) {
 													top: `${-(s / STRIP_COUNT) * 100}vh`,
 													backgroundImage:
 														isPhotoMounted(p)
-															? `url(${photo.src})`
+															? `url(${resolveImageUrl(photo.src, STRIP_IMAGE_WIDTH)})`
 															: undefined,
 												} as CSSProperties
 											}

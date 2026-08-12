@@ -57,10 +57,16 @@ function Thumbnail({
 	);
 }
 
+// How many neighbours of the active photo to keep mounted for smooth crossfades.
+const ACTIVE_MOUNT_RADIUS = 1;
+
 export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [canScrollLeft, setCanScrollLeft] = useState(false);
 	const [canScrollRight, setCanScrollRight] = useState(false);
+	const [mountedPhotos, setMountedPhotos] = useState<Set<number>>(
+		() => new Set([0])
+	);
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const preloadedRef = useRef<Set<string>>(new Set());
 	const displayPhotos = trip.photos;
@@ -68,6 +74,25 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 		displayPhotos.length > 0
 			? Math.min(activeIndex, displayPhotos.length - 1)
 			: 0;
+
+	// Mount the given photo (± a small radius) so its crossfade neighbours are
+	// ready. Once mounted a photo stays mounted, so navigating back is instant.
+	const mountAround = useCallback(
+		(index: number) => {
+			setMountedPhotos((prev) => {
+				const next = new Set(prev);
+				for (
+					let i = index - ACTIVE_MOUNT_RADIUS;
+					i <= index + ACTIVE_MOUNT_RADIUS;
+					i++
+				) {
+					if (i >= 0 && i < displayPhotos.length) next.add(i);
+				}
+				return next.size === prev.size ? prev : next;
+			});
+		},
+		[displayPhotos.length]
+	);
 	const timeline = config.animation.timeline;
 	const titleClasses = "text-4xl font-light tracking-wide";
 	const bodyClasses = "text-sm";
@@ -122,6 +147,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 	const handleThumbnailClick = useCallback(
 		(index: number) => {
 			setActiveIndex(index);
+			mountAround(index);
 
 			const photo = displayPhotos[index];
 			if (photo) preloadFullSize(photo.src);
@@ -135,7 +161,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 				});
 			}
 		},
-		[displayPhotos, preloadFullSize]
+		[displayPhotos, preloadFullSize, mountAround]
 	);
 
 	const scrollThumbs = useCallback((direction: number) => {
@@ -197,14 +223,16 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 									: undefined
 							}
 						>
-							<Image
-								src={photo.src}
-								alt={photo.title || `Photo ${index + 1}`}
-								fill
-								sizes="(max-width: 768px) 100vw, 80vw"
-								style={{ objectFit: "cover" }}
-								priority={index === 0}
-							/>
+							{mountedPhotos.has(index) && (
+								<Image
+									src={photo.src}
+									alt={photo.title || `Photo ${index + 1}`}
+									fill
+									sizes="(max-width: 768px) 100vw, 80vw"
+									style={{ objectFit: "cover" }}
+									priority={index === 0}
+								/>
+							)}
 						</div>
 					))}
 				</div>

@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { resolveImageUrl } from "@/utils/image-url";
 import styles from "./cursor-image-trail.module.scss";
 
 const PRELOAD_BUFFER = 3;
+// Trail cards are ~330px wide; a 640px derivative stays crisp at 2x DPR.
+const TRAIL_IMAGE_WIDTH = 640;
 
 interface CursorImageTrailProps {
 	images: string[];
@@ -25,11 +28,6 @@ export function CursorImageTrail({
 	lifespan = 2400,
 	maxItems = 20,
 }: CursorImageTrailProps) {
-	const [hasPointer] = useState(() => {
-		if (typeof window === "undefined") return true;
-		return window.matchMedia("(hover: hover)").matches;
-	});
-
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const mouseRef = useRef<Point>({ x: 0, y: 0 });
 	const interpRef = useRef<Point>({ x: 0, y: 0 });
@@ -42,7 +40,7 @@ export function CursorImageTrail({
 		if (typeof window === "undefined" || images.length === 0) return;
 		images.slice(0, PRELOAD_BUFFER).forEach((src) => {
 			const img = new window.Image();
-			img.src = src;
+			img.src = resolveImageUrl(src, TRAIL_IMAGE_WIDTH);
 		});
 	}, [images]);
 
@@ -56,8 +54,7 @@ export function CursorImageTrail({
 
 		const container = containerRef.current;
 
-		const handleMouseMove = (event: MouseEvent) => {
-			const { clientX, clientY } = event;
+		const updatePointer = (clientX: number, clientY: number) => {
 			mouseRef.current = { x: clientX, y: clientY };
 			if (!interpRef.current.x && !interpRef.current.y) {
 				interpRef.current = { x: clientX, y: clientY };
@@ -65,7 +62,22 @@ export function CursorImageTrail({
 			}
 		};
 
+		const handleMouseMove = (event: MouseEvent) => {
+			updatePointer(event.clientX, event.clientY);
+		};
+
+		// Touch devices have no hover, so drag-to-reveal drives the trail there:
+		// a finger dragged across the (non-scrolling) hero spawns the same trail.
+		const handleTouchMove = (event: TouchEvent) => {
+			const touch = event.touches[0];
+			if (!touch) return;
+			updatePointer(touch.clientX, touch.clientY);
+		};
+
 		window.addEventListener("mousemove", handleMouseMove);
+		window.addEventListener("touchmove", handleTouchMove, {
+			passive: true,
+		});
 
 		const distance = (a: Point, b: Point) => {
 			const dx = a.x - b.x;
@@ -87,14 +99,14 @@ export function CursorImageTrail({
 
 			const src = images[imageIndexRef.current % images.length];
 			imageIndexRef.current += 1;
-			el.style.backgroundImage = `url(${src})`;
+			el.style.backgroundImage = `url(${resolveImageUrl(src, TRAIL_IMAGE_WIDTH)})`;
 
 			const preloadSrc =
 				images[
 					(imageIndexRef.current + PRELOAD_BUFFER - 1) % images.length
 				];
 			const preloadImg = new window.Image();
-			preloadImg.src = preloadSrc;
+			preloadImg.src = resolveImageUrl(preloadSrc, TRAIL_IMAGE_WIDTH);
 
 			const randomness = (min: number, max: number) =>
 				min + Math.random() * (max - min);
@@ -169,6 +181,7 @@ export function CursorImageTrail({
 
 		return () => {
 			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("touchmove", handleTouchMove);
 			if (rafRef.current != null) {
 				cancelAnimationFrame(rafRef.current);
 			}
@@ -178,8 +191,6 @@ export function CursorImageTrail({
 			itemsRef.current = [];
 		};
 	}, [images, spawnThreshold, smoothing, lifespan, maxItems]);
-
-	if (!hasPointer) return null;
 
 	return <div ref={containerRef} className={styles.container} />;
 }

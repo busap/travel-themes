@@ -4,6 +4,7 @@ import {
 	AnimationEvent,
 	CSSProperties,
 	PointerEvent,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -12,6 +13,7 @@ import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryName, getCountryNames } from "@/utils/country";
+import { resolveImageUrl } from "@/utils/image-url";
 import styles from "./drag-shuffle-theme.module.scss";
 
 type SwipeDirection = "left" | "right";
@@ -30,6 +32,12 @@ const SWIPE_THRESHOLD = 120;
 const PRELOAD_BUFFER = 2;
 const MAX_VISIBLE_CARDS = 1 + PRELOAD_BUFFER;
 const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
+// Cards render at ~420px; a 640px derivative stays crisp at 2x DPR.
+const CARD_IMAGE_WIDTH = 640;
+// Accumulated horizontal wheel delta (trackpad two-finger swipe) that commits a
+// navigation. One gesture then locks until its momentum settles.
+const WHEEL_SWIPE_THRESHOLD = 60;
+const WHEEL_SETTLE_MS = 200;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -40,6 +48,11 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		null
 	);
 	const pointerStartRef = useRef<DragPoint | null>(null);
+	const deckRef = useRef<HTMLDivElement>(null);
+	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
+	const wheelLockRef = useRef(false);
+	const wheelAccumRef = useRef(0);
+	const wheelSettleRef = useRef<number | null>(null);
 	const animationDurationMs = Math.max(
 		260,
 		Math.round((config.animation?.timeline?.duration ?? 0.45) * 1000)
@@ -74,7 +87,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		const photo = deckPhotos[index % deckPhotos.length];
 		if (!photo) return;
 		const img = new window.Image();
-		img.src = photo.src;
+		img.src = resolveImageUrl(photo.src, CARD_IMAGE_WIDTH);
 	};
 
 	const clearGestureState = () => {
@@ -136,6 +149,64 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		setIsPointerDragging(false);
 	};
 
+	const goNext = () => {
+		if (!hasCards || isAnimating) return;
+		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
+		triggerSwipe("left");
+	};
+
+	const goPrev = () => {
+		handleRevert();
+	};
+
+	// Trackpad two-finger horizontal swipe → navigate. Keep the latest closure in
+	// a ref so the native listener (attached once below) always sees fresh state.
+	useEffect(() => {
+		wheelHandlerRef.current = (event: WheelEvent) => {
+			if (!hasCards) return;
+			if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+
+			event.preventDefault();
+
+			if (wheelSettleRef.current !== null) {
+				window.clearTimeout(wheelSettleRef.current);
+			}
+			wheelSettleRef.current = window.setTimeout(() => {
+				wheelLockRef.current = false;
+				wheelAccumRef.current = 0;
+			}, WHEEL_SETTLE_MS);
+
+			if (wheelLockRef.current || isAnimating) return;
+
+			wheelAccumRef.current += event.deltaX;
+			if (Math.abs(wheelAccumRef.current) < WHEEL_SWIPE_THRESHOLD) return;
+
+			const forward = wheelAccumRef.current > 0;
+			wheelLockRef.current = true;
+			wheelAccumRef.current = 0;
+			if (forward) goNext();
+			else goPrev();
+		};
+	});
+
+	// A native, non-passive listener lets us preventDefault so the gesture
+	// doesn't trigger the browser's back/forward history navigation.
+	useEffect(() => {
+		const el = deckRef.current;
+		if (!el) return;
+
+		const listener = (event: WheelEvent) =>
+			wheelHandlerRef.current?.(event);
+		el.addEventListener("wheel", listener, { passive: false });
+
+		return () => {
+			el.removeEventListener("wheel", listener);
+			if (wheelSettleRef.current !== null) {
+				window.clearTimeout(wheelSettleRef.current);
+			}
+		};
+	}, []);
+
 	const getDragDelta = (event: PointerEvent<HTMLDivElement>): DragPoint => {
 		if (!pointerStartRef.current) return EMPTY_DRAG_POINT;
 
@@ -183,6 +254,50 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		if (event.target !== event.currentTarget || !swipeDirection) return;
 		finalizeSwipe();
 	};
+
+	const renderChevron = (direction: "left" | "right") => (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			className={styles.navIcon}
+			aria-hidden="true"
+		>
+			<path
+				d={
+					direction === "left"
+						? "M15 6L9 12L15 18"
+						: "M9 6L15 12L9 18"
+				}
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+
+	const renderNavArrows = () => (
+		<>
+			<button
+				type="button"
+				className={`${styles.navArrow} ${styles.navArrowLeft}`}
+				onClick={goPrev}
+				disabled={!canRevert}
+				aria-label="Previous image"
+			>
+				{renderChevron("left")}
+			</button>
+			<button
+				type="button"
+				className={`${styles.navArrow} ${styles.navArrowRight}`}
+				onClick={goNext}
+				disabled={isAnimating}
+				aria-label="Next image"
+			>
+				{renderChevron("right")}
+			</button>
+		</>
+	);
 
 	const renderTripMeta = () => (
 		<header className={styles.tripPanel}>
@@ -291,6 +406,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 				{renderTripMeta()}
 				<div className={styles.deckPanel}>
 					<div
+						ref={deckRef}
 						className={`${styles.deck} ${
 							swipeDirection === "left"
 								? styles.deckLeft
@@ -300,9 +416,12 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 						}`}
 					>
 						{hasCards ? (
-							visibleCards.map((photo, index) =>
-								renderStackCard(photo, index)
-							)
+							<>
+								{visibleCards.map((photo, index) =>
+									renderStackCard(photo, index)
+								)}
+								{renderNavArrows()}
+							</>
 						) : (
 							<div className={styles.emptyState}>
 								No photos available

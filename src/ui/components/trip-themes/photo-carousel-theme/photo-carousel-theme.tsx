@@ -293,7 +293,10 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 										fill
 										draggable={false}
 										className={styles.image}
-										sizes="(max-width: 768px) 180px, 280px"
+										// Small, constantly-moving tiles: a modest
+										// derivative loads far faster with no
+										// perceptible quality loss on the carousel.
+										sizes="(max-width: 768px) 130px, 190px"
 									/>
 								</div>
 							))
