@@ -47,6 +47,11 @@
 	@apply flex flex-col items-center gap-4;
 }
 
+.deckRow {
+	@apply flex w-full items-center justify-center;
+	gap: 0.75rem;
+}
+
 .deck {
 	@apply relative;
 	width: min(100%, 420px);
@@ -76,13 +81,12 @@
 	@apply h-4 w-4;
 }
 
-// Desktop-only prev/next arrows flanking the deck. Touch devices navigate by
-// dragging, so these are hidden there.
+// Prev/next arrows sit beside the deck (outside the image). Touch devices
+// navigate by dragging, so the arrows are hidden there to reclaim the space.
 .navArrow {
-	@apply absolute top-1/2 z-20 hidden place-items-center rounded-full border border-white/30 text-white;
+	@apply hidden shrink-0 place-items-center rounded-full border border-white/30 text-white;
 	width: 2.75rem;
 	height: 2.75rem;
-	transform: translateY(-50%);
 	background: rgba(15, 23, 42, 0.55);
 	backdrop-filter: blur(6px);
 	transition:
@@ -97,21 +101,13 @@
 	}
 }
 
-.navArrowLeft {
-	left: 0.6rem;
-}
-
-.navArrowRight {
-	right: 0.6rem;
-}
-
 .navArrow:hover:not(:disabled) {
 	background: rgba(15, 23, 42, 0.78);
-	transform: translateY(-50%) scale(1.06);
+	transform: scale(1.08);
 }
 
 .navArrow:disabled {
-	@apply cursor-not-allowed opacity-0;
+	@apply cursor-not-allowed opacity-30;
 }
 
 .navIcon {

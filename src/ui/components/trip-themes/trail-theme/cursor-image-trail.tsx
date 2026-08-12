@@ -111,10 +111,27 @@ export function CursorImageTrail({
 			const randomness = (min: number, max: number) =>
 				min + Math.random() * (max - min);
 
-			const baseLeft =
-				xInContainer - el.offsetWidth / 2 || xInContainer - 110;
-			const baseTop =
-				yInContainer - el.offsetHeight / 2 || yInContainer - 75;
+			// Append before measuring so offsetWidth/Height are real (they're 0
+			// pre-insertion), then keep the item fully within the container so it
+			// never spills off-screen — important on narrow phones.
+			container.appendChild(el);
+			itemsRef.current.push(el);
+
+			const itemW = el.offsetWidth;
+			const itemH = el.offsetHeight;
+			const clampAxis = (value: number, extent: number, size: number) =>
+				Math.max(0, Math.min(value, Math.max(0, extent - size)));
+
+			const baseLeft = clampAxis(
+				xInContainer - itemW / 2,
+				rect.width,
+				itemW
+			);
+			const baseTop = clampAxis(
+				yInContainer - itemH / 2,
+				rect.height,
+				itemH
+			);
 
 			const dirX = mouseRef.current.x - interpRef.current.x;
 			const dirY = mouseRef.current.y - interpRef.current.y;
@@ -129,9 +146,6 @@ export function CursorImageTrail({
 			const rotation = randomness(-12, 12);
 			el.style.transform = `translate3d(0, 0, 0) rotate(${rotation}deg)`;
 
-			container.appendChild(el);
-			itemsRef.current.push(el);
-
 			if (itemsRef.current.length > maxItems) {
 				const first = itemsRef.current.shift();
 				if (first && first.parentElement === container) {
@@ -140,8 +154,16 @@ export function CursorImageTrail({
 			}
 
 			requestAnimationFrame(() => {
-				const targetLeft = baseLeft + normX * slideDistance;
-				const targetTop = baseTop + normY * slideDistance;
+				const targetLeft = clampAxis(
+					baseLeft + normX * slideDistance,
+					rect.width,
+					itemW
+				);
+				const targetTop = clampAxis(
+					baseTop + normY * slideDistance,
+					rect.height,
+					itemH
+				);
 				el.style.left = `${targetLeft}px`;
 				el.style.top = `${targetTop}px`;
 				el.style.opacity = "1";

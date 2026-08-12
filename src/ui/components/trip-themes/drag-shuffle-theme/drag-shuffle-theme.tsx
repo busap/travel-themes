@@ -35,9 +35,12 @@ const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 // Cards render at ~420px; a 640px derivative stays crisp at 2x DPR.
 const CARD_IMAGE_WIDTH = 640;
 // Accumulated horizontal wheel delta (trackpad two-finger swipe) that commits a
-// navigation. One gesture then locks until its momentum settles.
-const WHEEL_SWIPE_THRESHOLD = 60;
-const WHEEL_SETTLE_MS = 200;
+// navigation, then a short cooldown paces continuous scrolling so one flick can
+// step through several cards without firing dozens at once.
+const WHEEL_SWIPE_THRESHOLD = 45;
+const WHEEL_COOLDOWN_MS = 260;
+// A gap this long between wheel events starts a fresh gesture (resets the accum).
+const WHEEL_IDLE_RESET_MS = 160;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -50,9 +53,9 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const pointerStartRef = useRef<DragPoint | null>(null);
 	const deckRef = useRef<HTMLDivElement>(null);
 	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
-	const wheelLockRef = useRef(false);
 	const wheelAccumRef = useRef(0);
-	const wheelSettleRef = useRef<number | null>(null);
+	const wheelCooldownUntilRef = useRef(0);
+	const wheelLastTsRef = useRef(0);
 	const animationDurationMs = Math.max(
 		260,
 		Math.round((config.animation?.timeline?.duration ?? 0.45) * 1000)
@@ -149,14 +152,25 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		setIsPointerDragging(false);
 	};
 
-	const goNext = () => {
+	// Instant navigation for the arrows and trackpad. No fly-away animation — the
+	// next/previous card is already rendered behind the top card and eases into
+	// place via its own transform transition, so this feels immediate rather than
+	// waiting out the ~420ms swipe animation.
+	const advance = (direction: 1 | -1) => {
 		if (!hasCards || isAnimating) return;
-		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
-		triggerSwipe("left");
-	};
 
-	const goPrev = () => {
-		handleRevert();
+		if (direction === -1) {
+			handleRevert();
+			return;
+		}
+
+		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
+		setDragPoint(EMPTY_DRAG_POINT);
+		setSwipeDirection(null);
+		setActiveIndex((previous) => {
+			if (deckPhotos.length === 0) return 0;
+			return (previous + 1) % deckPhotos.length;
+		});
 	};
 
 	// Trackpad two-finger horizontal swipe → navigate. Keep the latest closure in
@@ -168,24 +182,22 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 			event.preventDefault();
 
-			if (wheelSettleRef.current !== null) {
-				window.clearTimeout(wheelSettleRef.current);
-			}
-			wheelSettleRef.current = window.setTimeout(() => {
-				wheelLockRef.current = false;
+			const now = performance.now();
+			// A pause between events means a new gesture — drop stale delta.
+			if (now - wheelLastTsRef.current > WHEEL_IDLE_RESET_MS) {
 				wheelAccumRef.current = 0;
-			}, WHEEL_SETTLE_MS);
+			}
+			wheelLastTsRef.current = now;
 
-			if (wheelLockRef.current || isAnimating) return;
+			if (now < wheelCooldownUntilRef.current) return;
 
 			wheelAccumRef.current += event.deltaX;
 			if (Math.abs(wheelAccumRef.current) < WHEEL_SWIPE_THRESHOLD) return;
 
 			const forward = wheelAccumRef.current > 0;
-			wheelLockRef.current = true;
 			wheelAccumRef.current = 0;
-			if (forward) goNext();
-			else goPrev();
+			wheelCooldownUntilRef.current = now + WHEEL_COOLDOWN_MS;
+			advance(forward ? 1 : -1);
 		};
 	});
 
@@ -201,9 +213,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 		return () => {
 			el.removeEventListener("wheel", listener);
-			if (wheelSettleRef.current !== null) {
-				window.clearTimeout(wheelSettleRef.current);
-			}
 		};
 	}, []);
 
@@ -276,28 +285,20 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		</svg>
 	);
 
-	const renderNavArrows = () => (
-		<>
+	const renderNavArrow = (direction: "left" | "right") => {
+		const isLeft = direction === "left";
+		return (
 			<button
 				type="button"
-				className={`${styles.navArrow} ${styles.navArrowLeft}`}
-				onClick={goPrev}
-				disabled={!canRevert}
-				aria-label="Previous image"
+				className={styles.navArrow}
+				onClick={() => advance(isLeft ? -1 : 1)}
+				disabled={isLeft ? !canRevert : isAnimating}
+				aria-label={isLeft ? "Previous image" : "Next image"}
 			>
-				{renderChevron("left")}
+				{renderChevron(direction)}
 			</button>
-			<button
-				type="button"
-				className={`${styles.navArrow} ${styles.navArrowRight}`}
-				onClick={goNext}
-				disabled={isAnimating}
-				aria-label="Next image"
-			>
-				{renderChevron("right")}
-			</button>
-		</>
-	);
+		);
+	};
 
 	const renderTripMeta = () => (
 		<header className={styles.tripPanel}>
@@ -405,28 +406,29 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			<div className={styles.layout}>
 				{renderTripMeta()}
 				<div className={styles.deckPanel}>
-					<div
-						ref={deckRef}
-						className={`${styles.deck} ${
-							swipeDirection === "left"
-								? styles.deckLeft
-								: swipeDirection === "right"
-									? styles.deckRight
-									: ""
-						}`}
-					>
-						{hasCards ? (
-							<>
-								{visibleCards.map((photo, index) =>
+					<div className={styles.deckRow}>
+						{hasCards && renderNavArrow("left")}
+						<div
+							ref={deckRef}
+							className={`${styles.deck} ${
+								swipeDirection === "left"
+									? styles.deckLeft
+									: swipeDirection === "right"
+										? styles.deckRight
+										: ""
+							}`}
+						>
+							{hasCards ? (
+								visibleCards.map((photo, index) =>
 									renderStackCard(photo, index)
-								)}
-								{renderNavArrows()}
-							</>
-						) : (
-							<div className={styles.emptyState}>
-								No photos available
-							</div>
-						)}
+								)
+							) : (
+								<div className={styles.emptyState}>
+									No photos available
+								</div>
+							)}
+						</div>
+						{hasCards && renderNavArrow("right")}
 					</div>
 
 					{hasCards && (

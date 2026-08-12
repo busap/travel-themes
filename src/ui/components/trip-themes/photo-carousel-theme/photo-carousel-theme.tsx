@@ -255,14 +255,16 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	});
 
 	const renderRow = (rowPhotos: Photo[], rowIndex: number) => {
-		const isActive = activeRows[rowIndex];
 		const loadedCount = Math.max(
 			0,
 			Math.min(loadedCounts[rowIndex] ?? 0, rowPhotos.length)
 		);
-		const loadedRowPhotos = rowPhotos.slice(0, loadedCount);
-		// Duplicate the photos so the track is seamlessly loopable
-		const items = [...loadedRowPhotos, ...loadedRowPhotos];
+		// Render EVERY card (fixed CSS width) twice for the seamless loop, and
+		// only mount the <Image> once a card is within the loaded window. The
+		// cards themselves are always present, so the track width never changes
+		// as images stream in — otherwise progressive loading would reflow the
+		// track and cause a visible jump/blink while dragging.
+		const items = [...rowPhotos, ...rowPhotos];
 
 		return (
 			<div
@@ -281,12 +283,16 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 					}}
 					className={styles.rowTrack}
 				>
-					{items.length > 0
-						? items.map((photo, i) => (
-								<div
-									key={`${photo.src}-${rowIndex}-${i}`}
-									className={styles.imageCard}
-								>
+					{items.map((photo, i) => {
+						const isLoaded = i % rowPhotos.length < loadedCount;
+						return (
+							<div
+								key={`${photo.src}-${rowIndex}-${i}`}
+								className={`${styles.imageCard} ${
+									isLoaded ? "" : styles.imageSkeleton
+								}`}
+							>
+								{isLoaded && (
 									<Image
 										src={photo.src}
 										alt={photo.title || `Photo ${i + 1}`}
@@ -298,21 +304,10 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 										// perceptible quality loss on the carousel.
 										sizes="(max-width: 768px) 130px, 190px"
 									/>
-								</div>
-							))
-						: Array.from(
-								{
-									length: isActive
-										? Math.min(3, rowPhotos.length)
-										: 0,
-								},
-								(_, i) => (
-									<div
-										key={`skeleton-${rowIndex}-${i}`}
-										className={`${styles.imageCard} ${styles.imageSkeleton}`}
-									/>
-								)
-							)}
+								)}
+							</div>
+						);
+					})}
 				</div>
 			</div>
 		);
