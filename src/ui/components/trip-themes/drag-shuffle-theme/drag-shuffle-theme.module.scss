@@ -19,7 +19,7 @@
 
 .layout {
 	@apply mx-auto grid w-full max-w-6xl gap-10;
-	grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+	grid-template-columns: minmax(0, 1fr) minmax(280px, 660px);
 	align-items: center;
 }
 
@@ -54,8 +54,11 @@
 
 .deck {
 	@apply relative;
-	width: min(100%, 420px);
+	// Height-driven so the card fills most of the viewport height; width follows
+	// the aspect ratio. flex-none keeps the arrows from shrinking it.
+	height: min(76vh, 720px);
 	aspect-ratio: 3 / 4.4;
+	flex: 0 0 auto;
 	perspective: 1200px;
 }
 
@@ -302,7 +305,8 @@
 	}
 
 	.deck {
-		width: min(76vw, 292px);
+		height: auto;
+		width: min(82vw, 320px);
 	}
 
 	.cardFooter {

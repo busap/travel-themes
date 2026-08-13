@@ -34,13 +34,11 @@ const MAX_VISIBLE_CARDS = 1 + PRELOAD_BUFFER;
 const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 // Cards render at ~420px; a 640px derivative stays crisp at 2x DPR.
 const CARD_IMAGE_WIDTH = 640;
-// Accumulated horizontal wheel delta (trackpad two-finger swipe) that commits a
-// navigation, then a short cooldown paces continuous scrolling so one flick can
-// step through several cards without firing dozens at once.
-const WHEEL_SWIPE_THRESHOLD = 45;
-const WHEEL_COOLDOWN_MS = 260;
-// A gap this long between wheel events starts a fresh gesture (resets the accum).
-const WHEEL_IDLE_RESET_MS = 160;
+// Trackpad swipe: one card per gesture, regardless of swipe size (matching a
+// drag). Fire once when a horizontal gesture starts, then ignore the rest of it
+// — including inertial momentum — until this quiet gap re-arms the next gesture.
+const WHEEL_START_DELTA = 6;
+const WHEEL_GESTURE_GAP_MS = 140;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -53,9 +51,8 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const pointerStartRef = useRef<DragPoint | null>(null);
 	const deckRef = useRef<HTMLDivElement>(null);
 	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
-	const wheelAccumRef = useRef(0);
-	const wheelCooldownUntilRef = useRef(0);
-	const wheelLastTsRef = useRef(0);
+	const wheelGestureActiveRef = useRef(false);
+	const wheelEndTimerRef = useRef<number | null>(null);
 	const animationDurationMs = Math.max(
 		260,
 		Math.round((config.animation?.timeline?.duration ?? 0.45) * 1000)
@@ -173,8 +170,9 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		});
 	};
 
-	// Trackpad two-finger horizontal swipe → navigate. Keep the latest closure in
-	// a ref so the native listener (attached once below) always sees fresh state.
+	// Trackpad two-finger horizontal swipe → one card per gesture. Keep the latest
+	// closure in a ref so the native listener (attached once below) sees fresh
+	// state.
 	useEffect(() => {
 		wheelHandlerRef.current = (event: WheelEvent) => {
 			if (!hasCards) return;
@@ -182,22 +180,20 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 			event.preventDefault();
 
-			const now = performance.now();
-			// A pause between events means a new gesture — drop stale delta.
-			if (now - wheelLastTsRef.current > WHEEL_IDLE_RESET_MS) {
-				wheelAccumRef.current = 0;
+			// Every event (including momentum) pushes the gesture-end out; the
+			// gesture only re-arms after a quiet gap, so one flick = one card.
+			if (wheelEndTimerRef.current !== null) {
+				window.clearTimeout(wheelEndTimerRef.current);
 			}
-			wheelLastTsRef.current = now;
+			wheelEndTimerRef.current = window.setTimeout(() => {
+				wheelGestureActiveRef.current = false;
+			}, WHEEL_GESTURE_GAP_MS);
 
-			if (now < wheelCooldownUntilRef.current) return;
+			if (wheelGestureActiveRef.current) return;
+			if (Math.abs(event.deltaX) < WHEEL_START_DELTA) return;
 
-			wheelAccumRef.current += event.deltaX;
-			if (Math.abs(wheelAccumRef.current) < WHEEL_SWIPE_THRESHOLD) return;
-
-			const forward = wheelAccumRef.current > 0;
-			wheelAccumRef.current = 0;
-			wheelCooldownUntilRef.current = now + WHEEL_COOLDOWN_MS;
-			advance(forward ? 1 : -1);
+			wheelGestureActiveRef.current = true;
+			advance(event.deltaX > 0 ? 1 : -1);
 		};
 	});
 
@@ -213,6 +209,9 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 		return () => {
 			el.removeEventListener("wheel", listener);
+			if (wheelEndTimerRef.current !== null) {
+				window.clearTimeout(wheelEndTimerRef.current);
+			}
 		};
 	}, []);
 
