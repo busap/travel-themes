@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useState, useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Syne, Space_Grotesk } from "next/font/google";
@@ -32,10 +32,10 @@ const MIN_CELLS_WHEN_EMPTY = GRID_COLS * MIN_ROWS_WHEN_EMPTY;
 const INITIAL_VISIBLE_ROWS = 3;
 
 export function GridHoverTheme({ trip }: GridHoverThemeProps) {
-	const [hoveredCell, setHoveredCell] = useState<number | null>(null);
-	const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
-	const [isHovering, setIsHovering] = useState(false);
-	const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+	const heroRef = useRef<HTMLElement | null>(null);
+	const wrapperRef = useRef<HTMLDivElement | null>(null);
+	const pointerRef = useRef({ x: 0.5, y: 0.5 });
+	const rafPendingRef = useRef(false);
 
 	const cellCount =
 		trip.photos.length > 0 ? trip.photos.length : MIN_CELLS_WHEN_EMPTY;
@@ -53,57 +53,72 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 		after: INITIAL_VISIBLE_ROWS - 1,
 	});
 
+	// Drive the tilt + spotlight imperatively (refs + rAF) instead of through
+	// React state — updating state on every mousemove re-rendered all cells and
+	// made the effect stutter. The active-cell highlight is pure CSS `:hover`.
+	const applyPointer = useCallback(() => {
+		rafPendingRef.current = false;
+		const { x, y } = pointerRef.current;
+		if (wrapperRef.current) {
+			const rotateX = (y - 0.5) * -10;
+			const rotateY = (x - 0.5) * 10;
+			wrapperRef.current.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+		}
+		if (heroRef.current) {
+			heroRef.current.style.setProperty("--mouse-x", `${x * 100}%`);
+			heroRef.current.style.setProperty("--mouse-y", `${y * 100}%`);
+		}
+	}, []);
+
 	const handleMouseMove = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			const w = typeof window !== "undefined" ? window.innerWidth : 1;
 			const h = typeof window !== "undefined" ? window.innerHeight : 1;
-			setMousePos({
-				x: e.clientX / w,
-				y: e.clientY / h,
-			});
+			pointerRef.current = { x: e.clientX / w, y: e.clientY / h };
+			if (!rafPendingRef.current) {
+				rafPendingRef.current = true;
+				requestAnimationFrame(applyPointer);
+			}
 		},
-		[]
+		[applyPointer]
 	);
 
-	const rotateX = (mousePos.y - 0.5) * -10;
-	const rotateY = (mousePos.x - 0.5) * 10;
+	const handleMouseEnter = useCallback(() => {
+		if (wrapperRef.current) {
+			wrapperRef.current.style.transition = "transform 0.08s ease-out";
+		}
+	}, []);
+
+	const handleMouseLeave = useCallback(() => {
+		pointerRef.current = { x: 0.5, y: 0.5 };
+		if (wrapperRef.current) {
+			wrapperRef.current.style.transition = "transform 0.7s ease-out";
+			wrapperRef.current.style.transform =
+				"perspective(1200px) rotateX(0deg) rotateY(0deg)";
+		}
+		if (heroRef.current) {
+			heroRef.current.style.setProperty("--mouse-x", "50%");
+			heroRef.current.style.setProperty("--mouse-y", "50%");
+		}
+	}, []);
 
 	const renderHero = () => (
 		<section
+			ref={heroRef}
 			className={styles.hero}
 			onMouseMove={handleMouseMove}
-			onMouseEnter={() => setIsHovering(true)}
-			onMouseLeave={() => {
-				setIsHovering(false);
-				setMousePos({ x: 0.5, y: 0.5 });
-				setHoveredCell(null);
-			}}
-			style={
-				{
-					"--mouse-x": `${mousePos.x * 100}%`,
-					"--mouse-y": `${mousePos.y * 100}%`,
-				} as React.CSSProperties
-			}
+			onMouseEnter={handleMouseEnter}
+			onMouseLeave={handleMouseLeave}
 		>
 			<div className={styles.spotlight} />
 
-			<div
-				className={styles.perspectiveWrapper}
-				style={{
-					transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-					transition: isHovering
-						? "transform 0.08s ease-out"
-						: "transform 0.7s ease-out",
-				}}
-			>
+			<div ref={wrapperRef} className={styles.perspectiveWrapper}>
 				<div className={styles.grid}>
 					{Array.from({ length: cellCount }, (_, cellIndex) => {
 						const photo = trip.photos[cellIndex];
 						const showPhoto = !!photo;
-						const isActive = hoveredCell === cellIndex;
 						const rowIndex = Math.floor(cellIndex / GRID_COLS);
 						const isFirstInRow = cellIndex % GRID_COLS === 0;
-						const isLoaded = loadedImages.has(cellIndex);
 
 						return (
 							<div
@@ -114,12 +129,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 								className={[
 									styles.cell,
 									showPhoto ? styles.hasPhoto : "",
-									isActive ? styles.active : "",
 								].join(" ")}
-								onMouseEnter={() =>
-									showPhoto && setHoveredCell(cellIndex)
-								}
-								onMouseLeave={() => setHoveredCell(null)}
 							>
 								{showPhoto && isRowMounted(rowIndex) && (
 									<div className={styles.photoReveal}>
@@ -140,19 +150,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 													? undefined
 													: "lazy"
 											}
-											onLoad={() =>
-												setLoadedImages(
-													(prev) =>
-														new Set([
-															...prev,
-															cellIndex,
-														])
-												)
-											}
 										/>
-										{!isLoaded && (
-											<div className={styles.skeleton} />
-										)}
 										<div className={styles.photoSheen} />
 									</div>
 								)}

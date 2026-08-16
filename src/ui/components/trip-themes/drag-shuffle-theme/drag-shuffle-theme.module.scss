@@ -18,8 +18,10 @@
 }
 
 .layout {
-	@apply mx-auto grid w-full max-w-6xl gap-10;
-	grid-template-columns: minmax(0, 1fr) minmax(280px, 660px);
+	// Full-bleed (no centered max-width) so the deck sits toward the right edge
+	// of the viewport rather than in a centered band.
+	@apply grid w-full gap-10;
+	grid-template-columns: minmax(0, 1fr) minmax(280px, 760px);
 	align-items: center;
 }
 
@@ -48,15 +50,17 @@
 }
 
 .deckRow {
-	@apply flex w-full items-center justify-center;
+	// Right-aligned so the card hugs the right edge; centered on mobile below.
+	@apply flex w-full items-center justify-end;
 	gap: 0.75rem;
 }
 
 .deck {
 	@apply relative;
 	// Height-driven so the card fills most of the viewport height; width follows
-	// the aspect ratio. flex-none keeps the arrows from shrinking it.
-	height: min(76vh, 720px);
+	// the aspect ratio. flex-none keeps the arrows from shrinking it. Capped so
+	// the counter row below and the page padding still fit without scrolling.
+	height: min(80vh, 840px);
 	aspect-ratio: 3 / 4.4;
 	flex: 0 0 auto;
 	perspective: 1200px;
@@ -280,8 +284,12 @@
 
 @media (max-width: $breakpoint-md) {
 	.layout {
-		@apply max-w-md gap-7;
+		@apply mx-auto max-w-md gap-7;
 		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.deckRow {
+		@apply justify-center;
 	}
 
 	.tripPanel {

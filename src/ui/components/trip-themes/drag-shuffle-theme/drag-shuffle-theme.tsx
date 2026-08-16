@@ -35,10 +35,13 @@ const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 // Cards render at ~420px; a 640px derivative stays crisp at 2x DPR.
 const CARD_IMAGE_WIDTH = 640;
 // Trackpad swipe: one card per gesture, regardless of swipe size (matching a
-// drag). Fire once when a horizontal gesture starts, then ignore the rest of it
-// — including inertial momentum — until this quiet gap re-arms the next gesture.
-const WHEEL_START_DELTA = 6;
-const WHEEL_GESTURE_GAP_MS = 140;
+// drag). Fire once when a horizontal gesture starts (delta past START), then
+// ignore the rest of it. Re-arm as soon as the flick's inertial momentum decays
+// below REARM — or, as a safety net, after a quiet gap — so the next flick fires
+// immediately without needing to move the mouse.
+const WHEEL_START_DELTA = 8;
+const WHEEL_REARM_DELTA = 4;
+const WHEEL_GESTURE_GAP_MS = 120;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -180,8 +183,9 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 			event.preventDefault();
 
-			// Every event (including momentum) pushes the gesture-end out; the
-			// gesture only re-arms after a quiet gap, so one flick = one card.
+			const absX = Math.abs(event.deltaX);
+
+			// Safety-net re-arm: a quiet gap always ends the gesture.
 			if (wheelEndTimerRef.current !== null) {
 				window.clearTimeout(wheelEndTimerRef.current);
 			}
@@ -189,8 +193,15 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 				wheelGestureActiveRef.current = false;
 			}, WHEEL_GESTURE_GAP_MS);
 
-			if (wheelGestureActiveRef.current) return;
-			if (Math.abs(event.deltaX) < WHEEL_START_DELTA) return;
+			if (wheelGestureActiveRef.current) {
+				// Re-arm once this flick's momentum has decayed toward zero.
+				if (absX < WHEEL_REARM_DELTA) {
+					wheelGestureActiveRef.current = false;
+				}
+				return;
+			}
+
+			if (absX < WHEEL_START_DELTA) return;
 
 			wheelGestureActiveRef.current = true;
 			advance(event.deltaX > 0 ? 1 : -1);
