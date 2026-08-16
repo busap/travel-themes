@@ -38,16 +38,12 @@ const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 // The deck renders at ~540px; a 1080px derivative stays crisp at 2x DPR and
 // matches what the <Image> requests, so the preload warms the same file.
 const CARD_IMAGE_WIDTH = 1080;
-// Trackpad swipe: one card per gesture, regardless of swipe size (matching a
-// drag). Fire once when a horizontal gesture starts (delta past START), then
-// ignore the rest of it. Re-arm for the next flick when the momentum decays
-// below REARM, when a fresh push re-accelerates above the decaying tail (a new
-// flick landing before the old momentum died), or after a quiet gap — so rapid
-// successive swipes each register without needing to move the mouse.
-const WHEEL_START_DELTA = 8;
-const WHEEL_REARM_DELTA = 4;
-const WHEEL_REACCEL_DELTA = 10;
-const WHEEL_GESTURE_GAP_MS = 120;
+// Trackpad swipe: exactly one card per gesture, regardless of swipe size
+// (matching a drag). Fire once when a horizontal gesture starts (delta past
+// START); every subsequent event — including inertial momentum — is ignored,
+// and the gesture only re-arms after a genuine quiet gap between wheel events.
+const WHEEL_START_DELTA = 6;
+const WHEEL_GESTURE_GAP_MS = 140;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -61,7 +57,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const deckRef = useRef<HTMLDivElement>(null);
 	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
 	const wheelGestureActiveRef = useRef(false);
-	const wheelLastAbsXRef = useRef(0);
 	const wheelEndTimerRef = useRef<number | null>(null);
 	const animationDurationMs = Math.max(
 		260,
@@ -198,27 +193,17 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 
 			event.preventDefault();
 
-			const absX = Math.abs(event.deltaX);
-			const prevAbsX = wheelLastAbsXRef.current;
-			wheelLastAbsXRef.current = absX;
-
-			// Safety-net re-arm: a quiet gap always ends the gesture.
+			// Every event (including momentum) pushes the gesture-end out; the
+			// gesture only re-arms after a quiet gap, so one flick = one card.
 			if (wheelEndTimerRef.current !== null) {
 				window.clearTimeout(wheelEndTimerRef.current);
 			}
 			wheelEndTimerRef.current = window.setTimeout(() => {
 				wheelGestureActiveRef.current = false;
-				wheelLastAbsXRef.current = 0;
 			}, WHEEL_GESTURE_GAP_MS);
 
-			if (wheelGestureActiveRef.current) {
-				const decayed = absX < WHEEL_REARM_DELTA;
-				const reAccelerated = absX > prevAbsX + WHEEL_REACCEL_DELTA;
-				if (!decayed && !reAccelerated) return;
-				wheelGestureActiveRef.current = false;
-			}
-
-			if (absX < WHEEL_START_DELTA) return;
+			if (wheelGestureActiveRef.current) return;
+			if (Math.abs(event.deltaX) < WHEEL_START_DELTA) return;
 
 			wheelGestureActiveRef.current = true;
 			advance(event.deltaX > 0 ? 1 : -1);
@@ -317,7 +302,9 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		return (
 			<button
 				type="button"
-				className={styles.navArrow}
+				className={`${styles.navArrow} ${
+					isLeft ? styles.navArrowLeft : styles.navArrowRight
+				}`}
 				onClick={() => advance(isLeft ? -1 : 1)}
 				disabled={isLeft ? !canRevert : isAnimating}
 				aria-label={isLeft ? "Previous image" : "Next image"}
@@ -433,7 +420,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			<div className={styles.layout}>
 				{renderTripMeta()}
 				<div className={styles.deckPanel}>
-					<div className={styles.deckRow}>
+					<div className={styles.deckStage}>
 						{hasCards && renderNavArrow("left")}
 						<div
 							ref={deckRef}
