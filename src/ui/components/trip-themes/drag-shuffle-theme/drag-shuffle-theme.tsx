@@ -38,14 +38,14 @@ const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 // The deck renders at ~540px; a 1080px derivative stays crisp at 2x DPR and
 // matches what the <Image> requests, so the preload warms the same file.
 const CARD_IMAGE_WIDTH = 1080;
-// Trackpad swipe: exactly one card per flick, but successive flicks each count
-// without needing to move the mouse. Momentum only ever DECAYS after a flick's
-// peak, so a genuine new flick is a fresh RISE that appears after the previous
-// momentum has fallen well below its peak. We fire on that rise (and on the
-// first flick), ignore everything else, and re-arm on a quiet gap as a safety.
+// Trackpad swipe: exactly one card per flick, with successive flicks still
+// counting without moving the mouse. Fire once when a horizontal gesture starts,
+// then stay locked. A flick's inertial momentum only ever DECAYS toward zero, so
+// re-arming only once the delta has essentially died (below REARM) means a
+// single swipe can never fire twice — its momentum crosses that point just once,
+// at the very end — while the next distinct flick starts fresh and fires again.
 const WHEEL_START_DELTA = 6;
-const WHEEL_RISE_DELTA = 10; // jump over the prior event that marks a new push
-const WHEEL_DECAY_FRACTION = 0.5; // momentum must fall below this × peak first
+const WHEEL_REARM_DELTA = 4;
 const WHEEL_GESTURE_GAP_MS = 140;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
@@ -60,9 +60,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const deckRef = useRef<HTMLDivElement>(null);
 	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
 	const wheelGestureActiveRef = useRef(false);
-	const wheelPeakRef = useRef(0);
-	const wheelPrevAbsRef = useRef(0);
-	const wheelDecayedRef = useRef(false);
 	const wheelEndTimerRef = useRef<number | null>(null);
 	const animationDurationMs = Math.max(
 		260,
@@ -200,8 +197,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			event.preventDefault();
 
 			const absX = Math.abs(event.deltaX);
-			const prevAbs = wheelPrevAbsRef.current;
-			wheelPrevAbsRef.current = absX;
 
 			// A quiet gap between events always ends the gesture (safety re-arm).
 			if (wheelEndTimerRef.current !== null) {
@@ -209,36 +204,20 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			}
 			wheelEndTimerRef.current = window.setTimeout(() => {
 				wheelGestureActiveRef.current = false;
-				wheelPrevAbsRef.current = 0;
 			}, WHEEL_GESTURE_GAP_MS);
 
-			const fire = () => {
-				wheelGestureActiveRef.current = true;
-				wheelPeakRef.current = absX;
-				wheelDecayedRef.current = false;
-				advance(event.deltaX > 0 ? 1 : -1);
-			};
-
-			if (!wheelGestureActiveRef.current) {
-				if (absX >= WHEEL_START_DELTA) fire();
+			if (wheelGestureActiveRef.current) {
+				// Locked to the current flick until its momentum dies away.
+				if (absX < WHEEL_REARM_DELTA) {
+					wheelGestureActiveRef.current = false;
+				}
 				return;
 			}
 
-			// Locked to the current flick. Track its peak and whether momentum
-			// has decayed; a fresh rise after that decay is a new flick.
-			if (absX > wheelPeakRef.current) wheelPeakRef.current = absX;
-			if (absX < wheelPeakRef.current * WHEEL_DECAY_FRACTION) {
-				wheelDecayedRef.current = true;
-			}
+			if (absX < WHEEL_START_DELTA) return;
 
-			const rising = absX > prevAbs + WHEEL_RISE_DELTA;
-			if (
-				wheelDecayedRef.current &&
-				rising &&
-				absX >= WHEEL_START_DELTA
-			) {
-				fire();
-			}
+			wheelGestureActiveRef.current = true;
+			advance(event.deltaX > 0 ? 1 : -1);
 		};
 	});
 
