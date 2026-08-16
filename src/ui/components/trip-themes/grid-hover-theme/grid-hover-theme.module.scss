@@ -19,15 +19,20 @@
 }
 
 .spotlight {
-	@apply fixed inset-0 pointer-events-none;
+	@apply fixed top-0 left-0 pointer-events-none;
 	z-index: 4;
+	// Fixed-size element carrying a centred gradient; positioned by a transform
+	// (composited) instead of an animated gradient position (repaints).
+	width: 1040px;
+	height: 800px;
 	background: radial-gradient(
-		ellipse 520px 400px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+		ellipse 520px 400px at center,
 		rgba(251, 191, 36, 0.09) 0%,
 		rgba(251, 191, 36, 0.03) 45%,
 		transparent 75%
 	);
-	transition: background 0.05s ease;
+	will-change: transform;
+	transform: translate3d(-9999px, -9999px, 0);
 }
 
 .perspectiveWrapper {

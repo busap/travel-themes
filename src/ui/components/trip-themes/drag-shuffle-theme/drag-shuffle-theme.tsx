@@ -29,18 +29,24 @@ interface DragShuffleThemeProps {
 }
 
 const SWIPE_THRESHOLD = 120;
-const PRELOAD_BUFFER = 2;
+// Cards ahead of the top one are rendered (hidden, but eager-loaded) so images
+// are ready when you swipe onto them; a couple more are preloaded beyond that.
+const PRELOAD_BUFFER = 3;
 const MAX_VISIBLE_CARDS = 1 + PRELOAD_BUFFER;
+const PRELOAD_AHEAD = 2;
 const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
-// Cards render at ~420px; a 640px derivative stays crisp at 2x DPR.
-const CARD_IMAGE_WIDTH = 640;
+// The deck renders at ~540px; a 1080px derivative stays crisp at 2x DPR and
+// matches what the <Image> requests, so the preload warms the same file.
+const CARD_IMAGE_WIDTH = 1080;
 // Trackpad swipe: one card per gesture, regardless of swipe size (matching a
 // drag). Fire once when a horizontal gesture starts (delta past START), then
-// ignore the rest of it. Re-arm as soon as the flick's inertial momentum decays
-// below REARM — or, as a safety net, after a quiet gap — so the next flick fires
-// immediately without needing to move the mouse.
+// ignore the rest of it. Re-arm for the next flick when the momentum decays
+// below REARM, when a fresh push re-accelerates above the decaying tail (a new
+// flick landing before the old momentum died), or after a quiet gap — so rapid
+// successive swipes each register without needing to move the mouse.
 const WHEEL_START_DELTA = 8;
 const WHEEL_REARM_DELTA = 4;
+const WHEEL_REACCEL_DELTA = 10;
 const WHEEL_GESTURE_GAP_MS = 120;
 
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
@@ -55,6 +61,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const deckRef = useRef<HTMLDivElement>(null);
 	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
 	const wheelGestureActiveRef = useRef(false);
+	const wheelLastAbsXRef = useRef(0);
 	const wheelEndTimerRef = useRef<number | null>(null);
 	const animationDurationMs = Math.max(
 		260,
@@ -91,6 +98,14 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		if (!photo) return;
 		const img = new window.Image();
 		img.src = resolveImageUrl(photo.src, CARD_IMAGE_WIDTH);
+	};
+
+	// Warm the images just beyond the rendered stack so a quick swipe lands on a
+	// ready photo rather than a skeleton.
+	const preloadUpcoming = () => {
+		for (let k = 0; k < PRELOAD_AHEAD; k++) {
+			preloadNextCard(activeIndex + MAX_VISIBLE_CARDS + k);
+		}
 	};
 
 	const clearGestureState = () => {
@@ -164,7 +179,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			return;
 		}
 
-		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
+		preloadUpcoming();
 		setDragPoint(EMPTY_DRAG_POINT);
 		setSwipeDirection(null);
 		setActiveIndex((previous) => {
@@ -184,6 +199,8 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			event.preventDefault();
 
 			const absX = Math.abs(event.deltaX);
+			const prevAbsX = wheelLastAbsXRef.current;
+			wheelLastAbsXRef.current = absX;
 
 			// Safety-net re-arm: a quiet gap always ends the gesture.
 			if (wheelEndTimerRef.current !== null) {
@@ -191,14 +208,14 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			}
 			wheelEndTimerRef.current = window.setTimeout(() => {
 				wheelGestureActiveRef.current = false;
+				wheelLastAbsXRef.current = 0;
 			}, WHEEL_GESTURE_GAP_MS);
 
 			if (wheelGestureActiveRef.current) {
-				// Re-arm once this flick's momentum has decayed toward zero.
-				if (absX < WHEEL_REARM_DELTA) {
-					wheelGestureActiveRef.current = false;
-				}
-				return;
+				const decayed = absX < WHEEL_REARM_DELTA;
+				const reAccelerated = absX > prevAbsX + WHEEL_REACCEL_DELTA;
+				if (!decayed && !reAccelerated) return;
+				wheelGestureActiveRef.current = false;
 			}
 
 			if (absX < WHEEL_START_DELTA) return;
@@ -241,7 +258,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		event.currentTarget.setPointerCapture(event.pointerId);
 		pointerStartRef.current = { x: event.clientX, y: event.clientY };
 		setIsPointerDragging(true);
-		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
+		preloadUpcoming();
 	};
 
 	const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -394,7 +411,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 					priority={isTopCard}
 					loading={isTopCard ? undefined : "eager"}
 					className={styles.cardImage}
-					sizes="(max-width: 768px) 78vw, 420px"
+					sizes="(max-width: 768px) 82vw, 540px"
 				/>
 				<div className={styles.imageShade} />
 				<footer className={styles.cardFooter}>

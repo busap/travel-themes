@@ -18,10 +18,10 @@
 }
 
 .layout {
-	// Full-bleed (no centered max-width) so the deck sits toward the right edge
-	// of the viewport rather than in a centered band.
-	@apply grid w-full gap-10;
-	grid-template-columns: minmax(0, 1fr) minmax(280px, 760px);
+	// Centered band with generous side margins; the wide right column gives the
+	// tall deck and its arrows room without shrinking the deck.
+	@apply mx-auto grid w-full max-w-7xl gap-10;
+	grid-template-columns: minmax(0, 1fr) minmax(280px, 720px);
 	align-items: center;
 }
 
@@ -50,8 +50,7 @@
 }
 
 .deckRow {
-	// Right-aligned so the card hugs the right edge; centered on mobile below.
-	@apply flex w-full items-center justify-end;
+	@apply flex w-full items-center justify-center;
 	gap: 0.75rem;
 }
 
@@ -286,10 +285,6 @@
 	.layout {
 		@apply mx-auto max-w-md gap-7;
 		grid-template-columns: minmax(0, 1fr);
-	}
-
-	.deckRow {
-		@apply justify-center;
 	}
 
 	.tripPanel {

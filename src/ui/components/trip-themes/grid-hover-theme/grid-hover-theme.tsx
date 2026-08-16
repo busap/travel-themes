@@ -31,9 +31,14 @@ const MIN_ROWS_WHEN_EMPTY = 5;
 const MIN_CELLS_WHEN_EMPTY = GRID_COLS * MIN_ROWS_WHEN_EMPTY;
 const INITIAL_VISIBLE_ROWS = 3;
 
+// Half the spotlight element's size (see .spotlight in the SCSS) — used to
+// centre it on the cursor via a transform.
+const SPOTLIGHT_HALF_W = 520;
+const SPOTLIGHT_HALF_H = 400;
+
 export function GridHoverTheme({ trip }: GridHoverThemeProps) {
-	const heroRef = useRef<HTMLElement | null>(null);
 	const wrapperRef = useRef<HTMLDivElement | null>(null);
+	const spotlightRef = useRef<HTMLDivElement | null>(null);
 	const pointerRef = useRef({ x: 0.5, y: 0.5 });
 	const rafPendingRef = useRef(false);
 
@@ -64,9 +69,15 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 			const rotateY = (x - 0.5) * 10;
 			wrapperRef.current.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 		}
-		if (heroRef.current) {
-			heroRef.current.style.setProperty("--mouse-x", `${x * 100}%`);
-			heroRef.current.style.setProperty("--mouse-y", `${y * 100}%`);
+		// Move the spotlight with a transform (GPU-composited) rather than
+		// repositioning a radial-gradient via CSS vars, which repaints the whole
+		// fixed overlay every frame and was the main source of stutter.
+		if (spotlightRef.current) {
+			const px =
+				x * (typeof window !== "undefined" ? window.innerWidth : 0);
+			const py =
+				y * (typeof window !== "undefined" ? window.innerHeight : 0);
+			spotlightRef.current.style.transform = `translate3d(${px - SPOTLIGHT_HALF_W}px, ${py - SPOTLIGHT_HALF_H}px, 0)`;
 		}
 	}, []);
 
@@ -96,21 +107,20 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 			wrapperRef.current.style.transform =
 				"perspective(1200px) rotateX(0deg) rotateY(0deg)";
 		}
-		if (heroRef.current) {
-			heroRef.current.style.setProperty("--mouse-x", "50%");
-			heroRef.current.style.setProperty("--mouse-y", "50%");
+		if (spotlightRef.current) {
+			spotlightRef.current.style.transform =
+				"translate3d(-9999px, -9999px, 0)";
 		}
 	}, []);
 
 	const renderHero = () => (
 		<section
-			ref={heroRef}
 			className={styles.hero}
 			onMouseMove={handleMouseMove}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 		>
-			<div className={styles.spotlight} />
+			<div ref={spotlightRef} className={styles.spotlight} />
 
 			<div ref={wrapperRef} className={styles.perspectiveWrapper}>
 				<div className={styles.grid}>
