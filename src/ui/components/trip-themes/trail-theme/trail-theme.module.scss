@@ -2,7 +2,10 @@
 @reference "../../../../app/globals.scss";
 
 .layout {
-	@apply relative w-full h-screen overflow-hidden;
+	@apply relative w-full overflow-hidden;
+	// Fill the visible viewport exactly on mobile — no page scroll, no gap.
+	height: 100vh;
+	height: 100dvh;
 	background: radial-gradient(
 		circle at top left,
 		#fefcf8 0%,

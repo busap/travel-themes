@@ -1,5 +1,9 @@
 @reference "../../../app/globals.scss";
 
 .tripDetail {
-	@apply min-h-screen;
+	// Dynamic viewport height so full-screen themes fit the visible area exactly
+	// on mobile (no empty space, no page scroll); scrollable themes still grow
+	// past this floor. Falls back to vh where dvh is unsupported.
+	min-height: 100vh;
+	min-height: 100dvh;
 }

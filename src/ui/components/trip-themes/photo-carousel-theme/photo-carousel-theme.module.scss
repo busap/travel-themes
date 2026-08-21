@@ -5,7 +5,10 @@
 
 .theme {
 	@apply relative w-full overflow-hidden;
-	height: 100svh;
+	// Dynamic viewport height fills the visible area exactly on mobile: svh left
+	// a gap at the bottom once the address bar hid.
+	height: 100vh;
+	height: 100dvh;
 	background:
 		radial-gradient(
 			ellipse 80% 60% at 50% 0%,
