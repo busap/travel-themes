@@ -4,7 +4,6 @@ import {
 	AnimationEvent,
 	CSSProperties,
 	PointerEvent,
-	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -38,16 +37,6 @@ const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
 // The deck renders at ~540px; a 1080px derivative stays crisp at 2x DPR and
 // matches what the <Image> requests, so the preload warms the same file.
 const CARD_IMAGE_WIDTH = 1080;
-// Trackpad swipe: exactly one card per flick, with successive flicks still
-// counting without moving the mouse. Fire once when a horizontal gesture starts,
-// then stay locked. A flick's inertial momentum only ever DECAYS toward zero, so
-// re-arming only once the delta has essentially died (below REARM) means a
-// single swipe can never fire twice — its momentum crosses that point just once,
-// at the very end — while the next distinct flick starts fresh and fires again.
-const WHEEL_START_DELTA = 6;
-const WHEEL_REARM_DELTA = 4;
-const WHEEL_GESTURE_GAP_MS = 140;
-
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [dragPoint, setDragPoint] = useState<DragPoint>(EMPTY_DRAG_POINT);
@@ -57,10 +46,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		null
 	);
 	const pointerStartRef = useRef<DragPoint | null>(null);
-	const deckRef = useRef<HTMLDivElement>(null);
-	const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
-	const wheelGestureActiveRef = useRef(false);
-	const wheelEndTimerRef = useRef<number | null>(null);
 	const animationDurationMs = Math.max(
 		260,
 		Math.round((config.animation?.timeline?.duration ?? 0.45) * 1000)
@@ -185,59 +170,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			return (previous + 1) % deckPhotos.length;
 		});
 	};
-
-	// Trackpad two-finger horizontal swipe → one card per gesture. Keep the latest
-	// closure in a ref so the native listener (attached once below) sees fresh
-	// state.
-	useEffect(() => {
-		wheelHandlerRef.current = (event: WheelEvent) => {
-			if (!hasCards) return;
-			if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
-
-			event.preventDefault();
-
-			const absX = Math.abs(event.deltaX);
-
-			// A quiet gap between events always ends the gesture (safety re-arm).
-			if (wheelEndTimerRef.current !== null) {
-				window.clearTimeout(wheelEndTimerRef.current);
-			}
-			wheelEndTimerRef.current = window.setTimeout(() => {
-				wheelGestureActiveRef.current = false;
-			}, WHEEL_GESTURE_GAP_MS);
-
-			if (wheelGestureActiveRef.current) {
-				// Locked to the current flick until its momentum dies away.
-				if (absX < WHEEL_REARM_DELTA) {
-					wheelGestureActiveRef.current = false;
-				}
-				return;
-			}
-
-			if (absX < WHEEL_START_DELTA) return;
-
-			wheelGestureActiveRef.current = true;
-			advance(event.deltaX > 0 ? 1 : -1);
-		};
-	});
-
-	// A native, non-passive listener lets us preventDefault so the gesture
-	// doesn't trigger the browser's back/forward history navigation.
-	useEffect(() => {
-		const el = deckRef.current;
-		if (!el) return;
-
-		const listener = (event: WheelEvent) =>
-			wheelHandlerRef.current?.(event);
-		el.addEventListener("wheel", listener, { passive: false });
-
-		return () => {
-			el.removeEventListener("wheel", listener);
-			if (wheelEndTimerRef.current !== null) {
-				window.clearTimeout(wheelEndTimerRef.current);
-			}
-		};
-	}, []);
 
 	const getDragDelta = (event: PointerEvent<HTMLDivElement>): DragPoint => {
 		if (!pointerStartRef.current) return EMPTY_DRAG_POINT;
@@ -434,7 +366,6 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 					<div className={styles.deckStage}>
 						{hasCards && renderNavArrow("left")}
 						<div
-							ref={deckRef}
 							className={`${styles.deck} ${
 								swipeDirection === "left"
 									? styles.deckLeft
