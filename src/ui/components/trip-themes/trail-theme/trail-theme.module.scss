@@ -28,6 +28,33 @@
 	@apply mt-1 text-sm md:text-base text-zinc-600 tracking-wide;
 }
 
+.hint {
+	@apply absolute bottom-8 left-1/2 z-30 text-sm text-zinc-500 tracking-wide;
+	transform: translateX(-50%);
+	display: none;
+	text-align: center;
+	white-space: nowrap;
+	pointer-events: none;
+	animation: hintPulse 2.4s ease-in-out infinite;
+}
+
+// Only surface the drag hint where there's no hover (touch devices).
+@media (hover: none) {
+	.hint {
+		display: block;
+	}
+}
+
+@keyframes hintPulse {
+	0%,
+	100% {
+		opacity: 0.55;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
 .stack {
 	@apply relative;
 	width: min(900px, 90vw);

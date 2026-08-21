@@ -5,10 +5,9 @@ import { Photo } from "@/types/photo";
 import { ThemeConfig } from "@/config/theme-config";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { getCountryNames } from "@/utils/country";
-import Image, { getImageProps } from "next/image";
+import Image from "next/image";
 import styles from "./showcase-theme.module.scss";
 
-const ACTIVE_PHOTO_SIZES = "(max-width: 768px) 100vw, 80vw";
 const THUMBNAIL_SIZES = "(max-width: 768px) 80px, 110px";
 
 interface ShowcaseThemeProps {
@@ -22,7 +21,6 @@ interface ThumbnailProps {
 	isActive: boolean;
 	isEager: boolean;
 	onClick: () => void;
-	onPreload: () => void;
 }
 
 function Thumbnail({
@@ -31,7 +29,6 @@ function Thumbnail({
 	isActive,
 	isEager,
 	onClick,
-	onPreload,
 }: ThumbnailProps) {
 	const [ready, setReady] = useState(false);
 
@@ -39,8 +36,6 @@ function Thumbnail({
 		<div
 			className={`${styles.thumbnail} ${isActive ? styles.thumbnailActive : ""}`}
 			onClick={onClick}
-			onMouseEnter={onPreload}
-			onFocus={onPreload}
 		>
 			{!ready && <div className={styles.thumbnailSkeleton} aria-hidden />}
 			<Image
@@ -57,17 +52,41 @@ function Thumbnail({
 	);
 }
 
+// How many neighbours of the active photo to keep mounted for smooth crossfades.
+const ACTIVE_MOUNT_RADIUS = 1;
+
 export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [canScrollLeft, setCanScrollLeft] = useState(false);
 	const [canScrollRight, setCanScrollRight] = useState(false);
+	const [mountedPhotos, setMountedPhotos] = useState<Set<number>>(
+		() => new Set([0])
+	);
 	const scrollRef = useRef<HTMLDivElement>(null);
-	const preloadedRef = useRef<Set<string>>(new Set());
 	const displayPhotos = trip.photos;
 	const effectiveIndex =
 		displayPhotos.length > 0
 			? Math.min(activeIndex, displayPhotos.length - 1)
 			: 0;
+
+	// Mount the given photo (± a small radius) so its crossfade neighbours are
+	// ready. Once mounted a photo stays mounted, so navigating back is instant.
+	const mountAround = useCallback(
+		(index: number) => {
+			setMountedPhotos((prev) => {
+				const next = new Set(prev);
+				for (
+					let i = index - ACTIVE_MOUNT_RADIUS;
+					i <= index + ACTIVE_MOUNT_RADIUS;
+					i++
+				) {
+					if (i >= 0 && i < displayPhotos.length) next.add(i);
+				}
+				return next.size === prev.size ? prev : next;
+			});
+		},
+		[displayPhotos.length]
+	);
 	const timeline = config.animation.timeline;
 	const titleClasses = "text-4xl font-light tracking-wide";
 	const bodyClasses = "text-sm";
@@ -93,38 +112,10 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 		};
 	}, [updateScrollButtons, displayPhotos.length]);
 
-	const preloadFullSize = useCallback((src: string) => {
-		if (typeof document === "undefined") return;
-		if (preloadedRef.current.has(src)) return;
-		preloadedRef.current.add(src);
-
-		// Use getImageProps so the preload URL matches the same optimized
-		// /_next/image variant the active <Image> will render, sharing the
-		// browser cache instead of fetching the original twice.
-		const {
-			props: { src: optimizedSrc, srcSet, sizes },
-		} = getImageProps({
-			src,
-			alt: "",
-			fill: true,
-			sizes: ACTIVE_PHOTO_SIZES,
-		});
-
-		const link = document.createElement("link");
-		link.rel = "preload";
-		link.as = "image";
-		link.href = optimizedSrc;
-		if (srcSet) link.setAttribute("imagesrcset", srcSet);
-		if (sizes) link.setAttribute("imagesizes", sizes);
-		document.head.appendChild(link);
-	}, []);
-
 	const handleThumbnailClick = useCallback(
 		(index: number) => {
 			setActiveIndex(index);
-
-			const photo = displayPhotos[index];
-			if (photo) preloadFullSize(photo.src);
+			mountAround(index);
 
 			const thumbs = scrollRef.current?.children;
 			if (thumbs?.[index]) {
@@ -135,7 +126,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 				});
 			}
 		},
-		[displayPhotos, preloadFullSize]
+		[mountAround]
 	);
 
 	const scrollThumbs = useCallback((direction: number) => {
@@ -197,14 +188,16 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 									: undefined
 							}
 						>
-							<Image
-								src={photo.src}
-								alt={photo.title || `Photo ${index + 1}`}
-								fill
-								sizes="(max-width: 768px) 100vw, 80vw"
-								style={{ objectFit: "cover" }}
-								priority={index === 0}
-							/>
+							{mountedPhotos.has(index) && (
+								<Image
+									src={photo.src}
+									alt={photo.title || `Photo ${index + 1}`}
+									fill
+									sizes="(max-width: 768px) 100vw, 80vw"
+									style={{ objectFit: "cover" }}
+									priority={index === 0}
+								/>
+							)}
 						</div>
 					))}
 				</div>
@@ -248,9 +241,8 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 							photo={photo}
 							index={index}
 							isActive={index === effectiveIndex}
-							isEager={index < 4}
+							isEager={index < 8}
 							onClick={() => handleThumbnailClick(index)}
-							onPreload={() => preloadFullSize(photo.src)}
 						/>
 					))}
 				</div>

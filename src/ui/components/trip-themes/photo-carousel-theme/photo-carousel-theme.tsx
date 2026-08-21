@@ -1,18 +1,10 @@
 "use client";
 
-import {
-	useRef,
-	useMemo,
-	useEffect,
-	useState,
-	CSSProperties,
-	PointerEvent,
-} from "react";
+import { useRef, useMemo, useEffect, CSSProperties, PointerEvent } from "react";
 import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryNames } from "@/utils/country";
-import { useVirtualWindow } from "@/hooks/use-virtual-window";
 import styles from "./photo-carousel-theme.module.scss";
 import { Photo } from "@/types/photo";
 
@@ -33,9 +25,9 @@ interface RowState {
 
 // Speed ratios per row (sign = direction, magnitude = relative speed)
 const ROW_SPEED_RATIOS = [-1.3, 1.0, -1.5] as const;
-const INITIAL_LOAD_PER_ROW = 7;
-const LOAD_CHUNK = 3;
-const LOAD_THRESHOLD_PX = 520;
+// How many leading tiles per row load eagerly for a fast first paint; the rest
+// use native lazy loading and stream in as the marquee brings them into view.
+const EAGER_PER_ROW = 6;
 
 function makeRowState(): RowState {
 	return {
@@ -77,31 +69,6 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	const trackRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
 	const wrapperRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
 
-	// `before: 0, after: 0` makes isMounted reflect strict viewport presence
-	// rather than a sliding window — needed because every "active row"
-	// drives an independent rAF animation track.
-	const { isMounted: isRowActive } = useVirtualWindow({
-		mode: "dom-visibility",
-		count: rows.length,
-		rootMarginPx: 120,
-		before: 0,
-		after: 0,
-	});
-
-	const isRow0Active = isRowActive(0);
-	const isRow1Active = isRowActive(1);
-	const isRow2Active = isRowActive(2);
-	const activeRows = useMemo(
-		() => [isRow0Active, isRow1Active, isRow2Active],
-		[isRow0Active, isRow1Active, isRow2Active]
-	);
-
-	const [loadedCounts, setLoadedCounts] = useState<number[]>(() =>
-		rows.map((_, i) => (i === 0 ? INITIAL_LOAD_PER_ROW : 0))
-	);
-	const loadedCountsRef = useRef<number[]>(loadedCounts);
-	const travelSinceLoadRef = useRef<number[]>([0, 0, 0]);
-
 	const rowStates = useRef<RowState[]>([
 		makeRowState(),
 		makeRowState(),
@@ -109,46 +76,6 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	]);
 
 	const rafRef = useRef<number>(0);
-
-	useEffect(() => {
-		loadedCountsRef.current = loadedCounts;
-	}, [loadedCounts]);
-
-	useEffect(() => {
-		const resetCounts = rows.map((_, i) =>
-			i === 0 ? INITIAL_LOAD_PER_ROW : 0
-		);
-		loadedCountsRef.current = resetCounts;
-		travelSinceLoadRef.current = [0, 0, 0];
-		const frameId = requestAnimationFrame(() => {
-			setLoadedCounts(resetCounts);
-		});
-		return () => cancelAnimationFrame(frameId);
-	}, [rows]);
-
-	useEffect(() => {
-		const frameId = requestAnimationFrame(() => {
-			setLoadedCounts((prev) => {
-				const next = [...prev];
-				let changed = false;
-
-				activeRows.forEach((isActive, rowIndex) => {
-					if (!isActive) return;
-					const minNeeded = Math.min(
-						INITIAL_LOAD_PER_ROW,
-						rows[rowIndex].length
-					);
-					if (next[rowIndex] < minNeeded) {
-						next[rowIndex] = minNeeded;
-						changed = true;
-					}
-				});
-
-				return changed ? next : prev;
-			});
-		});
-		return () => cancelAnimationFrame(frameId);
-	}, [activeRows, rows]);
 
 	useEffect(() => {
 		const speeds = ROW_SPEED_RATIOS.map((r) => r * baseSpeed);
@@ -171,7 +98,6 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 				const halfWidth = el.scrollWidth / 2;
 				if (halfWidth <= 0) return;
-				const before = state.position;
 
 				if (!state.isDragging) {
 					// Apply momentum from drag release
@@ -186,21 +112,6 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 				state.position = clamp(state.position, halfWidth);
 				el.style.transform = `translateX(${state.position}px)`;
-
-				if (activeRows[i]) {
-					const moved = Math.abs(state.position - before);
-					travelSinceLoadRef.current[i] += moved;
-					if (travelSinceLoadRef.current[i] >= LOAD_THRESHOLD_PX) {
-						travelSinceLoadRef.current[i] = 0;
-						setLoadedCounts((prev) => {
-							const rowLimit = rows[i].length;
-							if (prev[i] >= rowLimit) return prev;
-							const next = [...prev];
-							next[i] = Math.min(rowLimit, prev[i] + LOAD_CHUNK);
-							return next;
-						});
-					}
-				}
 			});
 
 			rafRef.current = requestAnimationFrame(tick);
@@ -208,7 +119,7 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 
 		rafRef.current = requestAnimationFrame(tick);
 		return () => cancelAnimationFrame(rafRef.current);
-	}, [activeRows, baseSpeed, rows]);
+	}, [baseSpeed, rows]);
 
 	const getPointerHandlers = (rowIndex: number) => ({
 		onPointerDown(e: PointerEvent<HTMLDivElement>) {
@@ -255,14 +166,11 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 	});
 
 	const renderRow = (rowPhotos: Photo[], rowIndex: number) => {
-		const isActive = activeRows[rowIndex];
-		const loadedCount = Math.max(
-			0,
-			Math.min(loadedCounts[rowIndex] ?? 0, rowPhotos.length)
-		);
-		const loadedRowPhotos = rowPhotos.slice(0, loadedCount);
-		// Duplicate the photos so the track is seamlessly loopable
-		const items = [...loadedRowPhotos, ...loadedRowPhotos];
+		// Render every tile twice for the seamless loop. Each <Image> loads
+		// natively: the leading few per row are eager for a fast first paint and
+		// the rest are lazy, streaming in reliably as the marquee (or a drag)
+		// brings them into view — same approach the other themes use.
+		const items = [...rowPhotos, ...rowPhotos];
 
 		return (
 			<div
@@ -281,35 +189,28 @@ export function PhotoCarouselTheme({ trip, config }: PhotoCarouselThemeProps) {
 					}}
 					className={styles.rowTrack}
 				>
-					{items.length > 0
-						? items.map((photo, i) => (
-								<div
-									key={`${photo.src}-${rowIndex}-${i}`}
-									className={styles.imageCard}
-								>
-									<Image
-										src={photo.src}
-										alt={photo.title || `Photo ${i + 1}`}
-										fill
-										draggable={false}
-										className={styles.image}
-										sizes="(max-width: 768px) 180px, 280px"
-									/>
-								</div>
-							))
-						: Array.from(
-								{
-									length: isActive
-										? Math.min(3, rowPhotos.length)
-										: 0,
-								},
-								(_, i) => (
-									<div
-										key={`skeleton-${rowIndex}-${i}`}
-										className={`${styles.imageCard} ${styles.imageSkeleton}`}
-									/>
-								)
-							)}
+					{items.map((photo, i) => {
+						const isEager = i < EAGER_PER_ROW;
+						return (
+							<div
+								key={`${photo.src}-${rowIndex}-${i}`}
+								className={styles.imageCard}
+							>
+								<Image
+									src={photo.src}
+									alt={photo.title || `Photo ${i + 1}`}
+									fill
+									draggable={false}
+									loading={isEager ? "eager" : "lazy"}
+									className={styles.image}
+									// Small, constantly-moving tiles: a modest
+									// derivative loads far faster with no
+									// perceptible quality loss on the carousel.
+									sizes="(max-width: 768px) 130px, 190px"
+								/>
+							</div>
+						);
+					})}
 				</div>
 			</div>
 		);

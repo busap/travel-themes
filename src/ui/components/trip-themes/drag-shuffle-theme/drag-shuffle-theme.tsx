@@ -12,6 +12,7 @@ import Image from "next/image";
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
 import { getCountryName, getCountryNames } from "@/utils/country";
+import { resolveImageUrl } from "@/utils/image-url";
 import styles from "./drag-shuffle-theme.module.scss";
 
 type SwipeDirection = "left" | "right";
@@ -27,10 +28,15 @@ interface DragShuffleThemeProps {
 }
 
 const SWIPE_THRESHOLD = 120;
-const PRELOAD_BUFFER = 2;
+// Cards ahead of the top one are rendered (hidden, but eager-loaded) so images
+// are ready when you swipe onto them; a couple more are preloaded beyond that.
+const PRELOAD_BUFFER = 3;
 const MAX_VISIBLE_CARDS = 1 + PRELOAD_BUFFER;
+const PRELOAD_AHEAD = 2;
 const EMPTY_DRAG_POINT: DragPoint = { x: 0, y: 0 };
-
+// The deck renders at ~540px; a 1080px derivative stays crisp at 2x DPR and
+// matches what the <Image> requests, so the preload warms the same file.
+const CARD_IMAGE_WIDTH = 1080;
 export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [dragPoint, setDragPoint] = useState<DragPoint>(EMPTY_DRAG_POINT);
@@ -74,7 +80,15 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		const photo = deckPhotos[index % deckPhotos.length];
 		if (!photo) return;
 		const img = new window.Image();
-		img.src = photo.src;
+		img.src = resolveImageUrl(photo.src, CARD_IMAGE_WIDTH);
+	};
+
+	// Warm the images just beyond the rendered stack so a quick swipe lands on a
+	// ready photo rather than a skeleton.
+	const preloadUpcoming = () => {
+		for (let k = 0; k < PRELOAD_AHEAD; k++) {
+			preloadNextCard(activeIndex + MAX_VISIBLE_CARDS + k);
+		}
 	};
 
 	const clearGestureState = () => {
@@ -136,6 +150,27 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		setIsPointerDragging(false);
 	};
 
+	// Instant navigation for the arrows and trackpad. No fly-away animation — the
+	// next/previous card is already rendered behind the top card and eases into
+	// place via its own transform transition, so this feels immediate rather than
+	// waiting out the ~420ms swipe animation.
+	const advance = (direction: 1 | -1) => {
+		if (!hasCards || isAnimating) return;
+
+		if (direction === -1) {
+			handleRevert();
+			return;
+		}
+
+		preloadUpcoming();
+		setDragPoint(EMPTY_DRAG_POINT);
+		setSwipeDirection(null);
+		setActiveIndex((previous) => {
+			if (deckPhotos.length === 0) return 0;
+			return (previous + 1) % deckPhotos.length;
+		});
+	};
+
 	const getDragDelta = (event: PointerEvent<HTMLDivElement>): DragPoint => {
 		if (!pointerStartRef.current) return EMPTY_DRAG_POINT;
 
@@ -151,7 +186,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 		event.currentTarget.setPointerCapture(event.pointerId);
 		pointerStartRef.current = { x: event.clientX, y: event.clientY };
 		setIsPointerDragging(true);
-		preloadNextCard(activeIndex + MAX_VISIBLE_CARDS);
+		preloadUpcoming();
 	};
 
 	const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -182,6 +217,44 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 	const handleSwipeAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
 		if (event.target !== event.currentTarget || !swipeDirection) return;
 		finalizeSwipe();
+	};
+
+	const renderChevron = (direction: "left" | "right") => (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			className={styles.navIcon}
+			aria-hidden="true"
+		>
+			<path
+				d={
+					direction === "left"
+						? "M15 6L9 12L15 18"
+						: "M9 6L15 12L9 18"
+				}
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+
+	const renderNavArrow = (direction: "left" | "right") => {
+		const isLeft = direction === "left";
+		return (
+			<button
+				type="button"
+				className={`${styles.navArrow} ${
+					isLeft ? styles.navArrowLeft : styles.navArrowRight
+				}`}
+				onClick={() => advance(isLeft ? -1 : 1)}
+				disabled={isLeft ? !canRevert : isAnimating}
+				aria-label={isLeft ? "Previous image" : "Next image"}
+			>
+				{renderChevron(direction)}
+			</button>
+		);
 	};
 
 	const renderTripMeta = () => (
@@ -268,7 +341,7 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 					priority={isTopCard}
 					loading={isTopCard ? undefined : "eager"}
 					className={styles.cardImage}
-					sizes="(max-width: 768px) 78vw, 420px"
+					sizes="(max-width: 768px) 82vw, 540px"
 				/>
 				<div className={styles.imageShade} />
 				<footer className={styles.cardFooter}>
@@ -290,24 +363,28 @@ export function DragShuffleTheme({ trip, config }: DragShuffleThemeProps) {
 			<div className={styles.layout}>
 				{renderTripMeta()}
 				<div className={styles.deckPanel}>
-					<div
-						className={`${styles.deck} ${
-							swipeDirection === "left"
-								? styles.deckLeft
-								: swipeDirection === "right"
-									? styles.deckRight
-									: ""
-						}`}
-					>
-						{hasCards ? (
-							visibleCards.map((photo, index) =>
-								renderStackCard(photo, index)
-							)
-						) : (
-							<div className={styles.emptyState}>
-								No photos available
-							</div>
-						)}
+					<div className={styles.deckStage}>
+						{hasCards && renderNavArrow("left")}
+						<div
+							className={`${styles.deck} ${
+								swipeDirection === "left"
+									? styles.deckLeft
+									: swipeDirection === "right"
+										? styles.deckRight
+										: ""
+							}`}
+						>
+							{hasCards ? (
+								visibleCards.map((photo, index) =>
+									renderStackCard(photo, index)
+								)
+							) : (
+								<div className={styles.emptyState}>
+									No photos available
+								</div>
+							)}
+						</div>
+						{hasCards && renderNavArrow("right")}
 					</div>
 
 					{hasCards && (

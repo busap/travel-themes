@@ -18,8 +18,10 @@
 }
 
 .layout {
-	@apply mx-auto grid w-full max-w-6xl gap-10;
-	grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+	// Centered band with generous side margins; the wide right column gives the
+	// tall deck and its arrows room without shrinking the deck.
+	@apply mx-auto grid w-full max-w-7xl gap-10;
+	grid-template-columns: minmax(0, 1fr) minmax(280px, 720px);
 	align-items: center;
 }
 
@@ -45,11 +47,22 @@
 
 .deckPanel {
 	@apply flex flex-col items-center gap-4;
+	// Height-driven card, width derived from the aspect ratio. Shared as vars so
+	// the stage and the counter row below line up exactly with the image. Capped
+	// so the counter row and page padding still fit without scrolling.
+	--deck-height: min(80vh, 840px);
+	--deck-width: calc(var(--deck-height) * 3 / 4.4);
+}
+
+.deckStage {
+	@apply relative;
+	width: var(--deck-width);
 }
 
 .deck {
 	@apply relative;
-	width: min(100%, 420px);
+	width: var(--deck-width);
+	height: var(--deck-height);
 	aspect-ratio: 3 / 4.4;
 	perspective: 1200px;
 }
@@ -74,6 +87,47 @@
 
 .revertIcon {
 	@apply h-4 w-4;
+}
+
+// Prev/next arrows sit just outside the image, vertically centred on it. Touch
+// devices navigate by dragging, so the arrows are hidden there.
+.navArrow {
+	@apply absolute top-1/2 z-20 hidden place-items-center rounded-full border border-white/30 text-white;
+	width: 2.75rem;
+	height: 2.75rem;
+	background: rgba(15, 23, 42, 0.55);
+	backdrop-filter: blur(6px);
+	transition:
+		background-color 160ms ease,
+		opacity 160ms ease;
+}
+
+.navArrowLeft {
+	right: calc(100% + 0.85rem);
+	transform: translateY(-50%);
+}
+
+.navArrowRight {
+	left: calc(100% + 0.85rem);
+	transform: translateY(-50%);
+}
+
+@media (hover: hover) {
+	.navArrow {
+		display: grid;
+	}
+}
+
+.navArrow:hover:not(:disabled) {
+	background: rgba(15, 23, 42, 0.78);
+}
+
+.navArrow:disabled {
+	@apply cursor-not-allowed opacity-30;
+}
+
+.navIcon {
+	@apply h-5 w-5;
 }
 
 .stackCard {
@@ -163,7 +217,10 @@
 }
 
 .progressRow {
-	@apply flex items-center justify-between w-full gap-2 px-4;
+	// Match the image width so the back button and counter line up with the
+	// image's left/right edges.
+	@apply flex items-center justify-between gap-2 px-1;
+	width: var(--deck-width);
 }
 
 .progress {
@@ -239,7 +296,7 @@
 
 @media (max-width: $breakpoint-md) {
 	.layout {
-		@apply max-w-md gap-7;
+		@apply mx-auto max-w-md gap-7;
 		grid-template-columns: minmax(0, 1fr);
 	}
 
@@ -263,8 +320,13 @@
 		@apply text-xs;
 	}
 
+	.deckPanel {
+		// Width-driven on mobile; the stage, deck and counter row all follow.
+		--deck-width: min(82vw, 320px);
+	}
+
 	.deck {
-		width: min(76vw, 292px);
+		height: auto;
 	}
 
 	.cardFooter {
@@ -276,6 +338,6 @@
 	}
 
 	.progressRow {
-		@apply gap-1.5 justify-around px-2;
+		@apply gap-1.5;
 	}
 }

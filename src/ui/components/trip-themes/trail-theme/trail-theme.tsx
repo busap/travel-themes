@@ -33,6 +33,14 @@ export function TrailTheme({ trip }: TrailThemeProps) {
 		</div>
 	);
 
+	// Desktop reveals the trail on hover; touch devices have no hover, so this
+	// hint tells them to drag instead. Shown only on `(hover: none)` via CSS.
+	const renderHint = () => (
+		<p className={styles.hint} aria-hidden>
+			Drag across the screen to reveal photos
+		</p>
+	);
+
 	const renderStack = () => (
 		<div className={styles.stack}>
 			{stackPhotos.map((photo, index) => (
@@ -56,6 +64,7 @@ export function TrailTheme({ trip }: TrailThemeProps) {
 		<div className={styles.layout}>
 			<div className={styles.content}>
 				{renderInfo()}
+				{renderHint()}
 				{renderStack()}
 				{trailImages.length > 0 && (
 					<CursorImageTrail

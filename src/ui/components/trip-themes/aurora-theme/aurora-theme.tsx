@@ -169,11 +169,13 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 										aria-hidden
 									/>
 								)}
-								<p
-									className={`${styles.photoCaption} ${crimson.className}`}
-								>
-									{photo.title || ""}
-								</p>
+								{photo.title?.trim() && (
+									<p
+										className={`${styles.photoCaption} ${crimson.className}`}
+									>
+										{photo.title}
+									</p>
+								)}
 							</div>
 						</div>
 					);

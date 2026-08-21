@@ -19,15 +19,20 @@
 }
 
 .spotlight {
-	@apply fixed inset-0 pointer-events-none;
+	@apply fixed top-0 left-0 pointer-events-none;
 	z-index: 4;
+	// Fixed-size element carrying a centred gradient; positioned by a transform
+	// (composited) instead of an animated gradient position (repaints).
+	width: 1040px;
+	height: 800px;
 	background: radial-gradient(
-		ellipse 520px 400px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+		ellipse 520px 400px at center,
 		rgba(251, 191, 36, 0.09) 0%,
 		rgba(251, 191, 36, 0.03) 45%,
 		transparent 75%
 	);
-	transition: background 0.05s ease;
+	will-change: transform;
+	transform: translate3d(-9999px, -9999px, 0);
 }
 
 .perspectiveWrapper {
@@ -66,7 +71,9 @@
 		transition: opacity 0.35s ease;
 	}
 
-	&.active {
+	// Pure-CSS hover highlight — no React state, so moving the cursor across the
+	// grid never triggers a re-render.
+	&.hasPhoto:hover {
 		border-color: rgba(251, 191, 36, 0.55);
 		background: rgba(251, 191, 36, 0.025);
 		box-shadow:
@@ -74,7 +81,7 @@
 			0 0 40px rgba(251, 191, 36, 0.1);
 		z-index: 2;
 
-		&.hasPhoto::before {
+		&::before {
 			opacity: 0;
 		}
 
@@ -83,29 +90,6 @@
 			transform: scale(1);
 			clip-path: inset(0% 0% 0% 0%);
 		}
-	}
-}
-
-.skeleton {
-	@apply absolute inset-0;
-	z-index: 1;
-	pointer-events: none;
-	background: linear-gradient(
-		90deg,
-		rgba(255, 255, 255, 0.05) 0%,
-		rgba(255, 255, 255, 0.13) 50%,
-		rgba(255, 255, 255, 0.05) 100%
-	);
-	background-size: 200% 100%;
-	animation: skeletonShimmer 1.4s ease-in-out infinite;
-}
-
-@keyframes skeletonShimmer {
-	0% {
-		background-position: 200% 0;
-	}
-	100% {
-		background-position: -200% 0;
 	}
 }
 
@@ -182,14 +166,11 @@
 }
 
 @media (hover: none) {
+	// No hover on touch: reveal every photo so the grid isn't blank.
 	.photoReveal {
-		opacity: 0.6;
+		opacity: 1;
 		transform: scale(1);
 		clip-path: inset(0% 0% 0% 0%);
-	}
-
-	.cell.active .photoReveal {
-		opacity: 1;
 	}
 }
 
