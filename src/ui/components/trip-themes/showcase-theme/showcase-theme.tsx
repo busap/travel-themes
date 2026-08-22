@@ -193,7 +193,7 @@ export function ShowcaseTheme({ trip, config }: ShowcaseThemeProps) {
 									src={photo.src}
 									alt={photo.title || `Photo ${index + 1}`}
 									fill
-									sizes="(max-width: 768px) 100vw, 80vw"
+									sizes="100vw"
 									style={{ objectFit: "cover" }}
 									priority={index === 0}
 								/>
