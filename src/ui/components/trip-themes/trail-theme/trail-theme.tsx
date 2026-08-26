@@ -33,11 +33,12 @@ export function TrailTheme({ trip }: TrailThemeProps) {
 		</div>
 	);
 
-	// Desktop reveals the trail on hover; touch devices have no hover, so this
-	// hint tells them to drag instead. Shown only on `(hover: none)` via CSS.
+	// Desktop reveals the trail on hover; touch devices have no hover and reveal
+	// one photo per tap, so this hint tells them to tap. Shown only on
+	// `(hover: none)` via CSS.
 	const renderHint = () => (
 		<p className={styles.hint} aria-hidden>
-			Drag across the screen to reveal photos
+			Tap anywhere to reveal photos
 		</p>
 	);
 

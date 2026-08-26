@@ -6,6 +6,9 @@
 	// Fill the visible viewport exactly on mobile — no page scroll, no gap.
 	height: 100vh;
 	height: 100dvh;
+	// The theme fills the viewport and never scrolls, so swallow scroll chaining
+	// to stop iOS rubber-banding the page under the photos.
+	overscroll-behavior: none;
 	background: radial-gradient(
 		circle at top left,
 		#fefcf8 0%,
@@ -41,10 +44,16 @@
 	animation: hintPulse 2.4s ease-in-out infinite;
 }
 
-// Only surface the drag hint where there's no hover (touch devices).
+// Only surface the tap hint where there's no hover (touch devices), and let
+// taps land without the browser treating them as the start of a pan/zoom —
+// that gesture is what made the page jump while photos were being revealed.
 @media (hover: none) {
 	.hint {
 		display: block;
+	}
+
+	.layout {
+		touch-action: none;
 	}
 }
 
