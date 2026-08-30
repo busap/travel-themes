@@ -1,5 +1,10 @@
 @reference "../../../app/globals.scss";
 
 .home {
-	@apply h-screen w-screen overflow-hidden;
+	@apply w-full overflow-hidden;
+	// dvh follows the visible viewport, so the globe is never cut off behind
+	// the mobile browser bar the way a flat 100vh leaves it.
+	height: 100vh;
+	height: 100dvh;
+	overscroll-behavior: none;
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
+import { useIsTouch } from "@/hooks/use-is-touch";
 import { resolveImageUrl } from "@/utils/image-url";
 import styles from "./cursor-image-trail.module.scss";
 
@@ -10,18 +11,6 @@ const TRAIL_IMAGE_WIDTH = 640;
 // Touch devices reveal one photo per tap, so cap the on-screen pile lower than
 // the pointer trail — taps are deliberate, not a continuous stream.
 const TAP_MAX_ITEMS = 12;
-
-const TOUCH_QUERY = "(hover: none)";
-
-function subscribeToTouch(callback: () => void) {
-	const query = window.matchMedia(TOUCH_QUERY);
-	query.addEventListener("change", callback);
-	return () => query.removeEventListener("change", callback);
-}
-
-function getTouchSnapshot() {
-	return window.matchMedia(TOUCH_QUERY).matches;
-}
 
 interface CursorImageTrailProps {
 	images: string[];
@@ -55,11 +44,7 @@ export function CursorImageTrail({
 	// `touchmove`, which fights the browser's own scroll/rubber-band gesture and
 	// makes the page jump on iOS — so those devices reveal a photo per tap
 	// instead, and never observe the drag at all.
-	const isTouch = useSyncExternalStore(
-		subscribeToTouch,
-		getTouchSnapshot,
-		() => false
-	);
+	const isTouch = useIsTouch();
 
 	useEffect(() => {
 		if (typeof window === "undefined" || images.length === 0) return;

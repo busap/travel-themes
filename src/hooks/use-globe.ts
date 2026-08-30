@@ -38,6 +38,8 @@ interface UseGlobeProps {
 	trips: Trip[];
 	focusTripId?: string | null;
 	isMobile?: boolean;
+	/** Stop the WebGL render loop while the globe is hidden behind something. */
+	isPaused?: boolean;
 }
 
 interface UseGlobeReturn {
@@ -55,6 +57,7 @@ export function useGlobe({
 	trips,
 	focusTripId,
 	isMobile = false,
+	isPaused = false,
 }: UseGlobeProps): UseGlobeReturn {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const globeInstanceRef = useRef<GlobeInstance | null>(null);
@@ -658,6 +661,23 @@ export function useGlobe({
 		const controls = globeInstanceRef.current.controls();
 		if (controls) controls.autoRotate = !isOverGlobe;
 	}, []);
+
+	// A covered globe still renders every frame, and on a phone that WebGL loop
+	// competes with whatever is scrolling on top of it. Park it while it's out
+	// of sight; `isLoaded` re-runs this once the instance exists.
+	useEffect(() => {
+		const globe = globeInstanceRef.current;
+		if (!globe) return;
+
+		if (isPaused) {
+			globe.pauseAnimation();
+			return () => {
+				globeInstanceRef.current?.resumeAnimation();
+			};
+		}
+
+		globe.resumeAnimation();
+	}, [isPaused, isLoaded]);
 
 	useEffect(() => {
 		const container = containerRef.current;

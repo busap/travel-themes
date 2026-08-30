@@ -1,8 +1,13 @@
 @reference "../../../../app/globals.scss";
 
 .theme {
-	@apply h-screen w-screen overflow-hidden;
+	@apply w-full overflow-hidden;
 	@apply bg-gradient-to-br from-zinc-100 to-zinc-200;
+	// 100vh is the *large* viewport on mobile — with the browser bar showing it
+	// overflows and the page scrolls. dvh tracks the visible area instead.
+	height: 100vh;
+	height: 100dvh;
+	overscroll-behavior: none;
 }
 
 .header {

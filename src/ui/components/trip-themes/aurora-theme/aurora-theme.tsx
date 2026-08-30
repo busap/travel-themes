@@ -2,7 +2,7 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo, useState, useCallback } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Playfair_Display, Crimson_Pro } from "next/font/google";
@@ -10,7 +10,7 @@ import { AuroraBackground } from "./aurora-background";
 import { useAuroraAnimation } from "@/hooks/use-aurora-animation";
 import { useScrollPinnedReveal } from "@/hooks/use-scroll-pinned-reveal";
 import { seededRandom } from "@/utils/random";
-import { computeVirtualRange, rangeToSet } from "@/utils/virtualization";
+import { clampRange, rangeToSet } from "@/utils/virtualization";
 import styles from "./aurora-theme.module.scss";
 
 const playfair = Playfair_Display({
@@ -56,22 +56,27 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 		[scrollTriggerConfig?.scrub, config.animation?.timeline?.ease]
 	);
 
-	const MOUNT_BEHIND = 1;
 	const MOUNT_AHEAD = 2;
 
-	const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+	// Additive window: once a photo has been decoded it stays mounted. A sliding
+	// window unmounted photos behind the viewport, so scrolling back up swapped
+	// the image for a placeholder and re-ran the decode — the flicker you see
+	// mid-scroll on a phone.
+	const [furthestSection, setFurthestSection] = useState(0);
+
+	const trackSection = useCallback((index: number) => {
+		setFurthestSection((previous) => Math.max(previous, index));
+	}, []);
 
 	const mountedPhotos = useMemo(
 		() =>
 			rangeToSet(
-				computeVirtualRange(
-					activeSectionIndex,
-					MOUNT_BEHIND,
-					MOUNT_AHEAD,
+				clampRange(
+					{ start: 0, end: furthestSection + MOUNT_AHEAD },
 					validatedPhotos.length
 				)
 			),
-		[activeSectionIndex, validatedPhotos.length]
+		[furthestSection, validatedPhotos.length]
 	);
 
 	useScrollPinnedReveal({
@@ -80,8 +85,8 @@ export function AuroraTheme({ trip, config }: AuroraThemeProps) {
 		itemCount: validatedPhotos.length,
 		pinDuration,
 		config: scrollConfig,
-		onSectionEnter: setActiveSectionIndex,
-		onSectionEnterBack: setActiveSectionIndex,
+		onSectionEnter: trackSection,
+		onSectionEnterBack: trackSection,
 	});
 
 	const renderBackground = () => <AuroraBackground ref={svgRef} />;

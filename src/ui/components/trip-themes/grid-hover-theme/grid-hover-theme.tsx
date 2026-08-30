@@ -2,11 +2,12 @@
 
 import { Trip } from "@/types/trip";
 import { ThemeConfig } from "@/config/theme-config";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { getCountryNames } from "@/utils/country";
 import Image from "next/image";
 import { Syne, Space_Grotesk } from "next/font/google";
 import { useVirtualWindow } from "@/hooks/use-virtual-window";
+import { useIsTouch } from "@/hooks/use-is-touch";
 import styles from "./grid-hover-theme.module.scss";
 
 const syne = Syne({
@@ -38,6 +39,13 @@ const SPOTLIGHT_HALF_H = 400;
 
 export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 	const wrapperRef = useRef<HTMLDivElement | null>(null);
+	// Touch has no hover, so a tap stands in for it: tapping a cell reveals its
+	// photo and tapping again hides it. Revealing everything up front (the old
+	// touch fallback) gave the grid away instead of letting it be uncovered.
+	const isTouch = useIsTouch();
+	const [revealedCells, setRevealedCells] = useState<Set<number>>(
+		() => new Set()
+	);
 	const spotlightRef = useRef<HTMLDivElement | null>(null);
 	const pointerRef = useRef({ x: 0.5, y: 0.5 });
 	const rafPendingRef = useRef(false);
@@ -100,6 +108,14 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 		}
 	}, []);
 
+	const toggleCell = useCallback((cellIndex: number) => {
+		setRevealedCells((previous) => {
+			const next = new Set(previous);
+			if (!next.delete(cellIndex)) next.add(cellIndex);
+			return next;
+		});
+	}, []);
+
 	const handleMouseLeave = useCallback(() => {
 		pointerRef.current = { x: 0.5, y: 0.5 };
 		if (wrapperRef.current) {
@@ -130,6 +146,9 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 						const rowIndex = Math.floor(cellIndex / GRID_COLS);
 						const isFirstInRow = cellIndex % GRID_COLS === 0;
 
+						const isRevealed =
+							isTouch && revealedCells.has(cellIndex);
+
 						return (
 							<div
 								key={cellIndex}
@@ -139,7 +158,13 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 								className={[
 									styles.cell,
 									showPhoto ? styles.hasPhoto : "",
+									isRevealed ? styles.cellRevealed : "",
 								].join(" ")}
+								onClick={
+									isTouch && showPhoto
+										? () => toggleCell(cellIndex)
+										: undefined
+								}
 							>
 								{showPhoto && isRowMounted(rowIndex) && (
 									<div className={styles.photoReveal}>
@@ -179,7 +204,7 @@ export function GridHoverTheme({ trip }: GridHoverThemeProps) {
 					{trip.name}
 				</h1>
 				<p className={`${styles.hint} ${spaceGrotesk.className}`}>
-					move to explore
+					{isTouch ? "tap a square to reveal" : "move to explore"}
 				</p>
 			</div>
 		</section>

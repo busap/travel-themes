@@ -82,6 +82,12 @@ Components live in `src/ui/components/{name}/` with a co-located `.stories.tsx`.
 - Wire demo data in `src/mocks/trip-themes.ts` and, when needed, add/update trip content in `src/mocks/trips.ts`
 - Create story and extract reusable hooks if applicable
 
+## Touch devices
+
+`src/hooks/use-is-touch.ts` — `useIsTouch()` tracks `(hover: none)` and returns `false` during SSR, so hover-driven interactions can swap to a tap equivalent on hydration. Use it where the behaviour needs JS (Trail spawns a photo per tap, Grid Hover reveals the tapped cell); use a plain `@media (hover: none)` block where CSS alone can do it (Trip Card shows its hover content outright).
+
+Full-viewport themes size with `height: 100vh; height: 100dvh` — a bare `100vh` is the _large_ viewport on mobile, so the page scrolls behind the browser bar. Pair it with `overscroll-behavior: none` to stop rubber-banding, and `overscroll-behavior: contain` on inner scrollers so a flick past the end can't become pull-to-refresh.
+
 ## Virtualization
 
 Shared layer to avoid mounting off-screen photos. Skip it for themes with <~10 items.
@@ -97,18 +103,18 @@ Both modes accept `additive: true` — the mount window only grows, never unmoun
 
 ### Theme map
 
-| Theme                   | Mode                          | Notes                                                                                                                                                         |
-| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Parallax                | `scroll-progress`             | Photo per pinned section.                                                                                                                                     |
-| Trippy                  | `scroll-progress`, `additive` | `additive` + per-section `onLeave`/`onLeaveBack` snap the scrub tween to terminal state — needed because `scrub` lag causes reverse-scroll opacity overshoot. |
-| Feed                    | `dom-visibility` container    | Vertical phone-frame.                                                                                                                                         |
-| Collage                 | `dom-visibility` container    | Visible gate derived from `focusIndex`.                                                                                                                       |
-| Grid Hover              | `dom-visibility` window       | Per-row, `additive`.                                                                                                                                          |
-| Drift                   | `dom-visibility` window       | Parent passes `isMounted` into each `WaveSection`.                                                                                                            |
-| Mosaic                  | `dom-visibility` window       | `additive`; reuses existing `data-photo-index` via `indexAttr`.                                                                                               |
-| Image Grid Hero gallery | `dom-visibility` window       | Per-item lazy mount; a separate one-shot IO gates the GSAP timeline (the hook's initial window isn't empty).                                                  |
-| Photo Carousel          | `dom-visibility` window       | `before: 0, after: 0` for strict viewport presence per row.                                                                                                   |
-| Aurora                  | utility-only                  | `computeVirtualRange` + `rangeToSet` driven by `useScrollPinnedReveal` callbacks.                                                                             |
+| Theme                   | Mode                          | Notes                                                                                                                                                                                          |
+| ----------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parallax                | `scroll-progress`             | Photo per pinned section.                                                                                                                                                                      |
+| Trippy                  | `scroll-progress`, `additive` | `additive` + per-section `onLeave`/`onLeaveBack` snap the scrub tween to terminal state — needed because `scrub` lag causes reverse-scroll opacity overshoot.                                  |
+| Feed                    | `dom-visibility` container    | Vertical phone-frame.                                                                                                                                                                          |
+| Collage                 | `dom-visibility` container    | Visible gate derived from `focusIndex`.                                                                                                                                                        |
+| Grid Hover              | `dom-visibility` window       | Per-row, `additive`.                                                                                                                                                                           |
+| Drift                   | `dom-visibility` window       | Parent passes `isMounted` into each `WaveSection`.                                                                                                                                             |
+| Mosaic                  | `dom-visibility` window       | `additive`; reuses existing `data-photo-index` via `indexAttr`.                                                                                                                                |
+| Image Grid Hero gallery | `dom-visibility` window       | Per-item lazy mount; a separate one-shot IO gates the GSAP timeline (the hook's initial window isn't empty).                                                                                   |
+| Photo Carousel          | `dom-visibility` window       | `before: 0, after: 0` for strict viewport presence per row.                                                                                                                                    |
+| Aurora                  | utility-only, additive        | `clampRange` + `rangeToSet` from the furthest section reached, via `useScrollPinnedReveal` callbacks. Additive: unmounting behind the viewport re-ran the decode on scroll-back and flickered. |
 
 **GSAP gotcha:** if a timeline queries DOM at mount (Trippy, Mosaic), keep the queried element (e.g. `<div data-photo-img>`) permanent and render the heavy `<Image>` _inside_ it — never gate the queried element itself behind `isMounted`.
 

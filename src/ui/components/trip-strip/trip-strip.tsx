@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Trip } from "@/types/trip";
 import { TripCard } from "@/ui/components/trip-card/trip-card";
 import styles from "./trip-strip.module.scss";
@@ -39,12 +39,54 @@ function CloseIcon() {
 	);
 }
 
+// Opening a trip is a full page navigation, so coming back remounts the strip
+// with its list scrolled to the top. Session storage carries the offset across
+// that round trip; it is per-tab and cleared with the session, which is exactly
+// the lifetime this position should have.
+const SCROLL_STORAGE_KEY = "trip-strip-scroll";
+
+function readStoredScroll(): number {
+	try {
+		return Number(sessionStorage.getItem(SCROLL_STORAGE_KEY)) || 0;
+	} catch {
+		return 0;
+	}
+}
+
+function storeScroll(offset: number) {
+	try {
+		sessionStorage.setItem(SCROLL_STORAGE_KEY, String(offset));
+	} catch {
+		// Private-mode quota errors are not worth breaking scrolling over.
+	}
+}
+
 export function TripStrip({
 	trips,
 	onTripHover,
 	onIsOpenChange,
 }: TripStripProps) {
 	const [phase, setPhase] = useState<AnimPhase>("open");
+	const listRef = useRef<HTMLDivElement | null>(null);
+	const scrollWriteRef = useRef(false);
+
+	useEffect(() => {
+		const list = listRef.current;
+		if (!list) return;
+		const stored = readStoredScroll();
+		if (stored > 0) list.scrollTop = stored;
+	}, []);
+
+	// Writing on every scroll event would touch storage dozens of times a
+	// second; one write per frame is enough to survive a navigation.
+	const handleListScroll = useCallback(() => {
+		if (scrollWriteRef.current) return;
+		scrollWriteRef.current = true;
+		requestAnimationFrame(() => {
+			scrollWriteRef.current = false;
+			if (listRef.current) storeScroll(listRef.current.scrollTop);
+		});
+	}, []);
 
 	const handleOpen = useCallback(() => {
 		setPhase("opening");
@@ -110,7 +152,11 @@ export function TripStrip({
 
 	const renderList = () => {
 		return (
-			<div className={styles.list}>
+			<div
+				ref={listRef}
+				className={styles.list}
+				onScroll={handleListScroll}
+			>
 				{trips.map((trip, i) => (
 					<div key={trip.id} className={styles.cardWrapper}>
 						<TripCard

@@ -160,6 +160,31 @@
 		margin-top 500ms ease;
 }
 
+// Touch devices can't hover, so everything hover reveals — the description, the
+// explore affordance and the country badge — is simply visible from the start.
+@media (hover: none) {
+	.badgeContainer {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	.content {
+		transform: translateY(0);
+	}
+
+	.description,
+	.explore {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.compact .expandable {
+		max-height: 6rem;
+		opacity: 1;
+		margin-top: 0.375rem;
+	}
+}
+
 .card:hover .image {
 	transform: scale(1.1);
 }

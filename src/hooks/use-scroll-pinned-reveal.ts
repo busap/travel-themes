@@ -29,6 +29,11 @@ export function useScrollPinnedReveal({
 
 		gsap.registerPlugin(ScrollTrigger);
 
+		// Mobile browsers resize the viewport when the address bar slides away,
+		// which would otherwise refresh every pin mid-scroll — the pinned photo
+		// jumps and its reveal tween restarts, reading as a flicker.
+		ScrollTrigger.config({ ignoreMobileResize: true });
+
 		const container = containerRef.current;
 		const sections = container.querySelectorAll("[data-photo-index]");
 

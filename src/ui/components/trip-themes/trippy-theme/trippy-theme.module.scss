@@ -54,6 +54,8 @@
 	top: 0;
 	inset-inline: 0;
 	padding-top: 2.25rem;
+	// Long trip names ran edge to edge on phones; keep them clear of the sides.
+	padding-inline: 1.5rem;
 	text-align: center;
 	z-index: 20;
 	pointer-events: none;
@@ -61,6 +63,7 @@
 
 .title {
 	font-size: clamp(2.5rem, 8vw, 5.5rem);
+	overflow-wrap: break-word;
 	font-weight: 400;
 	letter-spacing: 0.04em;
 	line-height: 1;
@@ -190,6 +193,23 @@
 	50% {
 		opacity: 1;
 		transform: translateY(calc(-50% - 6px));
+	}
+}
+
+@media (max-width: $breakpoint-md) {
+	.header {
+		padding-top: 1.5rem;
+		padding-inline: 1.25rem;
+	}
+
+	.title {
+		// A long name wraps to two or three lines on a phone, so cap the size
+		// to keep the block from crowding the photo below it.
+		font-size: clamp(1.75rem, 7.5vw, 3rem);
+	}
+
+	.stickyStage {
+		padding-top: 8.5rem;
 	}
 }
 

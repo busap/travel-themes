@@ -9,6 +9,10 @@
 
 .header {
 	@apply py-16 px-8 text-center;
+
+	@media (max-width: $breakpoint-md) {
+		@apply py-10 px-5;
+	}
 }
 
 .title {
@@ -33,9 +37,13 @@
 	max-width: 1400px;
 	margin: 0 auto;
 
+	// On phones a group is usually one or two photos, so a 60vh floor left most
+	// waves centred in a mostly empty screen — a big gap between every group.
+	// Let each wave be as tall as its photos and set the rhythm with padding.
 	@media (max-width: $breakpoint-md) {
 		@apply px-4;
-		min-height: 60vh;
+		min-height: 0;
+		padding-block: 2rem;
 	}
 }
 

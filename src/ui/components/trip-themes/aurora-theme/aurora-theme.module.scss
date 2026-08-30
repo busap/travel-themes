@@ -128,6 +128,10 @@
 
 	.photo {
 		@apply max-w-full;
+		// A backdrop blur under a photo that GSAP is fading in forces a full
+		// repaint of the blurred region on every frame — expensive enough on a
+		// phone to show up as flicker, and invisible behind the image anyway.
+		backdrop-filter: none;
 	}
 
 	.photoImage {

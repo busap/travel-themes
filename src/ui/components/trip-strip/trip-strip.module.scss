@@ -68,6 +68,7 @@
 	@apply absolute top-0 right-0 bottom-0 z-20;
 	width: 300px;
 	pointer-events: none;
+	overscroll-behavior: none;
 }
 
 .arcBorder {
@@ -273,6 +274,11 @@
 	gap: 8px;
 	padding: 8px;
 	scrollbar-width: none;
+	// Keep the gesture inside the list: chaining it to the page is what let a
+	// scroll past the top turn into iOS pull-to-refresh, and what made the page
+	// move underneath as well as the list.
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -284,6 +290,9 @@
 	height: 180px;
 	border-radius: 12px;
 	overflow: hidden;
+	// Each card is its own paint layer, so scrolling the list doesn't repaint
+	// the rounded corners and shadows of every other card on the way past.
+	contain: paint;
 }
 
 @media (max-width: 1024px) {

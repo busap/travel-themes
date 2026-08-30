@@ -20,6 +20,8 @@ export function GlobeVisualization({
 	isMobile = false,
 	isStripOpen = false,
 }: GlobeVisualizationProps) {
+	// On mobile the open strip covers the globe completely, so there's nothing
+	// to render until it closes.
 	const {
 		containerRef,
 		isLoaded,
@@ -29,7 +31,12 @@ export function GlobeVisualization({
 		handleMouseMove,
 		clearActiveCountry,
 		clearExpandedCountry,
-	} = useGlobe({ trips, focusTripId, isMobile });
+	} = useGlobe({
+		trips,
+		focusTripId,
+		isMobile,
+		isPaused: isMobile && isStripOpen,
+	});
 
 	useEffect(() => {
 		if (isStripOpen) {

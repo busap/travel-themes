@@ -23,6 +23,7 @@
 .hero {
 	@apply relative w-full overflow-hidden;
 	height: 100vh;
+	height: 100dvh;
 	background: linear-gradient(
 		160deg,
 		#f5f0e8 0%,

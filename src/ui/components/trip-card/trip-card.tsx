@@ -43,7 +43,11 @@ export function TripCard({
 				placeholder="blur"
 				blurDataURL={BLUR_DATA_URL}
 				className={styles.image}
-				sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+				// The card only ever renders inside the strip: one column on a
+				// phone, two on a tablet, a fixed 300px rail on desktop. Asking
+				// for 33vw there meant decoding a near-full-width photo for a
+				// 180px-tall card on every scroll.
+				sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 300px"
 			/>
 
 			<div className={styles.primaryGradient} />
